@@ -1742,144 +1742,6 @@
                         </p>
                       </div>
                     </div>
-                  </div>
-                </div>
-
-                <!-- TAB 5: NEGOCIOS EN CERCANÍAS (CENSO OFICIAL OPEN DATA BCN & OSM) -->
-                <div class="tab-pane hidden flex flex-col gap-space-md" id="tab-negocios">
-                  <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-space-xs border-b border-sandstone-border/60 gap-2">
-                    <div class="flex flex-col">
-                      <div class="flex items-center gap-2">
-                        <span class="font-headline-md text-headline-md font-bold text-primary">_censo_comercial_&amp;_negocios_en_cercanías</span>
-                        <span class="px-2 py-0.5 rounded bg-badge-living-bg text-primary font-label-tabular-sm text-[10px] font-bold" id="lbl-negocios-cuenca-activa">Isócrona: 5 min (~300 m)</span>
-                      </div>
-                      <span class="font-body-sm text-body-sm text-on-surface-variant">Actividades económicas y locales en planta baja registradas por el Ajuntament de Barcelona (Open Data BCN) y OpenStreetMap</span>
-                    </div>
-                    <div class="flex items-center gap-1.5 self-start sm:self-auto">
-                      <span class="px-2.5 py-1 rounded bg-stone-surface border border-sandstone-border font-label-tabular-sm text-label-tabular-sm text-primary font-semibold">Fuente Oficial: Open Data BCN</span>
-                    </div>
-                  </div>
-
-                  <!-- REJILLA DE LAS 6 CATEGORÍAS DE EMPRESAS (TARJETAS CLICKABLES CON CONTADOR) -->
-                  <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-space-sm">
-                    
-                    <!-- Cat 1: Hostelería & Restauración -->
-                    <button type="button" onclick="window.filtrarCategoriaNegocios('hosteleria')" class="p-3 rounded-xl bg-surface hover:bg-stone-surface/60 border border-sandstone-border hover:border-primary/50 flex flex-col justify-between text-left transition-all shadow-xs cursor-pointer group" id="card-cat-hosteleria">
-                      <div class="flex items-center justify-between w-full">
-                        <div class="w-8 h-8 rounded-lg bg-amber-100 text-amber-900 flex items-center justify-center group-hover:scale-105 transition-transform">
-                          <span class="material-symbols-outlined text-[18px]">restaurant</span>
-                        </div>
-                        <span class="font-mono font-bold text-[18px] text-primary" id="cnt-neg-hosteleria">8</span>
-                      </div>
-                      <div class="mt-2 flex flex-col">
-                        <span class="font-body-sm text-[12px] font-bold text-charcoal-text leading-tight">Hostelería &amp; Restauración</span>
-                        <span class="text-[10px] text-outline font-medium">Bares, Cafeterías</span>
-                      </div>
-                    </button>
-
-                    <!-- Cat 2: Retail & Moda -->
-                    <button type="button" onclick="window.filtrarCategoriaNegocios('retail')" class="p-3 rounded-xl bg-surface hover:bg-stone-surface/60 border border-sandstone-border hover:border-primary/50 flex flex-col justify-between text-left transition-all shadow-xs cursor-pointer group" id="card-cat-retail">
-                      <div class="flex items-center justify-between w-full">
-                        <div class="w-8 h-8 rounded-lg bg-rose-100 text-rose-900 flex items-center justify-center group-hover:scale-105 transition-transform">
-                          <span class="material-symbols-outlined text-[18px]">checkroom</span>
-                        </div>
-                        <span class="font-mono font-bold text-[18px] text-primary" id="cnt-neg-retail">6</span>
-                      </div>
-                      <div class="mt-2 flex flex-col">
-                        <span class="font-body-sm text-[12px] font-bold text-charcoal-text leading-tight">Retail &amp; Moda</span>
-                        <span class="text-[10px] text-outline font-medium">Boutiques, Calzado</span>
-                      </div>
-                    </button>
-
-                    <!-- Cat 3: Alimentación & Proximidad -->
-                    <button type="button" onclick="window.filtrarCategoriaNegocios('alimentacion')" class="p-3 rounded-xl bg-surface hover:bg-stone-surface/60 border border-sandstone-border hover:border-primary/50 flex flex-col justify-between text-left transition-all shadow-xs cursor-pointer group" id="card-cat-alimentacion">
-                      <div class="flex items-center justify-between w-full">
-                        <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-900 flex items-center justify-center group-hover:scale-105 transition-transform">
-                          <span class="material-symbols-outlined text-[18px]">bakery_dining</span>
-                        </div>
-                        <span class="font-mono font-bold text-[18px] text-primary" id="cnt-neg-alimentacion">5</span>
-                      </div>
-                      <div class="mt-2 flex flex-col">
-                        <span class="font-body-sm text-[12px] font-bold text-charcoal-text leading-tight">Alimentación</span>
-                        <span class="text-[10px] text-outline font-medium">Panaderías, Súper</span>
-                      </div>
-                    </button>
-
-                    <!-- Cat 4: Salud & Farmacias -->
-                    <button type="button" onclick="window.filtrarCategoriaNegocios('salud')" class="p-3 rounded-xl bg-surface hover:bg-stone-surface/60 border border-sandstone-border hover:border-primary/50 flex flex-col justify-between text-left transition-all shadow-xs cursor-pointer group" id="card-cat-salud">
-                      <div class="flex items-center justify-between w-full">
-                        <div class="w-8 h-8 rounded-lg bg-sky-100 text-sky-900 flex items-center justify-center group-hover:scale-105 transition-transform">
-                          <span class="material-symbols-outlined text-[18px]">local_pharmacy</span>
-                        </div>
-                        <span class="font-mono font-bold text-[18px] text-primary" id="cnt-neg-salud">3</span>
-                      </div>
-                      <div class="mt-2 flex flex-col">
-                        <span class="font-body-sm text-[12px] font-bold text-charcoal-text leading-tight">Salud &amp; Farmacia</span>
-                        <span class="text-[10px] text-outline font-medium">Clínicas, Ópticas</span>
-                      </div>
-                    </button>
-
-                    <!-- Cat 5: Servicios Profesionales -->
-                    <button type="button" onclick="window.filtrarCategoriaNegocios('servicios')" class="p-3 rounded-xl bg-surface hover:bg-stone-surface/60 border border-sandstone-border hover:border-primary/50 flex flex-col justify-between text-left transition-all shadow-xs cursor-pointer group" id="card-cat-servicios">
-                      <div class="flex items-center justify-between w-full">
-                        <div class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-900 flex items-center justify-center group-hover:scale-105 transition-transform">
-                          <span class="material-symbols-outlined text-[18px]">business_center</span>
-                        </div>
-                        <span class="font-mono font-bold text-[18px] text-primary" id="cnt-neg-servicios">4</span>
-                      </div>
-                      <div class="mt-2 flex flex-col">
-                        <span class="font-body-sm text-[12px] font-bold text-charcoal-text leading-tight">Servicios &amp; Despachos</span>
-                        <span class="text-[10px] text-outline font-medium">Gestorías, Notarías</span>
-                      </div>
-                    </button>
-
-                    <!-- Cat 6: Servicios Especializados -->
-                    <button type="button" onclick="window.filtrarCategoriaNegocios('especializados')" class="p-3 rounded-xl bg-surface hover:bg-stone-surface/60 border border-sandstone-border hover:border-primary/50 flex flex-col justify-between text-left transition-all shadow-xs cursor-pointer group" id="card-cat-especializados">
-                      <div class="flex items-center justify-between w-full">
-                        <div class="w-8 h-8 rounded-lg bg-purple-100 text-purple-900 flex items-center justify-center group-hover:scale-105 transition-transform">
-                          <span class="material-symbols-outlined text-[18px]">build</span>
-                        </div>
-                        <span class="font-mono font-bold text-[18px] text-primary" id="cnt-neg-especializados">2</span>
-                      </div>
-                      <div class="mt-2 flex flex-col">
-                        <span class="font-body-sm text-[12px] font-bold text-charcoal-text leading-tight">Especializados</span>
-                        <span class="text-[10px] text-outline font-medium">Electrónica, Reparación</span>
-                      </div>
-                    </button>
-
-                  </div>
-
-                  <!-- BARRA DE FILTROS RÁPIDOS Y BUSCADOR EN VIVO -->
-                  <div class="p-3 rounded-xl bg-stone-surface/40 border border-sandstone-border flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 shadow-xs">
-                    <!-- Píldoras de filtro por categoría -->
-                    <div class="flex items-center gap-1 overflow-x-auto scrollbar-none pb-1 sm:pb-0">
-                      <button type="button" onclick="window.filtrarCategoriaNegocios('todos')" class="btn-filtro-negocio active px-2.5 py-1 rounded-md text-[11px] font-semibold bg-primary text-on-primary shadow-xs transition-all cursor-pointer" id="btn-filtro-todos">Todos (<span id="txt-badge-total-filtro">28</span>)</button>
-                      <button type="button" onclick="window.filtrarCategoriaNegocios('hosteleria')" class="btn-filtro-negocio px-2.5 py-1 rounded-md text-[11px] font-medium bg-surface hover:bg-stone-surface border border-sandstone-border text-charcoal-text transition-all cursor-pointer" id="btn-filtro-hosteleria">Hostelería</button>
-                      <button type="button" onclick="window.filtrarCategoriaNegocios('retail')" class="btn-filtro-negocio px-2.5 py-1 rounded-md text-[11px] font-medium bg-surface hover:bg-stone-surface border border-sandstone-border text-charcoal-text transition-all cursor-pointer" id="btn-filtro-retail">Retail &amp; Moda</button>
-                      <button type="button" onclick="window.filtrarCategoriaNegocios('alimentacion')" class="btn-filtro-negocio px-2.5 py-1 rounded-md text-[11px] font-medium bg-surface hover:bg-stone-surface border border-sandstone-border text-charcoal-text transition-all cursor-pointer" id="btn-filtro-alimentacion">Alimentación</button>
-                      <button type="button" onclick="window.filtrarCategoriaNegocios('salud')" class="btn-filtro-negocio px-2.5 py-1 rounded-md text-[11px] font-medium bg-surface hover:bg-stone-surface border border-sandstone-border text-charcoal-text transition-all cursor-pointer" id="btn-filtro-salud">Salud &amp; Farmacia</button>
-                      <button type="button" onclick="window.filtrarCategoriaNegocios('servicios')" class="btn-filtro-negocio px-2.5 py-1 rounded-md text-[11px] font-medium bg-surface hover:bg-stone-surface border border-sandstone-border text-charcoal-text transition-all cursor-pointer" id="btn-filtro-servicios">Servicios</button>
-                    </div>
-
-                    <!-- Buscador rápido por texto -->
-                    <div class="relative min-w-[240px]">
-                      <span class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-[16px] text-outline">search</span>
-                      <input type="text" id="input-buscar-negocio" oninput="window.buscarNegocioEnListado(this.value)" placeholder="Buscar por nombre o calle..." class="w-full h-8 pl-8 pr-3 rounded-lg bg-surface border border-sandstone-border text-charcoal-text placeholder:text-outline text-[11px] focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all">
-                    </div>
-                  </div>
-
-                  <!-- LISTADO DETALLADO DE NEGOCIOS (LOS 4 CAMPOS SOLICITADOS) -->
-                  <div class="flex flex-col gap-2" id="seccion-listado-negocios">
-                    <div class="flex items-center justify-between text-[11px] font-semibold text-outline px-1">
-                      <span id="lbl-titulo-filtro-negocios">Listado de actividades en cuenca activa</span>
-                      <span class="font-mono text-[10px]" id="lbl-conteo-visibles">Mostrando 28 negocios</span>
-                    </div>
-
-                    <!-- Contenedor dinámico donde se inyectan las tarjetas de negocios -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-[520px] overflow-y-auto pr-1" id="contenedor-lista-negocios">
-                      <!-- Renderizado asíncrono desde copilot.js -->
-                    </div>
-                  </div>
                 </div>
 
               </div>
@@ -1946,6 +1808,9 @@
               var activePane = document.getElementById(tabId);
               if (activePane) {
                 activePane.classList.remove('hidden');
+              }
+              if (tabId === 'tab-negocios' && typeof window.renderizarNegocios === 'function') {
+                window.renderizarNegocios();
               }
               if (window.leafletMap) {
                 setTimeout(function() {

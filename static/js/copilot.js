@@ -1738,7 +1738,7 @@ Tiempo de Acceso = ${distanciaMetro} m / 80 m/min = ${(distanciaMetro / 80).toFi
           <!-- Acción Interactiva: Ubicar en mapa -->
           <div class="pt-2 border-t border-sandstone-border/60 flex items-center justify-between">
             <span class="text-[10px] text-outline font-mono font-medium">EPSG:25831 • BCN</span>
-            <button type="button" onclick="window.ubicarNegocioEnMapa(${item.lat}, ${item.lon}, '${item.nombre.replace(/'/g, "\\'")}', '${item.direccion.replace(/'/g, "\\'")}', '${item.categoriaNombre}')" class="inline-flex items-center gap-1 text-[11px] font-bold text-primary hover:text-emerald-800 transition-colors cursor-pointer group-hover:underline underline-offset-2">
+            <button type="button" onclick="window.ubicarNegocioPorId('${item.id}')" class="inline-flex items-center gap-1 text-[11px] font-bold text-primary hover:text-emerald-800 transition-colors cursor-pointer group-hover:underline underline-offset-2">
               <span class="material-symbols-outlined text-[14px]">explore</span>
               <span>Ubicar en mapa</span>
             </button>
@@ -1749,6 +1749,16 @@ Tiempo de Acceso = ${distanciaMetro} m / 80 m/min = ${(distanciaMetro / 80).toFi
     });
 
     container.innerHTML = html;
+  };
+
+  /**
+   * Ubica un negocio por su ID único para evitar conflictos de comillas en HTML
+   */
+  window.ubicarNegocioPorId = function (id) {
+    const lista = obtenerNegociosCuencaActiva();
+    const item = lista.find(n => n.id === id);
+    if (!item) return;
+    window.ubicarNegocioEnMapa(item.lat, item.lon, item.nombre, item.direccion, item.categoriaNombre);
   };
 
   /**
