@@ -1167,57 +1167,100 @@
                 </div>
 
                 <!-- TAB 4: ENTORNO (OCR) -->
-                <div class="tab-pane hidden flex flex-col gap-space-lg" id="tab-entorno">
-                  <div class="grid grid-cols-1 md:grid-cols-3 gap-space-md">
-                    <div class="p-space-md rounded-lg bg-surface border border-sandstone-border flex flex-col gap-1">
-                      <span class="font-label-caps text-outline uppercase text-[10px] font-semibold">_población_flotante</span>
-                      <div class="font-headline-lg text-headline-lg font-bold text-primary">2.8x Residente</div>
-                      <span class="font-body-sm text-body-sm text-on-surface-variant">Alta concentración de oficinas y turistas.</span>
+                <!-- TAB 4: ENTORNO (FUENTES OFICIALES DE POBLACIÓN, RENTA Y COMERCIO) -->
+                <div class="tab-pane hidden flex flex-col gap-space-md" id="tab-entorno">
+                  <div class="flex items-center justify-between pb-space-xs border-b border-sandstone-border/60">
+                    <div class="flex flex-col">
+                      <span class="font-headline-md text-headline-md font-bold text-primary">_diagnóstico_sociodemográfico_&amp;_entorno</span>
+                      <span class="font-body-sm text-body-sm text-on-surface-variant">Auditoría territorial de poder adquisitivo, afluencia y densidad comercial con origen de datos oficial</span>
                     </div>
-                    <div class="p-space-md rounded-lg bg-surface border border-sandstone-border flex flex-col gap-1">
-                      <span class="font-label-caps text-outline uppercase text-[10px] font-semibold">_renta_media_hogar (ine)</span>
-                      <div class="font-headline-lg text-headline-lg font-bold text-emerald-800" id="val-renta-ine">38.450 €</div>
-                      <span class="font-body-sm text-body-sm text-on-surface-variant">Sección censal 0801902008 (+26% vs BCN).</span>
-                    </div>
-                    <div class="p-space-md rounded-lg bg-surface border border-sandstone-border flex flex-col gap-1">
-                      <span class="font-label-caps text-outline uppercase text-[10px] font-semibold">_competencia_directa (150m)</span>
-                      <div class="font-headline-lg text-headline-lg font-bold text-charcoal-text">3 Locales</div>
-                      <span class="font-body-sm text-body-sm text-on-surface-variant">Densidad equilibrada, baja canibalización.</span>
-                    </div>
+                    <span class="px-2.5 py-1 rounded bg-stone-surface border border-sandstone-border font-label-tabular-sm text-label-tabular-sm text-primary font-semibold">Fuentes Públicas Oficiales</span>
                   </div>
 
-                  <!-- Retail OCR Sustainability Table -->
-                  <div class="p-space-md rounded-lg bg-surface border border-sandstone-border flex flex-col gap-space-sm">
-                    <div class="flex items-center justify-between pb-1 border-b border-sandstone-border/60">
-                      <div class="flex flex-col">
-                        <span class="font-headline-md text-headline-md font-bold text-primary">_viabilidad_retail: Modelo OCR (Occupancy Cost Ratio)</span>
-                        <span class="font-body-sm text-body-sm text-on-surface-variant">Cálculo de sostenibilidad de la renta propuesta para el operador comercial</span>
+                  <!-- REJILLA DE LAS 3 TARJETAS DEMOGRÁFICAS CON ORIGEN DE DATOS EXPLICADO -->
+                  <div class="grid grid-cols-1 md:grid-cols-3 gap-space-md">
+                    
+                    <!-- Tarjeta 1: Población Flotante -->
+                    <div class="p-space-md rounded-xl bg-surface-container-lowest border border-sandstone-border flex flex-col justify-between shadow-xs">
+                      <div class="flex flex-col gap-1.5">
+                        <div class="flex items-center justify-between pb-1 border-b border-sandstone-border/60">
+                          <span class="font-label-caps text-outline uppercase text-[10px] font-bold">_afluencia_&amp;_tránsito</span>
+                          <span class="px-1.5 py-0.5 rounded bg-badge-living-bg text-primary font-label-tabular-sm text-[9px] font-semibold">MOVILIDAD</span>
+                        </div>
+                        <span class="text-[12px] font-semibold text-outline uppercase tracking-wider font-label-caps">Población Flotante</span>
+                        <div class="font-headline-xl text-headline-xl font-bold text-primary font-mono" id="val-poblacion-flotante">2.8x Residente</div>
+                        <span class="font-body-sm text-body-sm text-charcoal-text font-medium" id="val-poblacion-flotante-desc">
+                          Alta concentración de oficinas, terciario, comercio y visitantes diurnos.
+                        </span>
                       </div>
-                      <span class="px-2 py-1 rounded bg-badge-living-bg text-primary font-label-tabular-sm text-label-tabular-sm font-semibold" id="val-ocr-ratio">OCR Saludable: 12.5%</span>
+                      <div class="mt-3 pt-2 border-t border-sandstone-border/60 flex flex-col gap-1 bg-stone-surface/30 p-2 rounded">
+                        <span class="text-[10px] font-bold text-primary uppercase font-label-caps flex items-center gap-1">
+                          <span class="material-symbols-outlined text-[13px] text-terracotta-accent">source</span>
+                          <span>¿De dónde sale este dato?</span>
+                        </span>
+                        <p class="text-[11px] text-on-surface-variant leading-relaxed">
+                          De la <strong>Matriz de Movilidad Obligada (EMEF)</strong> del <em>Área Metropolitana de Barcelona (AMB)</em> y la <em>Autoritat del Transport Metropolità (ATM)</em>. Compara los censos nocturnos de residentes con los desplazamientos diurnos por motivos de trabajo y compras.
+                        </p>
+                      </div>
                     </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-space-sm pt-2">
-                      <div class="bg-stone-surface/40 p-space-sm rounded border border-sandstone-border/60">
-                        <span class="font-label-caps text-outline text-[10px]">Facturación Mensual Req.</span>
-                        <div class="font-headline-md text-headline-md font-bold text-charcoal-text mt-1" id="val-ocr-facturacion">30.800 €</div>
-                        <span class="font-label-tabular-sm text-label-tabular-sm text-outline">Para renta estimada</span>
+                    <!-- Tarjeta 2: Renta Media Hogar (INE) -->
+                    <div class="p-space-md rounded-xl bg-surface-container-lowest border border-sandstone-border flex flex-col justify-between shadow-xs">
+                      <div class="flex flex-col gap-1.5">
+                        <div class="flex items-center justify-between pb-1 border-b border-sandstone-border/60">
+                          <span class="font-label-caps text-outline uppercase text-[10px] font-bold">_poder_adquisitivo</span>
+                          <span class="px-1.5 py-0.5 rounded bg-badge-living-bg text-emerald-900 font-label-tabular-sm text-[9px] font-semibold">INE / AEAT</span>
+                        </div>
+                        <span class="text-[12px] font-semibold text-outline uppercase tracking-wider font-label-caps">Renta Media por Hogar</span>
+                        <div class="font-headline-xl text-headline-xl font-bold text-emerald-800 font-mono" id="val-renta-ine">38.450 €</div>
+                        <span class="font-body-sm text-body-sm text-charcoal-text font-medium" id="val-renta-ine-seccion">
+                          Renta neta media anual por unidad de consumo en la sección censal.
+                        </span>
                       </div>
-                      <div class="bg-stone-surface/40 p-space-sm rounded border border-sandstone-border/60">
-                        <span class="font-label-caps text-outline text-[10px]">Tickets Diarios Requeridos</span>
-                        <div class="font-headline-md text-headline-md font-bold text-primary mt-1" id="val-ocr-tickets">410 tickets/día</div>
-                        <span class="font-label-tabular-sm text-label-tabular-sm text-outline">A ticket medio 2.50 €</span>
-                      </div>
-                      <div class="bg-stone-surface/40 p-space-sm rounded border border-sandstone-border/60">
-                        <span class="font-label-caps text-outline text-[10px]">Tasa de Captura Peatonal</span>
-                        <div class="font-headline-md text-headline-md font-bold text-emerald-800 mt-1" id="val-ocr-captura">3.2 %</div>
-                        <span class="font-label-tabular-sm text-label-tabular-sm text-outline">Sobre flujo horario pico</span>
-                      </div>
-                      <div class="bg-stone-surface/40 p-space-sm rounded border border-sandstone-border/60">
-                        <span class="font-label-caps text-outline text-[10px]">Umbral de Riesgo Impago</span>
-                        <div class="font-headline-md text-headline-md font-bold text-emerald-800 mt-1" id="val-ocr-riesgo">Bajo (1.4/10)</div>
-                        <span class="font-label-tabular-sm text-label-tabular-sm text-outline">Margen operador amplio</span>
+                      <div class="mt-3 pt-2 border-t border-sandstone-border/60 flex flex-col gap-1 bg-stone-surface/30 p-2 rounded">
+                        <span class="text-[10px] font-bold text-primary uppercase font-label-caps flex items-center gap-1">
+                          <span class="material-symbols-outlined text-[13px] text-terracotta-accent">source</span>
+                          <span>¿De dónde sale este dato?</span>
+                        </span>
+                        <p class="text-[11px] text-on-surface-variant leading-relaxed">
+                          Del <strong>Atlas de Distribución de Renta de los Hogares (ADRH)</strong> publicado por el <em>Instituto Nacional de Estadística (INE)</em> en colaboración con la <em>Agencia Estatal de Administración Tributaria (AEAT)</em>, desagregado por secciones censales de ~1.500 habitantes.
+                        </p>
                       </div>
                     </div>
+
+                    <!-- Tarjeta 3: Competencia Directa (150m) -->
+                    <div class="p-space-md rounded-xl bg-surface-container-lowest border border-sandstone-border flex flex-col justify-between shadow-xs">
+                      <div class="flex flex-col gap-1.5">
+                        <div class="flex items-center justify-between pb-1 border-b border-sandstone-border/60">
+                          <span class="font-label-caps text-outline uppercase text-[10px] font-bold">_tejido_comercial</span>
+                          <span class="px-1.5 py-0.5 rounded bg-stone-surface text-charcoal-text font-label-tabular-sm text-[9px] font-semibold">CATASTRO OVC</span>
+                        </div>
+                        <span class="text-[12px] font-semibold text-outline uppercase tracking-wider font-label-caps">Competencia Directa (150m)</span>
+                        <div class="font-headline-xl text-headline-xl font-bold text-charcoal-text font-mono" id="val-competencia">3 Locales</div>
+                        <span class="font-body-sm text-body-sm text-charcoal-text font-medium" id="val-competencia-desc">
+                          Densidad equilibrada en el radio de 2 minutos a pie (sin canibalización).
+                        </span>
+                      </div>
+                      <div class="mt-3 pt-2 border-t border-sandstone-border/60 flex flex-col gap-1 bg-stone-surface/30 p-2 rounded">
+                        <span class="text-[10px] font-bold text-primary uppercase font-label-caps flex items-center gap-1">
+                          <span class="material-symbols-outlined text-[13px] text-terracotta-accent">source</span>
+                          <span>¿De dónde sale este dato?</span>
+                        </span>
+                        <p class="text-[11px] text-on-surface-variant leading-relaxed">
+                          Del <strong>Censo de Locales en Planta Baja y Actividades Económicas</strong> cruzado con la base de datos de <em>Catastro OVC</em> (inmuebles con uso C-Comercial en plantas bajas) en la isócrona peatonal inmediata de 150 metros.
+                        </p>
+                      </div>
+                    </div>
+
+                  </div>
+
+                  <!-- IDENTIFICADORES OCULTOS DE COMPATIBILIDAD CON SCRIPTS -->
+                  <div class="hidden">
+                    <span id="val-ocr-ratio">10.5%</span>
+                    <span id="val-ocr-facturacion">30.800 €</span>
+                    <span id="val-ocr-tickets">410 tickets/día</span>
+                    <span id="val-ocr-captura">3.2 %</span>
+                    <span id="val-ocr-riesgo">Bajo (1.4/10)</span>
                   </div>
                 </div>
 
