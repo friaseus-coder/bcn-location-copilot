@@ -694,6 +694,9 @@
     if (ruido.fuente) {
       setText('val-ruido-fuente', ruido.fuente);
     }
+    if (ruido.fecha_serie) {
+      setText('lbl-ruido-fecha-serie', ruido.fecha_serie);
+    }
 
     // 6 Tarjetas de Clima 365 días
     if (clima.dias_lluvia !== undefined) setText('clima-dias-lluvia', `${clima.dias_lluvia} días`);

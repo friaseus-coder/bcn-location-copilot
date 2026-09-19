@@ -1341,6 +1341,8 @@ def resolver_acustica_y_viandantes(
             "transit_ld": transit_ld,
             "transit_desc": transit_desc,
             "oci_desc": oci_desc,
+            "fecha_serie": "4º Ciclo Quinquenal Vigente 2022 – 2027 (Última consolidación Open Data BCN)",
+            "fecha_corta": "2022 - 2027",
             "fuente": "Mapa Estratègic de Soroll de Barcelona (MES) - 4º Ciclo Quinquenal (2022-2027, Directiva 2002/49/CE)."
         }
     }

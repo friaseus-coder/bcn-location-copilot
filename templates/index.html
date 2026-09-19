@@ -1326,15 +1326,28 @@
                     <!-- Acoustic Facade Decibel Meters (Columna Derecha 7) -->
                     <div class="lg:col-span-7 p-space-md rounded-xl bg-surface-container-lowest border border-sandstone-border flex flex-col justify-between shadow-xs">
                       <div>
-                        <div class="flex items-center justify-between pb-2 border-b border-sandstone-border/60">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-2 border-b border-sandstone-border/60 gap-1">
                           <div class="flex items-center gap-1.5 text-primary font-bold text-[12px] uppercase font-label-caps">
                             <span class="material-symbols-outlined text-[18px]">graphic_eq</span>
                             <span>_mapa_acústico_estratégico_bcn</span>
                           </div>
-                          <div class="flex items-center gap-2">
-                            <span class="px-1.5 py-0.5 rounded bg-stone-surface text-charcoal-text font-label-tabular-sm text-[9px] font-bold">FACHADA EDIFICIO</span>
+                          <div class="flex items-center gap-1.5">
+                            <span class="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-900 border border-emerald-200 font-label-tabular-sm text-[9px] font-bold flex items-center gap-1" id="badge-ruido-fecha">
+                              <span class="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse"></span>
+                              <span>ÚLTIMA SERIE: 2022-2027</span>
+                            </span>
+                            <span class="px-1.5 py-0.5 rounded bg-stone-surface text-charcoal-text font-label-tabular-sm text-[9px] font-bold">FACHADA 4m</span>
                             <span class="font-label-tabular-sm text-label-tabular-sm text-outline font-semibold">dBA Leq</span>
                           </div>
+                        </div>
+
+                        <!-- Banner Visible de Última Actualización y Serie Oficial -->
+                        <div class="flex items-center justify-between px-2.5 py-1.5 rounded-md bg-stone-surface/50 border border-sandstone-border/70 text-[11px] text-on-surface-variant font-medium mt-2.5">
+                          <div class="flex items-center gap-1.5 min-w-0">
+                            <span class="material-symbols-outlined text-[15px] text-emerald-700 flex-shrink-0">event_available</span>
+                            <span class="truncate">Fecha datos oficiales: <strong class="text-charcoal-text" id="lbl-ruido-fecha-serie">4º Ciclo Quinquenal Vigente 2022 – 2027</strong> (Open Data BCN)</span>
+                          </div>
+                          <span class="text-outline font-mono text-[9px] hidden sm:inline flex-shrink-0 ml-2">Próx. revisión: 2027</span>
                         </div>
 
                         <div class="flex flex-col gap-space-sm mt-3">
