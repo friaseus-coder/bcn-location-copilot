@@ -521,8 +521,6 @@
 
     // E. Panel Exclusivo: Renta INCASÒL (Zona más baja / Barrio) & IBI Municipal
     const rentaAnual = finanzas.renta_anual_bruta || (rentaMensual * 12);
-    const cuotaIbi = finanzas.ibi || 1248;
-    const ibiMensual = finanzas.ibi_mensual || Math.round(cuotaIbi / 12);
     const netoAnual = finanzas.neto_anual_post_ibi || (rentaAnual - cuotaIbi);
     const netoMensual = finanzas.neto_mensual_post_ibi || Math.round(netoAnual / 12);
 
