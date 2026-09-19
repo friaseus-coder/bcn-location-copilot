@@ -1172,15 +1172,18 @@
                           <span>Granularidad Mínima: Tramo de calle (isócrona 150m)</span>
                         </div>
                       </div>
-                      <div class="mt-3 pt-2 border-t border-sandstone-border/60 flex flex-col gap-1 bg-stone-surface/30 p-2 rounded">
-                        <span class="text-[10px] font-bold text-primary uppercase font-label-caps flex items-center gap-1">
-                          <span class="material-symbols-outlined text-[13px] text-terracotta-accent">source</span>
-                          <span>¿De dónde sale este dato?</span>
-                        </span>
-                        <p class="text-[11px] text-on-surface-variant leading-relaxed">
+                      <details class="group mt-2.5 pt-2 border-t border-sandstone-border/60 cursor-pointer">
+                        <summary class="list-none flex items-center justify-between text-[10px] font-bold text-primary uppercase font-label-caps hover:text-terracotta-accent transition-colors select-none py-0.5">
+                          <span class="flex items-center gap-1">
+                            <span class="material-symbols-outlined text-[13px] text-terracotta-accent">source</span>
+                            <span>¿De dónde sale este dato?</span>
+                          </span>
+                          <span class="material-symbols-outlined text-[15px] text-outline transition-transform duration-200 group-open:rotate-180">expand_more</span>
+                        </summary>
+                        <div class="mt-1.5 p-2 rounded bg-stone-surface/50 border border-sandstone-border/50 text-[11px] text-on-surface-variant leading-relaxed">
                           De la <strong>Matriz de Movilidad Obligada (EMEF)</strong> del <em>Área Metropolitana de Barcelona (AMB)</em> y la <em>ATM</em>. Se desagrega a nivel de <strong>tramo de vía urbana y radio peatonal de 150 metros</strong>, comparando el censo nocturno residencial con el tránsito peatonal laboral y comercial diurno.
-                        </p>
-                      </div>
+                        </div>
+                      </details>
                     </div>
 
                     <!-- Tarjeta 2: Renta Media Hogar (INE) -->
@@ -1200,15 +1203,18 @@
                           <span>Granularidad Mínima Nacional: Sección Censal (~1.200 hab.)</span>
                         </div>
                       </div>
-                      <div class="mt-3 pt-2 border-t border-sandstone-border/60 flex flex-col gap-1 bg-stone-surface/30 p-2 rounded">
-                        <span class="text-[10px] font-bold text-primary uppercase font-label-caps flex items-center gap-1">
-                          <span class="material-symbols-outlined text-[13px] text-terracotta-accent">source</span>
-                          <span>¿De dónde sale este dato?</span>
-                        </span>
-                        <p class="text-[11px] text-on-surface-variant leading-relaxed">
+                      <details class="group mt-2.5 pt-2 border-t border-sandstone-border/60 cursor-pointer">
+                        <summary class="list-none flex items-center justify-between text-[10px] font-bold text-primary uppercase font-label-caps hover:text-terracotta-accent transition-colors select-none py-0.5">
+                          <span class="flex items-center gap-1">
+                            <span class="material-symbols-outlined text-[13px] text-terracotta-accent">source</span>
+                            <span>¿De dónde sale este dato?</span>
+                          </span>
+                          <span class="material-symbols-outlined text-[15px] text-outline transition-transform duration-200 group-open:rotate-180">expand_more</span>
+                        </summary>
+                        <div class="mt-1.5 p-2 rounded bg-stone-surface/50 border border-sandstone-border/50 text-[11px] text-on-surface-variant leading-relaxed">
                           Del <strong>Atlas de Distribución de Renta de los Hogares (ADRH)</strong> publicado por el <em>Instituto Nacional de Estadística (INE)</em> y la <em>AEAT</em>. Mide la renta neta por hogar a nivel de <strong>Sección Censal</strong> (código oficial de 10 dígitos, ~1.200 habitantes), la unidad territorial más pequeña y granular que publica el Estado.
-                        </p>
-                      </div>
+                        </div>
+                      </details>
                     </div>
 
                     <!-- Tarjeta 3: Competencia Directa (150m) -->
@@ -1228,15 +1234,18 @@
                           <span>Granularidad Mínima: Manzana Catastral + 150m</span>
                         </div>
                       </div>
-                      <div class="mt-3 pt-2 border-t border-sandstone-border/60 flex flex-col gap-1 bg-stone-surface/30 p-2 rounded">
-                        <span class="text-[10px] font-bold text-primary uppercase font-label-caps flex items-center gap-1">
-                          <span class="material-symbols-outlined text-[13px] text-terracotta-accent">source</span>
-                          <span>¿De dónde sale este dato?</span>
-                        </span>
-                        <p class="text-[11px] text-on-surface-variant leading-relaxed">
+                      <details class="group mt-2.5 pt-2 border-t border-sandstone-border/60 cursor-pointer">
+                        <summary class="list-none flex items-center justify-between text-[10px] font-bold text-primary uppercase font-label-caps hover:text-terracotta-accent transition-colors select-none py-0.5">
+                          <span class="flex items-center gap-1">
+                            <span class="material-symbols-outlined text-[13px] text-terracotta-accent">source</span>
+                            <span>¿De dónde sale este dato?</span>
+                          </span>
+                          <span class="material-symbols-outlined text-[15px] text-outline transition-transform duration-200 group-open:rotate-180">expand_more</span>
+                        </summary>
+                        <div class="mt-1.5 p-2 rounded bg-stone-surface/50 border border-sandstone-border/50 text-[11px] text-on-surface-variant leading-relaxed">
                           Del <strong>Censo de Locales en Planta Baja y Actividades Económicas</strong> cruzado con la base de datos de <em>Catastro OVC</em>. Aísla la <strong>manzana catastral exacta (código de 7 dígitos)</strong> y los locales con uso comercial `C` en un radio inmediato de 150 metros (2 minutos a pie).
-                        </p>
-                      </div>
+                        </div>
+                      </details>
                     </div>
 
                   </div>
@@ -1267,19 +1276,22 @@
                             Medición consolidada promedio día laborable (picos a las 14:00h y 19:00h).
                           </span>
                         </div>
-                        <div class="mt-3 pt-2 border-t border-sandstone-border/60 flex flex-col gap-1 bg-stone-surface/30 p-2 rounded">
-                          <span class="text-[10px] font-bold text-primary uppercase font-label-caps flex items-center gap-1">
-                            <span class="material-symbols-outlined text-[13px] text-terracotta-accent">source</span>
-                            <span>Origen de los datos y fecha</span>
-                          </span>
-                          <p class="text-[11px] text-on-surface-variant leading-relaxed">
+                        <details class="group mt-2.5 pt-2 border-t border-sandstone-border/60 cursor-pointer">
+                          <summary class="list-none flex items-center justify-between text-[10px] font-bold text-primary uppercase font-label-caps hover:text-terracotta-accent transition-colors select-none py-0.5">
+                            <span class="flex items-center gap-1">
+                              <span class="material-symbols-outlined text-[13px] text-terracotta-accent">source</span>
+                              <span>Origen de los datos y fecha</span>
+                            </span>
+                            <span class="material-symbols-outlined text-[15px] text-outline transition-transform duration-200 group-open:rotate-180">expand_more</span>
+                          </summary>
+                          <div class="mt-1.5 p-2 rounded bg-stone-surface/50 border border-sandstone-border/50 text-[11px] text-on-surface-variant leading-relaxed">
                             <strong>Fuente:</strong> <em>Departament d'Estudis i Mobilitat</em> del <strong>Ajuntament de Barcelona</strong> y <em>ATM</em>.
                             <br>
                             <strong>Fecha / Serie:</strong> <strong>Campaña oficial 2023 - 2024</strong> (aforos directos y sensorización en tramos viarios).
                             <br>
                             <strong>Granularidad:</strong> Tramo de calle exacto e intersección inmediata.
-                          </p>
-                        </div>
+                          </div>
+                        </details>
                       </div>
 
                       <!-- Ordenanza Municipal de Terrazas -->
@@ -1300,19 +1312,22 @@
                             </div>
                           </div>
                         </div>
-                        <div class="mt-3 pt-2 border-t border-sandstone-border/60 flex flex-col gap-1 bg-stone-surface/30 p-2 rounded">
-                          <span class="text-[10px] font-bold text-primary uppercase font-label-caps flex items-center gap-1">
-                            <span class="material-symbols-outlined text-[13px] text-terracotta-accent">source</span>
-                            <span>Origen de los datos y fecha</span>
-                          </span>
-                          <p class="text-[11px] text-on-surface-variant leading-relaxed">
+                        <details class="group mt-2.5 pt-2 border-t border-sandstone-border/60 cursor-pointer">
+                          <summary class="list-none flex items-center justify-between text-[10px] font-bold text-primary uppercase font-label-caps hover:text-terracotta-accent transition-colors select-none py-0.5">
+                            <span class="flex items-center gap-1">
+                              <span class="material-symbols-outlined text-[13px] text-terracotta-accent">source</span>
+                              <span>Origen de los datos y fecha</span>
+                            </span>
+                            <span class="material-symbols-outlined text-[15px] text-outline transition-transform duration-200 group-open:rotate-180">expand_more</span>
+                          </summary>
+                          <div class="mt-1.5 p-2 rounded bg-stone-surface/50 border border-sandstone-border/50 text-[11px] text-on-surface-variant leading-relaxed">
                             <strong>Fuente:</strong> Cartografía Topográfica oficial 1:1000 del <strong>Institut Cartogràfic i Geològic de Catalunya (ICGC)</strong> y <em>Ordenanza Municipal de Terrazas del Ayuntamiento de Barcelona (BOPB)</em>.
                             <br>
                             <strong>Fecha / Vigencia:</strong> <strong>Normativa consolidada vigente 2023 - 2024</strong>.
                             <br>
                             <strong>Granularidad:</strong> Frente de fachada del inmueble y anchura de acera de bordillo a línea de fachada.
-                          </p>
-                        </div>
+                          </div>
+                        </details>
                       </div>
 
                     </div>
@@ -1385,19 +1400,22 @@
                         </div>
                       </div>
 
-                      <div class="mt-3 pt-2 border-t border-sandstone-border/60 flex flex-col gap-1 bg-stone-surface/30 p-2 rounded">
-                        <span class="text-[10px] font-bold text-primary uppercase font-label-caps flex items-center gap-1">
-                          <span class="material-symbols-outlined text-[13px] text-terracotta-accent">source</span>
-                          <span>Origen de los datos y fecha</span>
-                        </span>
-                        <p class="text-[11px] text-on-surface-variant leading-relaxed">
+                      <details class="group mt-2.5 pt-2 border-t border-sandstone-border/60 cursor-pointer">
+                        <summary class="list-none flex items-center justify-between text-[10px] font-bold text-primary uppercase font-label-caps hover:text-terracotta-accent transition-colors select-none py-0.5">
+                          <span class="flex items-center gap-1">
+                            <span class="material-symbols-outlined text-[13px] text-terracotta-accent">source</span>
+                            <span>Origen de los datos y fecha</span>
+                          </span>
+                          <span class="material-symbols-outlined text-[15px] text-outline transition-transform duration-200 group-open:rotate-180">expand_more</span>
+                        </summary>
+                        <div class="mt-1.5 p-2 rounded bg-stone-surface/50 border border-sandstone-border/50 text-[11px] text-on-surface-variant leading-relaxed">
                           <strong>Fuente:</strong> <strong>Mapa Estratègic de Soroll (MES)</strong> de Barcelona, elaborado por la <em>Direcció de Serveis de Medi Ambient</em> y la <em>Agència de Salut Pública de Barcelona (ASPB)</em> en cumplimiento de la <strong>Directiva Europea 2002/49/CE</strong> y la Ley 16/2002 de Cataluña.
                           <br>
                           <strong>Fecha / Ciclo:</strong> <strong>4º Ciclo Quinquenal Oficial (Periodo de vigencia 2022 - 2027)</strong>.
                           <br>
                           <strong>Granularidad:</strong> Modelización sonora tridimensional (CadnaA) a nivel de <strong>tramo de eje viario y fachada del edificio a 4 metros de altura</strong>.
-                        </p>
-                      </div>
+                        </div>
+                      </details>
                     </div>
 
                   </div>
