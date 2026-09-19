@@ -621,106 +621,93 @@
           
           <!-- 1. LEFT COLLAPSIBLE UNDERWRITING CONTROL SIDEBAR (320px) -->
           <aside class="w-full xl:w-[320px] flex-shrink-0 flex flex-col gap-space-md bg-surface-container-lowest rounded-xl p-space-md border border-sandstone-border shadow-[0_1px_3px_rgba(27,28,26,0.03)]">
-            <!-- Institutional Module Crest (Sanitizado) -->
+            <!-- Institutional Module Crest (Informativo Oficial) -->
             <div class="flex items-center gap-space-sm pb-space-sm bg-stone-surface/40 p-space-sm rounded-lg border border-sandstone-border/60">
               <div class="w-9 h-9 rounded bg-primary flex items-center justify-center flex-shrink-0 text-on-primary shadow-sm">
-                <span class="material-symbols-outlined text-[19px]">apartment</span>
+                <span class="material-symbols-outlined text-[19px]">domain</span>
               </div>
               <div class="flex flex-col min-w-0">
                 <div class="flex items-center gap-1.5">
-                  <span class="font-headline-md text-[14px] font-bold text-primary truncate leading-tight">Location Copilot</span>
-                  <span class="px-1.5 py-0.2 rounded bg-primary text-on-primary font-label-tabular-sm text-[9px] font-medium">Underwriting</span>
+                  <span class="font-headline-md text-[14px] font-bold text-primary truncate leading-tight">Ficha Técnica Oficial</span>
+                  <span class="px-1.5 py-0.2 rounded bg-primary text-on-primary font-label-tabular-sm text-[9px] font-medium">Catastro OVC</span>
                 </div>
-                <span class="font-label-caps text-outline uppercase text-[9px] tracking-wider truncate font-medium">Open Data &amp; Legal Compliance</span>
+                <span class="font-label-caps text-outline uppercase text-[9px] tracking-wider truncate font-medium">Auditoría Territorial Verificada</span>
               </div>
             </div>
 
-            <!-- Underwriting Inputs Form -->
-            <form class="flex flex-col gap-space-md" id="form-copilot" onsubmit="event.preventDefault(); window.recalcularModelo();">
-              <!-- Typology Selector Dropdown -->
+            <!-- Ficha Técnica del Inmueble (100% Solo Lectura Informativo) -->
+            <div class="flex flex-col gap-space-sm">
+              <!-- Tipología del Activo -->
               <div class="flex flex-col gap-1">
-                <label class="font-label-caps text-charcoal-text uppercase flex items-center justify-between text-[11px] font-semibold" for="select-tipologia">
-                  <span>_tipología_de_activo</span>
-                  <span class="text-terracotta-accent font-label-tabular-sm">Cód. PUM-BCN</span>
-                </label>
-                <div class="relative">
-                  <select class="w-full h-8 pl-2 pr-7 rounded bg-surface border border-sandstone-border font-body-sm text-body-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary appearance-none cursor-pointer" id="select-tipologia">
-                    <option selected="" value="retail">Local Comercial (Retail)</option>
-                    <option value="oficina">Oficina / Terciario</option>
-                    <option value="residencial">Vivienda Residencial</option>
-                  </select>
-                  <span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-outline text-[16px]">expand_more</span>
+                <div class="font-label-caps text-outline uppercase flex items-center justify-between text-[10px] font-semibold">
+                  <span>_uso_principal_catastral</span>
+                  <span class="text-terracotta-accent font-label-tabular-sm">PUM-BCN</span>
+                </div>
+                <div class="p-2.5 rounded-lg bg-surface border border-sandstone-border flex items-center justify-between shadow-xs">
+                  <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary text-[18px]">apartment</span>
+                    <span class="font-semibold text-charcoal-text text-[13px]" id="disp-tipologia">Vivienda Residencial</span>
+                  </div>
+                  <span class="px-1.5 py-0.5 rounded bg-stone-surface text-outline font-label-tabular-sm text-[10px] uppercase font-medium">Uso Dominante</span>
                 </div>
               </div>
 
-              <!-- Numerical Inputs: Area and Purchase Price -->
+              <!-- Superficie y Valor Estimado -->
               <div class="grid grid-cols-2 gap-space-sm">
-                <div class="flex flex-col gap-1">
-                  <label class="font-label-caps text-outline uppercase text-[10px] font-semibold" for="input-superficie">Sup. Útil (m²)</label>
-                  <div class="relative">
-                    <input class="w-full h-8 px-2 pr-6 rounded bg-surface border border-sandstone-border font-label-tabular text-label-tabular text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary text-right" id="input-superficie" max="10000" min="15" step="5" type="number" value="110"/>
-                    <span class="absolute right-2 top-1/2 -translate-y-1/2 font-label-tabular-sm text-label-tabular-sm text-outline pointer-events-none">m²</span>
-                  </div>
+                <div class="p-2.5 rounded-lg bg-surface border border-sandstone-border flex flex-col gap-0.5 shadow-xs">
+                  <span class="font-label-caps text-outline uppercase text-[10px] font-semibold">Sup. Construida</span>
+                  <div class="text-[17px] font-bold text-primary font-label-tabular" id="disp-superficie">110 m²</div>
+                  <span class="text-[10px] text-on-surface-variant/80 font-medium">Sede Catastro OVC</span>
                 </div>
-                <div class="flex flex-col gap-1">
-                  <label class="font-label-caps text-outline uppercase text-[10px] font-semibold" for="input-precio">Precio Objetivo (€)</label>
-                  <div class="relative">
-                    <input class="w-full h-8 px-2 pr-5 rounded bg-surface border border-sandstone-border font-label-tabular text-label-tabular text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary text-right" id="input-precio" max="100000000" min="50000" step="5000" type="number" value="320000"/>
-                    <span class="absolute right-2 top-1/2 -translate-y-1/2 font-label-tabular-sm text-label-tabular-sm text-outline pointer-events-none">€</span>
-                  </div>
+                <div class="p-2.5 rounded-lg bg-surface border border-sandstone-border flex flex-col gap-0.5 shadow-xs">
+                  <span class="font-label-caps text-outline uppercase text-[10px] font-semibold">Valor Estimado</span>
+                  <div class="text-[17px] font-bold text-charcoal-text font-label-tabular" id="disp-precio">320.000 €</div>
+                  <span class="text-[10px] text-on-surface-variant/80 font-medium" id="disp-precio-m2">2.909 €/m²</span>
                 </div>
               </div>
 
-              <!-- Facade & Physical Parameters -->
-              <div class="flex flex-col gap-space-sm pt-space-xs">
-                <div class="flex flex-col gap-1">
-                  <label class="font-label-caps text-outline uppercase text-[10px] font-semibold" for="select-fachada">_configuración_fachada</label>
-                  <div class="relative">
-                    <select class="w-full h-8 pl-2 pr-7 rounded bg-surface border border-sandstone-border font-body-sm text-body-sm text-on-surface focus:outline-none focus:border-primary appearance-none cursor-pointer" id="select-fachada">
-                      <option selected="" value="chaflan">Chaflán Eixample (&gt;10m)</option>
-                      <option value="escaparate_amplio">Escaparate amplio (6 - 10m)</option>
-                      <option value="escaparate_std">Escaparate estándar (3 - 6m)</option>
-                      <option value="fachada_estrecha">Fachada estrecha (&lt;3m)</option>
-                    </select>
-                    <span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-outline text-[16px]">expand_more</span>
-                  </div>
+              <!-- Características Físicas y Cumplimiento Legal -->
+              <div class="flex flex-col gap-1.5 pt-1">
+                <!-- Fachada -->
+                <div class="p-2 rounded bg-surface border border-sandstone-border flex items-center justify-between text-body-sm shadow-xs">
+                  <span class="text-outline text-[11px] font-medium">Morfología Fachada</span>
+                  <span class="font-semibold text-charcoal-text text-[12px]" id="disp-fachada">Chaflán Eixample (>10m)</span>
                 </div>
 
-                <!-- Smoke Exhaust Checkbox -->
-                <label class="flex items-center gap-space-sm py-1.5 px-2 rounded bg-stone-surface/50 border border-sandstone-border/60 hover:bg-stone-surface cursor-pointer transition-colors">
-                  <input class="w-3.5 h-3.5 rounded text-primary focus:ring-0 focus:outline-none cursor-pointer accent-primary" id="check-humos" type="checkbox"/>
-                  <div class="flex items-center justify-between flex-1">
-                    <span class="font-body-sm text-body-sm text-charcoal-text font-medium">Salida de Humos Legal</span>
-                    <span class="font-label-tabular-sm text-label-tabular-sm text-outline text-[10px]">CTE DB-SI</span>
-                  </div>
-                </label>
+                <!-- Salida de Humos -->
+                <div class="p-2 rounded bg-surface border border-sandstone-border flex items-center justify-between text-body-sm shadow-xs">
+                  <span class="text-outline text-[11px] font-medium">Evacuación Humos CTE</span>
+                  <span class="font-semibold text-emerald-800 text-[12px] flex items-center gap-1" id="disp-humos">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-600 inline-block"></span>
+                    <span>Conforme DB-SI</span>
+                  </span>
+                </div>
 
-                <!-- Conservation Status -->
-                <div class="flex flex-col gap-1">
-                  <label class="font-label-caps text-outline uppercase text-[10px] font-semibold" for="select-conservacion">_estado_conservación</label>
-                  <div class="relative">
-                    <select class="w-full h-8 pl-2 pr-7 rounded bg-surface border border-sandstone-border font-body-sm text-body-sm text-on-surface focus:outline-none focus:border-primary appearance-none cursor-pointer" id="select-conservacion">
-                      <option value="listo">Listo para entrar / Buen estado</option>
-                      <option selected="" value="ligera">Requiere adecuación ligera</option>
-                      <option value="reforma">Para reforma integral</option>
-                    </select>
-                    <span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-outline text-[16px]">expand_more</span>
-                  </div>
+                <!-- Conservación & Antigüedad -->
+                <div class="p-2 rounded bg-surface border border-sandstone-border flex items-center justify-between text-body-sm shadow-xs">
+                  <span class="text-outline text-[11px] font-medium">Año y Conservación</span>
+                  <span class="font-semibold text-charcoal-text text-[12px]" id="disp-conservacion">1928 (Finca Clásica)</span>
                 </div>
               </div>
 
-              <!-- Action Button -->
-              <button class="w-full h-9 rounded bg-primary text-on-primary hover:bg-forest-muted font-headline-md text-[13px] font-semibold flex items-center justify-center gap-space-xs transition-all shadow-sm active:scale-[0.99] cursor-pointer" id="btn-recalcular" type="submit">
-                <span class="material-symbols-outlined text-[17px]">calculate</span>
-                <span>Recalcular Modelo</span>
-              </button>
-
-              <!-- Status Badge -->
-              <div class="flex items-center justify-center gap-1.5 p-1.5 rounded bg-badge-living-bg border border-emerald-900/10">
+              <!-- Badge Institucional Coste 0 € -->
+              <div class="flex items-center justify-center gap-1.5 p-2 rounded-lg bg-badge-living-bg border border-emerald-900/10">
                 <span class="w-2 h-2 rounded-full bg-emerald-600 inline-block"></span>
-                <span class="font-label-tabular-sm text-primary font-semibold text-[10px]">Fuentes Oficiales Públicas | Coste 0 €</span>
+                <span class="font-label-tabular-sm text-primary font-semibold text-[10px]">Auditoría Pública Automatizada | 0 €</span>
               </div>
-            </form>
+
+              <!-- Controles ocultos de compatibilidad técnica -->
+              <div class="hidden">
+                <select id="select-tipologia"><option value="retail" selected>retail</option></select>
+                <input type="hidden" id="input-superficie" value="110"/>
+                <input type="hidden" id="input-precio" value="320000"/>
+                <select id="select-fachada"><option value="chaflan" selected>chaflan</option></select>
+                <input type="checkbox" id="check-humos" checked/>
+                <select id="select-conservacion"><option value="ligera" selected>ligera</option></select>
+                <form id="form-copilot"></form>
+                <button id="btn-recalcular" type="button"></button>
+              </div>
+            </div>
 
             <!-- Asset Snapshot Metadata Card -->
             <div class="mt-space-xs p-space-sm rounded-lg bg-stone-surface/40 border border-sandstone-border/60 flex flex-col gap-space-xs">

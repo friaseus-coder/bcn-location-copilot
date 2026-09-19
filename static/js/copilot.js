@@ -467,11 +467,26 @@
     const metro = data.metro || {};
     const regulacion = data.regulacion || {};
 
-    // A. Metros cuadrados y año Catastro
-    if (activo.superficie) {
-      const inputSup = document.getElementById('input-superficie');
-      if (inputSup) inputSup.value = Math.round(activo.superficie);
+    // A. Metros cuadrados, año Catastro y Ficha Técnica Lateral
+    const supM2 = activo.superficie ? Math.round(activo.superficie) : 110;
+    const precioTotal = finanzas.precio || 320000;
+    const precioM2 = Math.round(precioTotal / supM2);
+
+    setText('disp-superficie', `${supM2} m²`);
+    setText('disp-precio', formatEuro.format(precioTotal));
+    setText('disp-precio-m2', `${formatInt.format(precioM2)} €/m²`);
+    setText('disp-conservacion', activo.ano_construccion ? `${activo.ano_construccion} (${activo.tipo_finca || 'Consolidado'})` : '1928 (Finca Clásica)');
+    
+    if (activo.tipologia) {
+      const tipoNombres = { 'retail': 'Local Comercial (Retail)', 'residencial': 'Vivienda Residencial', 'oficina': 'Oficina / Terciario' };
+      setText('disp-tipologia', tipoNombres[activo.tipologia] || 'Inmueble Urbano');
     }
+
+    const inputSup = document.getElementById('input-superficie');
+    if (inputSup) inputSup.value = supM2;
+    const inputPre = document.getElementById('input-precio');
+    if (inputPre) inputPre.value = precioTotal;
+
     setText('val-ano', activo.ano_construccion ? `${activo.ano_construccion} (${activo.tipo_finca || 'Finca Consolidada'})` : '1928 (Finca Clásica)');
 
     // B. Referencia Catastral y Ficha Registral
