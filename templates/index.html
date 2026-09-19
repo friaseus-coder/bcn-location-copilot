@@ -567,9 +567,22 @@
           <input class="w-full h-9 px-2 text-center rounded bg-surface border border-sandstone-border font-body-sm text-body-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" id="input-numero" max="9999" min="1" placeholder="Nº" type="number" value="12"/>
         </div>
 
-        <!-- Input Planta, Piso y Puerta (Piso/Pta) -->
-        <div class="w-[105px] flex-shrink-0">
-          <input class="w-full h-9 px-2 text-center rounded bg-surface border border-sandstone-border font-body-sm text-body-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" id="input-piso" placeholder="(Piso/Pta)" type="text" value="Principal 1ª"/>
+        <!-- Selector Desplegable Planta / Piso / Local disponible -->
+        <div class="relative min-w-[130px] max-w-[160px] flex-shrink-0">
+          <select id="input-piso" class="w-full h-9 pl-2.5 pr-7 rounded bg-surface border border-sandstone-border font-body-sm text-body-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary appearance-none cursor-pointer truncate">
+            <option value="Bajos / Local">Planta Baja (Local)</option>
+            <option value="Entresuelo">Entresuelo</option>
+            <option value="Principal" selected>Principal</option>
+            <option value="Planta 1ª">Planta 1ª</option>
+            <option value="Planta 2ª">Planta 2ª</option>
+            <option value="Planta 3ª">Planta 3ª</option>
+            <option value="Planta 4ª">Planta 4ª</option>
+            <option value="Planta 5ª">Planta 5ª</option>
+            <option value="Ático">Ático</option>
+            <option value="Sobreático">Sobreático</option>
+            <option value="Edificio Entero">Edificio Entero</option>
+          </select>
+          <span class="material-symbols-outlined absolute right-1.5 top-1/2 -translate-y-1/2 pointer-events-none text-outline text-[16px]">expand_more</span>
         </div>
 
         <!-- Input hidden fallback for legacy compatibility -->
@@ -706,6 +719,52 @@
                 <select id="select-conservacion"><option value="ligera" selected>ligera</option></select>
                 <form id="form-copilot"></form>
                 <button id="btn-recalcular" type="button"></button>
+            </div>
+
+            <!-- 2. IDENTIFICACIÓN CATASTRAL OFICIAL (SEDE ELECTRÓNICA OVC) -->
+            <div class="p-space-sm rounded-lg bg-surface border border-sandstone-border flex flex-col gap-1.5 shadow-xs" id="panel-catastro-sidebar">
+              <div class="flex items-center justify-between border-b border-sandstone-border/60 pb-1">
+                <div class="flex items-center gap-1.5 text-primary font-semibold text-[11px] uppercase tracking-wider font-label-caps">
+                  <span class="material-symbols-outlined text-[16px] text-primary">badge</span>
+                  <span>_identificación_catastral</span>
+                </div>
+                <span class="px-1.5 py-0.5 rounded bg-stone-surface text-outline font-label-tabular-sm text-[9px] font-medium">Sede OVC</span>
+              </div>
+              <div class="flex flex-col gap-0.5 bg-stone-surface/40 p-2 rounded border border-sandstone-border/60">
+                <span class="font-label-caps text-outline text-[9px] uppercase font-semibold">Referencia Catastral</span>
+                <div class="flex items-center justify-between gap-1">
+                  <span class="font-label-tabular text-[12px] font-bold text-primary tracking-wide font-mono truncate" id="val-ref-catastral-side">08019A014000320001KL</span>
+                  <button class="p-1 rounded hover:bg-stone-surface text-outline hover:text-primary transition-colors cursor-pointer" onclick="window.copiarRefCatastral()" title="Copiar referencia" type="button">
+                    <span class="material-symbols-outlined text-[15px]">content_copy</span>
+                  </button>
+                </div>
+              </div>
+              <div class="flex items-center justify-between text-[11px] text-on-surface-variant pt-0.5">
+                <span class="text-outline text-[10px] uppercase font-label-caps font-semibold">Calificación:</span>
+                <span class="font-semibold text-charcoal-text text-[11px]" id="val-calificacion-side">Clave 13b (Densificada)</span>
+              </div>
+            </div>
+
+            <!-- 3. PLAN DE USOS & MARCO REGULATORIO URBANÍSTICO (DEBAJO DE FICHA TÉCNICA Y DEL CATASTRAL) -->
+            <div class="p-space-sm rounded-lg bg-amber-50/80 border border-amber-200 flex flex-col gap-2 shadow-xs" id="panel-pla-dusos">
+              <div class="flex items-center justify-between border-b border-amber-200/60 pb-1">
+                <div class="flex items-center gap-1.5 text-amber-950 font-semibold text-[11px] uppercase tracking-wider font-label-caps">
+                  <span class="material-symbols-outlined text-[16px] text-amber-800">gavel</span>
+                  <span>_plan_de_usos_&amp;_normativa</span>
+                </div>
+                <span class="px-1.5 py-0.5 rounded bg-amber-200/70 text-amber-950 font-label-tabular-sm text-[9px] font-bold" id="val-pla-dusos-badge">REGULADO</span>
+              </div>
+              <div class="flex flex-col gap-1">
+                <div class="text-[12px] font-bold text-amber-950 leading-snug" id="val-pla-dusos-titulo">
+                  Pla d'Usos Eixample (Hostelería &amp; Terrazas)
+                </div>
+                <div class="text-[11px] text-amber-900 leading-relaxed" id="val-pla-dusos-desc">
+                  Sector afectado por el Pla Especial d'Usos. Suspensión de nuevas licencias de restauración C3 y verificación obligatoria del Índice MIVAU.
+                </div>
+              </div>
+              <div class="pt-1 border-t border-amber-200/50 flex items-center justify-between text-[10px] text-amber-900 font-medium">
+                <span>Régimen Ley 12/2023:</span>
+                <span class="font-bold text-emerald-800" id="val-pla-dusos-tensionado">Zona Tensionada MIVAU</span>
               </div>
             </div>
 

@@ -246,10 +246,7 @@
           if (inputCalle) inputCalle.value = nombreVia;
           sugerenciasContainer.classList.add('hidden');
 
-          // Ejecutar análisis inmediatamente al seleccionar la vía
-          ejecutarAnalisisCompleto();
-
-          // Trasladar automáticamente el foco al número de policía
+          // Trasladar automáticamente el foco al número de policía (no disparar análisis hasta pulsar Analizar)
           if (inputNumero) {
             inputNumero.focus();
             inputNumero.select();
@@ -276,18 +273,10 @@
     const inputCalle = document.getElementById('input-calle');
     const selectMunicipio = document.getElementById('select-municipio');
     const btnAnalizar = document.getElementById('btn-analizar');
-    const btnRecalcular = document.getElementById('btn-recalcular');
-    const formCopilot = document.getElementById('form-copilot');
 
-    // Inputs que disparan análisis completo al cambiar o salir del foco
-    const triggers = [inputCalle, inputNumero, inputPiso];
-    triggers.forEach(el => {
+    // Permitir pulsar Enter en cualquier campo de la barra de búsqueda para ejecutar análisis
+    [inputCalle, inputNumero, inputPiso].forEach(el => {
       if (!el) return;
-      ['change', 'blur'].forEach(evt => {
-        el.addEventListener(evt, () => {
-          verificarYDispararAnalisis();
-        });
-      });
       el.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
           e.preventDefault();
@@ -296,15 +285,7 @@
       });
     });
 
-    if (inputCalle) {
-      inputCalle.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          ejecutarAnalisisCompleto();
-        }
-      });
-    }
-
+    // Al cambiar de municipio, actualizar el contexto territorial pero NO ejecutar análisis
     if (selectMunicipio) {
       selectMunicipio.addEventListener('change', () => {
         const sugerenciasContainer = document.getElementById('sugerencias-vias');
@@ -322,52 +303,17 @@
         const calleVal = inputCalle ? inputCalle.value.trim() : '';
         if (calleVal && calleVal.length >= 2) {
           consultarSugerenciasICGC(calleVal, nuevoMun);
-        } else {
-          ejecutarAnalisisCompleto();
         }
       });
     }
 
-    // Botón principal Analizar
+    // BOTÓN PRINCIPAL ANALIZAR: Es el ÚNICO que dispara el análisis, el mapa y los datos
     if (btnAnalizar) {
       btnAnalizar.addEventListener('click', (e) => {
         e.preventDefault();
         ejecutarAnalisisCompleto();
       });
     }
-
-    // Botón / Formulario Recalcular
-    if (btnRecalcular) {
-      btnRecalcular.addEventListener('click', (e) => {
-        e.preventDefault();
-        ejecutarAnalisisCompleto();
-      });
-    }
-
-    if (formCopilot) {
-      formCopilot.addEventListener('submit', (e) => {
-        e.preventDefault();
-        ejecutarAnalisisCompleto();
-      });
-    }
-
-    // Cambios en inputs del Underwriting Sidebar para recalcular al vuelo
-    const inputsUnderwriting = [
-      'select-tipologia',
-      'select-fachada',
-      'select-conservacion',
-      'check-humos',
-      'input-superficie',
-      'input-precio'
-    ];
-
-    inputsUnderwriting.forEach(id => {
-      const element = document.getElementById(id);
-      if (!element) return;
-      element.addEventListener('change', () => {
-        ejecutarAnalisisCompleto();
-      });
-    });
   }
 
   function verificarYDispararAnalisis() {
@@ -491,6 +437,7 @@
 
     // B. Referencia Catastral y Ficha Registral
     setText('val-ref-catastral', activo.ref_catastral || '08019A014000320001KL');
+    setText('val-ref-catastral-side', activo.ref_catastral || '08019A014000320001KL');
     setText('val-municipio-distrito', `${activo.municipio || 'Barcelona'} • ${activo.distrito || 'Eixample'}`);
     setText('val-municipio-distrito-badge', `${activo.municipio || 'Barcelona'} • ${activo.distrito || 'Eixample'}`);
 
@@ -509,11 +456,18 @@
       `;
     }
 
-    // C. Banners Superiores
+    // C. Banners Superiores y Tarjeta Lateral Pla d'Usos
     if (document.getElementById('badge-regulacion')) {
       const tituloReg = regulacion.titulo || "Regulación Especial Activa (Pla d'Usos)";
-      document.getElementById('badge-regulacion').querySelector('.truncate').textContent = tituloReg;
+      const truncEl = document.getElementById('badge-regulacion').querySelector('.truncate');
+      if (truncEl) truncEl.textContent = tituloReg;
     }
+
+    // Actualizar Tarjeta Lateral Plan de Usos debajo de Ficha Técnica
+    setText('val-pla-dusos-titulo', regulacion.titulo || "Pla d'Usos Eixample (Hostelería & Terrazas)");
+    setText('val-pla-dusos-desc', regulacion.descripcion || "Sector afectado por el Pla Especial d'Usos. Suspensión de nuevas licencias de restauración C3 y verificación obligatoria del Índice MIVAU.");
+    setText('val-pla-dusos-badge', regulacion.alerta ? "REGULADO" : "CONFORME");
+    setText('val-pla-dusos-tensionado', regulacion.zona_tensionada ? "Zona Tensionada MIVAU" : "Régimen General");
 
     if (document.getElementById('badge-parking')) {
       const sinergia = finanzas.sinergia_parking || {};
@@ -846,20 +800,13 @@
   };
 
   // ==========================================
-  // ARRANQUE AUTOMÁTICO AL CARGAR EL DOM
+  // ARRANQUE LIMPIO AL CARGAR EL DOM
   // ==========================================
   document.addEventListener('DOMContentLoaded', function () {
     inicializarMapa();
     inicializarAutocompletado();
     inicializarDisparadores();
     inicializarAccionesDescarga();
-
-    // Trigger de arranque automático inicial suave
-    setTimeout(() => {
-      if (document.getElementById('input-calle')?.value && document.getElementById('input-numero')?.value) {
-        ejecutarAnalisisCompleto();
-      }
-    }, 400);
   });
 
 })();
