@@ -787,36 +787,51 @@
             <!-- 3. CRITICAL REGULATORY & MOBILITY BANNERS ROW -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-space-sm">
               <!-- Banner 1: Pla d'Usos / Regulación (#badge-regulacion) -->
-              <div class="flex items-center gap-space-sm px-space-md py-2.5 rounded-lg bg-[#fbf3eb] border border-amber-200 text-amber-950 shadow-sm" id="badge-regulacion">
-                <div class="w-7 h-7 rounded bg-[#faebd7] flex items-center justify-center flex-shrink-0 text-secondary">
-                  <span class="material-symbols-outlined text-[18px]">gavel</span>
+              <div class="flex items-center justify-between gap-space-sm px-space-md py-2.5 rounded-lg bg-[#fbf3eb] border border-amber-200 text-amber-950 shadow-sm" id="badge-regulacion">
+                <div class="flex items-center gap-space-sm min-w-0">
+                  <div class="w-7 h-7 rounded bg-[#faebd7] flex items-center justify-center flex-shrink-0 text-secondary">
+                    <span class="material-symbols-outlined text-[18px]">gavel</span>
+                  </div>
+                  <div class="flex flex-col min-w-0">
+                    <span class="font-label-caps uppercase text-[10px] text-secondary font-bold tracking-wide">_pla_especial_d'usos_bcn</span>
+                    <span class="font-body-sm text-body-sm font-semibold truncate text-[#592a05]">Regulación Especial Eixample (Susp. C3/Hostelería)</span>
+                  </div>
                 </div>
-                <div class="flex flex-col min-w-0">
-                  <span class="font-label-caps uppercase text-[10px] text-secondary font-bold tracking-wide">_pla_especial_d'usos_bcn</span>
-                  <span class="font-body-sm text-body-sm font-semibold truncate text-[#592a05]">Regulación Especial Eixample (Susp. C3/Hostelería)</span>
-                </div>
+                <button type="button" onclick="window.abrirModalInfo('regulacion')" class="p-1 rounded text-amber-800/70 hover:text-amber-950 hover:bg-amber-200/50 transition-colors flex-shrink-0 cursor-pointer" title="Ver origen oficial y normativa aplicada">
+                  <span class="material-symbols-outlined text-[17px]">info</span>
+                </button>
               </div>
 
               <!-- Banner 2: Parking Catchment Deficit (#badge-parking) -->
-              <div class="flex items-center gap-space-sm px-space-md py-2.5 rounded-lg bg-badge-parkings-bg border border-sky-200 text-primary shadow-sm" id="badge-parking">
-                <div class="w-7 h-7 rounded bg-white flex items-center justify-center flex-shrink-0 text-badge-parkings-text">
-                  <span class="material-symbols-outlined text-[18px]">local_parking</span>
+              <div class="flex items-center justify-between gap-space-sm px-space-md py-2.5 rounded-lg bg-badge-parkings-bg border border-sky-200 text-primary shadow-sm" id="badge-parking">
+                <div class="flex items-center gap-space-sm min-w-0">
+                  <div class="w-7 h-7 rounded bg-white flex items-center justify-center flex-shrink-0 text-badge-parkings-text">
+                    <span class="material-symbols-outlined text-[18px]">local_parking</span>
+                  </div>
+                  <div class="flex flex-col min-w-0">
+                    <span class="font-label-caps uppercase text-[10px] text-badge-parkings-text font-bold tracking-wide">_déficit_parking_cuenca</span>
+                    <span class="font-body-sm text-body-sm font-semibold truncate text-[#11314d]">90 / 100 (Alta Presión Área Verde/Azul)</span>
+                  </div>
                 </div>
-                <div class="flex flex-col min-w-0">
-                  <span class="font-label-caps uppercase text-[10px] text-badge-parkings-text font-bold tracking-wide">_déficit_parking_cuenca</span>
-                  <span class="font-body-sm text-body-sm font-semibold truncate text-[#11314d]">90 / 100 (Alta Presión Área Verde/Azul)</span>
-                </div>
+                <button type="button" onclick="window.abrirModalInfo('parking')" class="p-1 rounded text-sky-800/70 hover:text-sky-950 hover:bg-sky-200/50 transition-colors flex-shrink-0 cursor-pointer" title="Ver metodología y cálculo de la cuenca">
+                  <span class="material-symbols-outlined text-[17px]">info</span>
+                </button>
               </div>
 
               <!-- Banner 3: Transit Metro Proximity (#badge-transporte) -->
-              <div class="flex items-center gap-space-sm px-space-md py-2.5 rounded-lg bg-surface-container-lowest border border-sandstone-border text-on-surface shadow-sm" id="badge-transporte">
-                <div class="w-7 h-7 rounded bg-stone-surface/70 flex items-center justify-center flex-shrink-0 text-primary">
-                  <span class="material-symbols-outlined text-[18px]">directions_subway</span>
+              <div class="flex items-center justify-between gap-space-sm px-space-md py-2.5 rounded-lg bg-surface-container-lowest border border-sandstone-border text-on-surface shadow-sm" id="badge-transporte">
+                <div class="flex items-center gap-space-sm min-w-0">
+                  <div class="w-7 h-7 rounded bg-stone-surface/70 flex items-center justify-center flex-shrink-0 text-primary">
+                    <span class="material-symbols-outlined text-[18px]">directions_subway</span>
+                  </div>
+                  <div class="flex flex-col min-w-0">
+                    <span class="font-label-caps uppercase text-[10px] text-outline font-bold tracking-wide">_hub_intermodal_tmb</span>
+                    <span class="font-body-sm text-body-sm font-semibold truncate text-charcoal-text">Metro Universitat (L1/L2) a 280 m (3 min a pie)</span>
+                  </div>
                 </div>
-                <div class="flex flex-col min-w-0">
-                  <span class="font-label-caps uppercase text-[10px] text-outline font-bold tracking-wide">_hub_intermodal_tmb</span>
-                  <span class="font-body-sm text-body-sm font-semibold truncate text-charcoal-text">Metro Universitat (L1/L2) a 280 m (3 min a pie)</span>
-                </div>
+                <button type="button" onclick="window.abrirModalInfo('transporte')" class="p-1 rounded text-outline hover:text-primary hover:bg-stone-surface transition-colors flex-shrink-0 cursor-pointer" title="Ver red oficial TMB y cálculo de distancia">
+                  <span class="material-symbols-outlined text-[17px]">info</span>
+                </button>
               </div>
             </div>
 
@@ -825,7 +840,12 @@
               <!-- KPI 1: Location Score -->
               <div class="bg-surface-container-lowest p-space-md rounded-xl border border-sandstone-border shadow-[0_1px_3px_rgba(27,28,26,0.03)] flex flex-col justify-between">
                 <div class="flex items-center justify-between pb-1">
-                  <span class="font-label-caps text-outline uppercase text-[10px] font-semibold">_location_score</span>
+                  <div class="flex items-center gap-1.5">
+                    <span class="font-label-caps text-outline uppercase text-[10px] font-semibold">_location_score</span>
+                    <button type="button" onclick="window.abrirModalInfo('score')" class="p-0.5 rounded text-outline hover:text-primary hover:bg-stone-surface transition-colors cursor-pointer" title="Ver desglose de puntuación y fórmula">
+                      <span class="material-symbols-outlined text-[15px]">info</span>
+                    </button>
+                  </div>
                   <span class="material-symbols-outlined text-primary text-[18px]">verified</span>
                 </div>
                 <div class="my-1">
@@ -843,7 +863,12 @@
               <!-- KPI 2: Renta Estimada Incasòl -->
               <div class="bg-surface-container-lowest p-space-md rounded-xl border border-sandstone-border shadow-[0_1px_3px_rgba(27,28,26,0.03)] flex flex-col justify-between">
                 <div class="flex items-center justify-between pb-1">
-                  <span class="font-label-caps text-outline uppercase text-[10px] font-semibold">_renta_estimada (incasòl)</span>
+                  <div class="flex items-center gap-1.5">
+                    <span class="font-label-caps text-outline uppercase text-[10px] font-semibold">_renta_estimada (incasòl)</span>
+                    <button type="button" onclick="window.abrirModalInfo('renta')" class="p-0.5 rounded text-outline hover:text-primary hover:bg-stone-surface transition-colors cursor-pointer" title="Ver registro oficial INCASÒL y cálculo">
+                      <span class="material-symbols-outlined text-[15px]">info</span>
+                    </button>
+                  </div>
                   <span class="material-symbols-outlined text-terracotta-accent text-[18px]">real_estate_agent</span>
                 </div>
                 <div class="my-1">
@@ -1654,6 +1679,21 @@
                 window.print();
               }, 600);
             };
+
+            // Manejo del Modal de Información Oficial
+            window.cerrarModalInfo = function() {
+              var modal = document.getElementById('modal-info-auditoria');
+              if (modal) {
+                modal.classList.add('hidden');
+              }
+            };
+
+            // Cerrar con Escape
+            document.addEventListener('keydown', function(e) {
+              if (e.key === 'Escape') {
+                window.cerrarModalInfo();
+              }
+            });
           })();
         </script>
 
@@ -1662,6 +1702,87 @@
 
       </div>
     </main>
+  </div>
+
+  <!-- MODAL DE INFORMACIÓN Y AUDITORÍA DE DATOS OFICIALES -->
+  <div id="modal-info-auditoria" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs hidden transition-opacity duration-200" onclick="if(event.target===this) window.cerrarModalInfo();">
+    <div class="bg-surface-container-lowest border border-sandstone-border rounded-2xl shadow-2xl max-w-xl w-full max-h-[90vh] overflow-y-auto flex flex-col transform transition-transform duration-200" id="modal-info-card">
+      
+      <!-- Cabecera del Modal -->
+      <div class="px-space-md py-3.5 border-b border-sandstone-border flex items-center justify-between bg-stone-surface/40">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-lg bg-surface border border-sandstone-border flex items-center justify-center text-primary shadow-xs">
+            <span class="material-symbols-outlined text-[20px]" id="modal-info-icono">verified</span>
+          </div>
+          <div class="flex flex-col">
+            <span class="font-headline-md text-[14px] font-bold text-primary" id="modal-info-titulo">Auditoría de Datos Oficiales</span>
+            <span class="font-label-tabular-sm text-[10px] text-outline" id="modal-info-subtitulo">Metodología, procedencia y cálculo</span>
+          </div>
+        </div>
+        <button type="button" onclick="window.cerrarModalInfo()" class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-stone-surface text-outline hover:text-primary transition-colors cursor-pointer" title="Cerrar ventana">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+
+      <!-- Cuerpo del Modal -->
+      <div class="p-space-md flex flex-col gap-4 text-charcoal-text">
+        
+        <!-- Bloque 1: Organismo Oficial & Granularidad -->
+        <div class="p-3 rounded-xl bg-surface border border-sandstone-border flex flex-col gap-1.5 shadow-xs">
+          <div class="flex items-center justify-between">
+            <span class="font-label-caps text-primary text-[10px] font-bold uppercase flex items-center gap-1">
+              <span class="material-symbols-outlined text-[15px] text-primary">verified_user</span>
+              <span>Fuente Oficial &amp; Base Legal</span>
+            </span>
+            <span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-label-tabular-sm text-[9px] font-bold" id="modal-info-badge">OFICIAL</span>
+          </div>
+          <div class="text-[13px] font-bold text-charcoal-text" id="modal-info-organismo">
+            Institut Català del Sòl (INCASÒL)
+          </div>
+          <div class="text-[11px] text-on-surface-variant leading-relaxed" id="modal-info-base-legal">
+            Registro administrativo obligatorio de fianzas de arrendamientos urbanos.
+          </div>
+        </div>
+
+        <!-- Bloque 2: Metodología Explicada -->
+        <div class="flex flex-col gap-1">
+          <span class="font-label-caps text-outline text-[10px] uppercase font-bold">¿Para qué sirve y cómo se calcula?</span>
+          <p class="text-[12px] text-on-surface-variant leading-relaxed" id="modal-info-metodologia">
+            Explicación detallada...
+          </p>
+        </div>
+
+        <!-- Bloque 3: Datos Reales del Activo y Cálculo Exacto -->
+        <div class="p-3.5 rounded-xl bg-amber-50/60 border border-amber-200 flex flex-col gap-2 shadow-xs">
+          <div class="flex items-center justify-between border-b border-amber-200/60 pb-1">
+            <span class="font-label-caps text-amber-950 text-[10px] font-bold uppercase flex items-center gap-1">
+              <span class="material-symbols-outlined text-[16px] text-amber-800">calculate</span>
+              <span>Datos Reales de este Inmueble &amp; Fórmula Exacta</span>
+            </span>
+            <span class="font-mono text-[9px] px-1.5 py-0.2 rounded bg-amber-200/70 text-amber-950 font-bold" id="modal-info-formula-tag">FÓRMULA EXACTA</span>
+          </div>
+          
+          <div class="font-mono text-[11px] bg-white p-2.5 rounded-lg border border-amber-200/80 text-amber-950 overflow-x-auto whitespace-pre-wrap leading-relaxed shadow-xs" id="modal-info-calculo">
+            Superficie: 110 m² × Renta: 35,00 €/m² = 3.850,00 €/mes
+          </div>
+
+          <div class="text-[10px] text-amber-900 leading-snug flex items-center gap-1 pt-0.5" id="modal-info-nota">
+            <span class="material-symbols-outlined text-[14px] text-emerald-700 flex-shrink-0">check_circle</span>
+            <span>Cálculo generado automáticamente con la consulta oficial del inmueble analizado.</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Pie del Modal -->
+      <div class="px-space-md py-3 bg-stone-surface/40 border-t border-sandstone-border flex items-center justify-between">
+        <span class="font-label-tabular-sm text-[10px] text-outline">Auditoría Transparente • BCN Location Copilot</span>
+        <button type="button" onclick="window.cerrarModalInfo()" class="px-4 py-1.5 rounded-lg bg-primary hover:bg-forest-muted text-on-primary font-headline-md text-[12px] font-semibold transition-colors shadow-sm cursor-pointer">
+          Cerrar
+        </button>
+      </div>
+
+    </div>
   </div>
 </body>
 </html>
