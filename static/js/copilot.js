@@ -246,6 +246,9 @@
           if (inputCalle) inputCalle.value = nombreVia;
           sugerenciasContainer.classList.add('hidden');
 
+          // Ejecutar análisis inmediatamente al seleccionar la vía
+          ejecutarAnalisisCompleto();
+
           // Trasladar automáticamente el foco al número de policía
           if (inputNumero) {
             inputNumero.focus();
@@ -276,8 +279,8 @@
     const btnRecalcular = document.getElementById('btn-recalcular');
     const formCopilot = document.getElementById('form-copilot');
 
-    // Inputs que disparan análisis completo al cambiar
-    const triggers = [inputNumero, inputPiso];
+    // Inputs que disparan análisis completo al cambiar o salir del foco
+    const triggers = [inputCalle, inputNumero, inputPiso];
     triggers.forEach(el => {
       if (!el) return;
       ['change', 'blur'].forEach(evt => {
@@ -369,13 +372,9 @@
 
   function verificarYDispararAnalisis() {
     const calle = document.getElementById('input-calle')?.value.trim() || '';
-    const numero = document.getElementById('input-numero')?.value.trim() || '';
-
-    // Condición: calle con al menos 3 caracteres y número existente
-    if (calle.length >= 3 && numero.length >= 1) {
-      // Evitar llamadas duplicadas instantáneas
+    if (calle.length >= 2) {
       const now = Date.now();
-      if (now - ultimoAnalisisTimestamp > 500) {
+      if (now - ultimoAnalisisTimestamp > 250) {
         ultimoAnalisisTimestamp = now;
         ejecutarAnalisisCompleto();
       }
@@ -617,15 +616,18 @@
     if (clima.hdd !== undefined) setText('clima-hdd', `${clima.hdd} HDD`);
     if (clima.cdd !== undefined) setText('clima-cdd', `${clima.cdd} CDD`);
 
-    // H. Movimiento de Cámara Leaflet
+    // H. Movimiento de Cámara Leaflet y actualización de marcador
     if (activo.lat && activo.lon && map) {
       const lat = parseFloat(activo.lat);
       const lon = parseFloat(activo.lon);
       actualizarMarcadorYIsocronas(lat, lon, activo.direccion, activo.ref_catastral);
       map.flyTo([lat, lon], 17, {
         animate: true,
-        duration: 1.2
+        duration: 1.0
       });
+      if (currentMarker) {
+        setTimeout(() => currentMarker.openPopup(), 400);
+      }
     }
   }
 
