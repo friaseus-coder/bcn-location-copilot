@@ -869,11 +869,63 @@
           ratio_saludable: '12.5%'
         }
       },
-      acustica: {
-        viandantes_hora: 390,
-        apto_terraza: true,
-        ruido: { vianants_ld: 61, vianants_le: 58, oci_ln: 47, transit_ld: 64 }
-      },
+      acustica: (function() {
+        const c = (calle || '').toLowerCase();
+        if (c.includes('arago') || c.includes('gran via') || c.includes('meridiana') || c.includes('valencia') || c.includes('mallorca')) {
+          return {
+            viandantes_hora: 410,
+            apto_terraza: true,
+            ruido: {
+              vianants_ld: 69,
+              vianants_le: 67,
+              oci_ln: 54,
+              transit_ld: 72,
+              transit_desc: 'Eje arterial de tráfico rodado intenso. Exige carpintería técnica con aislamiento reforzado ≥ 38 dBA en fachada.',
+              oci_desc: 'Tráfico rodado predominante sobre ocio. Cumple ZATHN nocturno.'
+            }
+          };
+        } else if (c.includes('consell de cent') || c.includes('girona') || c.includes('rocafort') || c.includes('borrell')) {
+          return {
+            viandantes_hora: 520,
+            apto_terraza: true,
+            ruido: {
+              vianants_ld: 54,
+              vianants_le: 52,
+              oci_ln: 42,
+              transit_ld: 45,
+              transit_desc: 'Eje pacificado (Superilla). Tráfico rodado muy bajo (<10 km/h) restringido a carga/descarga y vecinal.',
+              oci_desc: 'Excelente confort acústico diurno y nocturno. Cumple ampliamente directivas europeas.'
+            }
+          };
+        } else if (c.includes('enric granados') || c.includes('carme') || c.includes('gotic') || c.includes('raval') || c.includes('born') || c.includes('blai')) {
+          return {
+            viandantes_hora: 580,
+            apto_terraza: true,
+            ruido: {
+              vianants_ld: 64,
+              vianants_le: 65,
+              oci_ln: 58,
+              transit_ld: 52,
+              transit_desc: 'Tráfico rodado pacificado o restringido a carga/descarga y vecinal.',
+              oci_desc: 'Zona Acústicamente Tensionada en Horario Nocturno (ZATHN). Restricción estricta de nuevas licencias.'
+            }
+          };
+        } else {
+          // Eje Comercial Cerdà estándar (Comte d'Urgell, Balmes, Muntaner, etc.)
+          return {
+            viandantes_hora: 460,
+            apto_terraza: true,
+            ruido: {
+              vianants_ld: 62,
+              vianants_le: 59,
+              oci_ln: 48,
+              transit_ld: 66,
+              transit_desc: 'Nivel confortable para terrazas y actividad diurna. Requiere carpintería técnica con aislamiento mín. 35 dB en caso residencial.',
+              oci_desc: 'Cumple ZATHN (Zona Acústicamente Tensionada en Horario Nocturno).'
+            }
+          };
+        }
+      })(),
       clima: {
         dias_lluvia: 48,
         precipitacion_mm: 512,

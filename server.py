@@ -1232,10 +1232,11 @@ def resolver_acustica_y_viandantes(
     calle_l = calle_clean.lower()
     num_str = f" núm. {numero}" if numero else ""
 
-    es_eje_peatonal_top = any(w in calle_l for w in ["portal de l'angel", "pelai", "rambla", "ramblas", "passeig de gracia", "pg de gracia"])
-    es_eje_comercial = any(w in calle_l for w in ["balmes", "diagonal", "consell de cent", "rambla catalunya", "creu coberta", "gran de gracia", "pau claris", "girona"])
-    es_eje_trafico_pesado = any(w in calle_l for w in ["arago", "gran via", "meridiana", "numancia", "mallorca", "valencia"])
-    es_calle_estrecha_historica = any(w in calle_l for w in ["gotic", "raval", "born", "ferran", "avinyo", "princesa", "hospital", "carme"])
+    es_eje_peatonal_top = any(w in calle_l for w in ["portal de l'angel", "pelai", "rambla", "ramblas", "passeig de gracia", "pg de gracia", "puerta del angel"])
+    es_eje_comercial = any(w in calle_l for w in ["balmes", "diagonal", "rambla catalunya", "creu coberta", "gran de gracia", "pau claris", "urgell", "comte d'urgell", "muntaner", "aribau", "tallers"])
+    es_eje_trafico_pesado = any(w in calle_l for w in ["arago", "gran via", "meridiana", "numancia", "mallorca", "valencia", "tarragona", "paral-lel", "paralelo"])
+    es_calle_estrecha_historica = any(w in calle_l for w in ["gotic", "raval", "born", "ferran", "avinyo", "princesa", "hospital", "carme", "enric granados", "blai", "joaquim costa"])
+    es_superilla_pacificada = any(w in calle_l for w in ["consell de cent", "girona", "rocafort", "comte borrell", "borrell"])
 
     # 1. AFORO PEATONAL
     if es_eje_peatonal_top:
@@ -1246,6 +1247,10 @@ def resolver_acustica_y_viandantes(
         viandantes_hora = 460
         viandantes_pico = 720
         tramo_desc = f"Tramo {calle_clean}{num_str}: Medición consolidada día laborable (picos 14:00h y 19:00h)."
+    elif es_superilla_pacificada:
+        viandantes_hora = 520
+        viandantes_pico = 810
+        tramo_desc = f"Tramo {calle_clean}{num_str}: Eje verde pacificado con alto flujo de paseantes y estancia vecinal."
     elif es_calle_estrecha_historica:
         viandantes_hora = 340
         viandantes_pico = 550
@@ -1261,6 +1266,11 @@ def resolver_acustica_y_viandantes(
         apto_terraza = False
         terraza_desc = "Acera < 3.0 m o plataforma única saturada. Restricción severa de veladores."
         terraza_status = "Restricción Total"
+    elif es_superilla_pacificada:
+        ancho_acera = 8.0
+        apto_terraza = True
+        terraza_desc = "Plataforma única pacificadas. Veladores sujetos al cupo estricto del Plan Especial Superilles."
+        terraza_status = "Viabilidad Condicionada"
     elif es_eje_peatonal_top:
         ancho_acera = 7.5
         apto_terraza = True
@@ -1285,6 +1295,13 @@ def resolver_acustica_y_viandantes(
         transit_ld = 72
         transit_desc = "Eje arterial de tráfico rodado intenso. Exige carpintería técnica con aislamiento reforzado ≥ 38 dBA en fachada."
         oci_desc = "Tráfico rodado predominante sobre ocio. Cumple ZATHN nocturno."
+    elif es_superilla_pacificada:
+        ruido_ld = 54
+        ruido_le = 52
+        ruido_ln = 42
+        transit_ld = 45
+        transit_desc = "Eje pacificado (Superilla). Tráfico rodado muy bajo (<10 km/h) restringido a carga/descarga y vecinal."
+        oci_desc = "Excelente confort acústico diurno y nocturno. Cumple ampliamente directivas europeas."
     elif es_calle_estrecha_historica:
         ruido_ld = 64
         ruido_le = 65
