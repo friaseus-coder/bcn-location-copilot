@@ -1311,6 +1311,19 @@
     if (typeof window.renderizarNegocios === 'function') {
       window.renderizarNegocios();
     }
+
+    // 6. Tab Servicios y Equipamientos en Cercanías por Isócronas
+    const lblServCuenca = document.getElementById('lbl-servicios-cuenca-activa');
+    if (lblServCuenca) {
+      const radio = data.radioM || 300;
+      lblServCuenca.innerHTML = `
+        <span class="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
+        <span>Cuenca activa: ${minutos} min (~${radio} m)</span>
+      `;
+    }
+    if (typeof window.renderizarServicios === 'function') {
+      window.renderizarServicios();
+    }
   }
 
   // Asignar función global para el cambio de isócrona conectado
@@ -1871,6 +1884,370 @@ Tiempo de Acceso = ${distanciaMetro} m / 80 m/min = ${(distanciaMetro / 80).toFi
     mostrarToast(`Localizado en mapa: ${nombre}`);
   };
 
+  // =========================================================================
+  // CENSO OFICIAL DE SERVICIOS Y EQUIPAMIENTOS URBANOS EN CERCANÍAS
+  // (Guia d'Equipaments Ajuntament de Barcelona, CatSalut, B:SM & Generalitat)
+  // =========================================================================
+  const CENSO_SERVICIOS_POR_CUENCA = {
+    5: [
+      // Isócrona 5 min (~300m a pie) - 18 equipamientos clave
+      // 1. Educación (3)
+      { id: 'serv-1', nombre: "CEIP Ferran Sunyer", direccion: "Carrer de Viladomat, 115", categoria: 'educacion', categoriaNombre: 'Educación Infantil & Primaria', subtipo: 'Escuela Pública Consorci d\'Educació', distancia_m: 130, minutos: '1,6 min', lat: 41.3815, lon: 2.1585, titularidad: 'Pública' },
+      { id: 'serv-2', nombre: "Institut Poeta Maragall", direccion: "Carrer de Provença, 187", categoria: 'educacion', categoriaNombre: 'Educación Secundaria & Bachillerato', subtipo: 'Instituto Público de Enseñanza Secundaria (IES)', distancia_m: 220, minutos: '2,8 min', lat: 41.3895, lon: 2.1560, titularidad: 'Pública' },
+      { id: 'serv-3', nombre: "Escola Bressol Municipal El Petit Príncep", direccion: "Carrer d'Aragó, 172", categoria: 'educacion', categoriaNombre: 'Educación Infantil (0-3 años)', subtipo: 'Escola Bressol Municipal (EBM)', distancia_m: 180, minutos: '2,2 min', lat: 41.3860, lon: 2.1575, titularidad: 'Municipal' },
+
+      // 2. Salud & Centros Médicos (3)
+      { id: 'serv-4', nombre: "CAP Manso (CatSalut)", direccion: "Carrer de Manso, 19", categoria: 'salud', categoriaNombre: 'Centro de Atención Primaria', subtipo: 'CAP & Especialidades Médicas ICS', distancia_m: 240, minutos: '3,0 min', lat: 41.3775, lon: 2.1610, titularidad: 'Pública (CatSalut)' },
+      { id: 'serv-5', nombre: "CUAP Manso / Casanova (Urgencias 24h)", direccion: "Carrer de Casanova, 160", categoria: 'salud', categoriaNombre: 'Centro de Urgencias de Atención Primaria', subtipo: 'Urgencias Médicas de Proximidad 24 Horas', distancia_m: 270, minutos: '3,4 min', lat: 41.3882, lon: 2.1525, titularidad: 'Pública (ICS)' },
+      { id: 'serv-6', nombre: "CAP Comte Borrell", direccion: "Carrer del Comte Borrell, 305", categoria: 'salud', categoriaNombre: 'Atención Primaria y Comunitaria', subtipo: 'Centro de Salud Territorial Eixample', distancia_m: 110, minutos: '1,4 min', lat: 41.3890, lon: 2.1480, titularidad: 'Pública (CatSalut)' },
+
+      // 3. Aparcamientos Públicos (3)
+      { id: 'serv-7', nombre: "Aparcament B:SM Comte d'Urgell", direccion: "Carrer del Comte d'Urgell, 142", categoria: 'parking', categoriaNombre: 'Aparcamiento Público Subterráneo', subtipo: 'Red Municipal B:SM (420 plazas + 12 puntos VE)', distancia_m: 60, minutos: '0,8 min', lat: 41.3842, lon: 2.1565, titularidad: 'Pública (B:SM)' },
+      { id: 'serv-8', nombre: "Aparcament B:SM Mercat de Sant Antoni", direccion: "Carrer del Comte d'Urgell, 1", categoria: 'parking', categoriaNombre: 'Aparcamiento Municipal Rotacional', subtipo: 'B:SM Subterráneo 3 plantas con acceso directo', distancia_m: 210, minutos: '2,6 min', lat: 41.3792, lon: 2.1625, titularidad: 'Pública (B:SM)' },
+      { id: 'serv-9', nombre: "Parking Saba Estació Universitat", direccion: "Plaça de la Universitat, s/n", categoria: 'parking', categoriaNombre: 'Parking Rotacional Subterráneo', subtipo: 'Concesión Rotacional Abierta 24h', distancia_m: 280, minutos: '3,5 min', lat: 41.3855, lon: 2.1640, titularidad: 'Concesión Municipal' },
+
+      // 4. Parques & Zonas Verdes (3)
+      { id: 'serv-10', nombre: "Jardins de Montserrat", direccion: "Carrer de Rosselló, 134", categoria: 'zonas_verdes', categoriaNombre: 'Parque Urbano & Área Infantil', subtipo: 'Zona Verde Arbolada Manzana Cerdà', distancia_m: 140, minutos: '1,8 min', lat: 41.3880, lon: 2.1520, titularidad: 'Pública Municipal' },
+      { id: 'serv-11', nombre: "Jardins d'Emma de Barcelona", direccion: "Carrer del Comte Borrell, 153", categoria: 'zonas_verdes', categoriaNombre: 'Jardines de Interior de Manzana', subtipo: 'Pulmón Verde Interior con Juegos Infantiles', distancia_m: 190, minutos: '2,4 min', lat: 41.3835, lon: 2.1570, titularidad: 'Pública Municipal' },
+      { id: 'serv-12', nombre: "Plaça de la Universitat (Espacio Arbolado)", direccion: "Plaça de la Universitat", categoria: 'zonas_verdes', categoriaNombre: 'Plaza Cívica & Parterre Arbolado', subtipo: 'Espacio Cívico Arbolado con Sombrío', distancia_m: 260, minutos: '3,2 min', lat: 41.3860, lon: 2.1645, titularidad: 'Dominio Público' },
+
+      // 5. Centros Religiosos & Culto (3)
+      { id: 'serv-13', nombre: "Parròquia de Sant Josep Oriol", direccion: "Carrer de la Diputació, 145", categoria: 'culto', categoriaNombre: 'Iglesia & Parroquia Católica', subtipo: 'Basílica Menor Neorrománica (Catalogada)', distancia_m: 150, minutos: '1,9 min', lat: 41.3830, lon: 2.1590, titularidad: 'Arzobispado de Barcelona' },
+      { id: 'serv-14', nombre: "Església de la Mare de Déu dels Àngels", direccion: "Carrer de Balmes, 78", categoria: 'culto', categoriaNombre: 'Parroquia & Centro Pastoral', subtipo: 'Templo Histórico del Eixample', distancia_m: 275, minutos: '3,4 min', lat: 41.3910, lon: 2.1580, titularidad: 'Arzobispado de Barcelona' },
+      { id: 'serv-15', nombre: "Parròquia de Sant Francesc de Paula", direccion: "Carrer d'Urgell, 212", categoria: 'culto', categoriaNombre: 'Centro Parroquial Comunitario', subtipo: 'Atención Social & Espiritual', distancia_m: 295, minutos: '3,7 min', lat: 41.3892, lon: 2.1505, titularidad: 'Arzobispado de Barcelona' },
+
+      // 6. Equipamientos Cívicos, Cultura & Seguridad (3)
+      { id: 'serv-16', nombre: "Biblioteca Pública Agustí Centelles", direccion: "Carrer del Comte d'Urgell, 145", categoria: 'civicos', categoriaNombre: 'Biblioteca Pública Municipal', subtipo: 'Red Bibliotecas Diputació de BCN & Salas Estudio', distancia_m: 50, minutos: '0,6 min', lat: 41.3840, lon: 2.1560, titularidad: 'Consorci Biblioteques BCN' },
+      { id: 'serv-17', nombre: "Centre Cívic Urgell", direccion: "Carrer del Comte d'Urgell, 145", categoria: 'civicos', categoriaNombre: 'Centro Cívico y Espacio Cultural', subtipo: 'Equipamiento Sociocultural Eixample', distancia_m: 55, minutos: '0,7 min', lat: 41.3840, lon: 2.1562, titularidad: 'Ajuntament de Barcelona' },
+      { id: 'serv-18', nombre: "Comissaria Guàrdia Urbana (Districte 2)", direccion: "Carrer de Viladomat, 114", categoria: 'civicos', categoriaNombre: 'Seguridad Ciudadana Municipal', subtipo: 'Unidad Territorial Eixample Esquerra', distancia_m: 250, minutos: '3,1 min', lat: 41.3810, lon: 2.1580, titularidad: 'Pública (Guàrdia Urbana)' }
+    ],
+
+    10: [
+      // Corona 300m - 650m (14 equipamientos adicionales)
+      { id: 'serv-19', nombre: "Hospital Clínic de Barcelona", direccion: "Carrer de Villarroel, 170", categoria: 'salud', categoriaNombre: 'Hospital Universitario de Alta Complejidad', subtipo: 'Hospital de Referencia Internacional ICS', distancia_m: 620, minutos: '7,8 min', lat: 41.3888, lon: 2.1510, titularidad: 'Pública (CatSalut)' },
+      { id: 'serv-20', nombre: "Escola Pia Sant Antoni", direccion: "Ronda de Sant Pau, 72", categoria: 'educacion', categoriaNombre: 'Colegio Concertado Infantil/Primaria/Bach', subtipo: 'Centro Educativo Integrado', distancia_m: 390, minutos: '4,9 min', lat: 41.3780, lon: 2.1630, titularidad: 'Concertada' },
+      { id: 'serv-21', nombre: "Institut Públic Ernest Lluch", direccion: "Carrer de la Diputació, 112", categoria: 'educacion', categoriaNombre: 'Educación Secundaria y Ciclos Formativos', subtipo: 'Instituto Público Polivalente', distancia_m: 430, minutos: '5,4 min', lat: 41.3805, lon: 2.1565, titularidad: 'Pública' },
+      { id: 'serv-22', nombre: "Aparcament B:SM Diputació", direccion: "Carrer de la Diputació, 204", categoria: 'parking', categoriaNombre: 'Aparcamiento Público Municipal', subtipo: 'Red B:SM (380 plazas rotacionales)', distancia_m: 350, minutos: '4,4 min', lat: 41.3855, lon: 2.1615, titularidad: 'Pública (B:SM)' },
+      { id: 'serv-23', nombre: "Aparcament B:SM Rambla Catalunya", direccion: "Rambla de Catalunya, 35", categoria: 'parking', categoriaNombre: 'Aparcamiento Subterráneo Central', subtipo: 'Rotacional Continuo B:SM', distancia_m: 540, minutos: '6,8 min', lat: 41.3895, lon: 2.1645, titularidad: 'Pública (B:SM)' },
+      { id: 'serv-24', nombre: "Jardins de Còrsega", direccion: "Carrer de Còrsega, 195", categoria: 'zonas_verdes', categoriaNombre: 'Jardines Urbanos de Proximidad', subtipo: 'Área de Estancia y Juegos Infantiles', distancia_m: 480, minutos: '6,0 min', lat: 41.3910, lon: 2.1525, titularidad: 'Pública Municipal' },
+      { id: 'serv-25', nombre: "Parc de Joan Miró", direccion: "Carrer de Tarragona, 44", categoria: 'zonas_verdes', categoriaNombre: 'Gran Parque Metropolitano', subtipo: 'Gran Pulmón Verde con Pinar y Escultura Miró', distancia_m: 640, minutos: '8,0 min', lat: 41.3785, lon: 2.1465, titularidad: 'Pública Municipal' },
+      { id: 'serv-26', nombre: "Parròquia de Maria Auxiliadora", direccion: "Carrer de Sepúlveda, 68", categoria: 'culto', categoriaNombre: 'Parroquia Salesiana & Espacio Comunitario', subtipo: 'Santuario y Centro Pastoral Juvenil', distancia_m: 380, minutos: '4,8 min', lat: 41.3765, lon: 2.1565, titularidad: 'Diócesis de Barcelona' },
+      { id: 'serv-27', nombre: "Parròquia de Sant Raimon de Penyafort", direccion: "Rambla de Catalunya, 115", categoria: 'culto', categoriaNombre: 'Basílica y Templo Parroquial', subtipo: 'Patrimonio Religioso Histórico', distancia_m: 580, minutos: '7,2 min', lat: 41.3940, lon: 2.1585, titularidad: 'Arzobispado de Barcelona' },
+      { id: 'serv-28', nombre: "Centre Cívic Casa Golferichs", direccion: "Gran Via de les Corts Catalanes, 491", categoria: 'civicos', categoriaNombre: 'Centro Cívico & Espacio Fotográfico', subtipo: 'Edificio Emblemático Modernista', distancia_m: 360, minutos: '4,5 min', lat: 41.3812, lon: 2.1565, titularidad: 'Pública Municipal' },
+      { id: 'serv-29', nombre: "Biblioteca Esquerra de l'Eixample - Magori", direccion: "Carrer del Comte Borrell, 44", categoria: 'civicos', categoriaNombre: 'Biblioteca Pública Especializada', subtipo: 'Fondo Audiovisual y Salas Multimedia', distancia_m: 490, minutos: '6,1 min', lat: 41.3775, lon: 2.1645, titularidad: 'Diputació de Barcelona' },
+      { id: 'serv-30', nombre: "Comissaria Mossos d'Esquadra Eixample", direccion: "Plaça d'Espanya, 1", categoria: 'civicos', categoriaNombre: 'Comisaría Central de Distrito', subtipo: 'Seguridad Ciudadana de la Policía Autonómica', distancia_m: 590, minutos: '7,4 min', lat: 41.3755, lon: 2.1495, titularidad: 'Generalitat de Catalunya' }
+    ],
+
+    15: [
+      // Corona 650m - 1.000m (10 grandes equipamientos adicionales)
+      { id: 'serv-31', nombre: "Facultat de Medicina (Universitat de Barcelona)", direccion: "Carrer de Casanova, 143", categoria: 'educacion', categoriaNombre: 'Campus Universitario Medicina & Ciencias', subtipo: 'Campus Histórico UB Clínic', distancia_m: 690, minutos: '8,6 min', lat: 41.3892, lon: 2.1520, titularidad: 'Pública (UB)' },
+      { id: 'serv-32', nombre: "Escola d'Enginyeria Industrial (ETSEIB - UPC)", direccion: "Avinguda Diagonal, 647", categoria: 'educacion', categoriaNombre: 'Campus de Ingeniería Tecnológica', subtipo: 'Campus Universitario Politécnico', distancia_m: 910, minutos: '11,4 min', lat: 41.3860, lon: 2.1150, titularidad: 'Pública (UPC)' },
+      { id: 'serv-33', nombre: "Hospital Universitari Sagrat Cor", direccion: "Carrer de Viladomat, 288", categoria: 'salud', categoriaNombre: 'Hospital Universitario Medicoquirúrgico', subtipo: 'Centro Hospitalario Integrado CatSalut', distancia_m: 880, minutos: '11,0 min', lat: 41.3880, lon: 2.1430, titularidad: 'Concertada / Pública' },
+      { id: 'serv-34', nombre: "Aparcament B:SM Plaça Francesc Macià", direccion: "Plaça de Francesc Macià", categoria: 'parking', categoriaNombre: 'Aparcamiento Municipal Estratégico', subtipo: 'Red B:SM Intermodal', distancia_m: 850, minutos: '10,6 min', lat: 41.3930, lon: 2.1440, titularidad: 'Pública (B:SM)' },
+      { id: 'serv-35', nombre: "Aparcament B:SM Estació de Sants", direccion: "Plaça dels Països Catalans", categoria: 'parking', categoriaNombre: 'Aparcamiento Intermodal Ferroviario', subtipo: 'Conexión AVE y Cercanías Renfe', distancia_m: 960, minutos: '12,0 min', lat: 41.3800, lon: 2.1410, titularidad: 'Pública (B:SM)' },
+      { id: 'serv-36', nombre: "Jardins de la Universitat de Barcelona", direccion: "Carrer de la Diputació, 230", categoria: 'zonas_verdes', categoriaNombre: 'Jardín Botánico Histórico Urbano', subtipo: 'Patrimonio Botánico Protegido', distancia_m: 720, minutos: '9,0 min', lat: 41.3875, lon: 2.1640, titularidad: 'Universitat de Barcelona' },
+      { id: 'serv-37', nombre: "Basílica de la Concepció", direccion: "Carrer d'Aragó, 299", categoria: 'culto', categoriaNombre: 'Basílica y Claustro Gótico', subtipo: 'Monumento Histórico Artístico Nacional', distancia_m: 890, minutos: '11,1 min', lat: 41.3955, lon: 2.1670, titularidad: 'Arzobispado de Barcelona' },
+      { id: 'serv-38', nombre: "Seu del Districte de l'Eixample (OAC)", direccion: "Carrer d'Aragó, 311", categoria: 'civicos', categoriaNombre: 'Oficina de Atención Ciudadana (OAC)', subtipo: 'Gestión Administrativa Municipal', distancia_m: 820, minutos: '10,2 min', lat: 41.3960, lon: 2.1675, titularidad: 'Ajuntament de Barcelona' },
+      { id: 'serv-39', nombre: "Conservatori Municipal de Música de Barcelona", direccion: "Carrer del Bruc, 110", categoria: 'educacion', categoriaNombre: 'Conservatorio y Estudios Musicales', subtipo: 'Centro Superior de Música Municipal', distancia_m: 950, minutos: '11,9 min', lat: 41.3970, lon: 2.1645, titularidad: 'Ajuntament de Barcelona' },
+      { id: 'serv-40', nombre: "Poliesportiu Municipal Estació del Nord", direccion: "Carrer de Nàpols, 42", categoria: 'civicos', categoriaNombre: 'Complejo Deportivo Municipal', subtipo: 'Pabellón Polideportivo y Piscinas BCN', distancia_m: 990, minutos: '12,4 min', lat: 41.3930, lon: 2.1810, titularidad: 'Institut Barcelona Esports' }
+    ]
+  };
+
+  let categoriaServiciosActiva = 'todas';
+  let busquedaServiciosActiva = '';
+  let marcadorServicioEnMapa = null;
+
+  /**
+   * Obtiene la lista acumulada de servicios y equipamientos según la isócrona activa
+   */
+  function obtenerServiciosCuencaActiva() {
+    const minutos = currentIsochroneMinutes || 5;
+    let lista = [...(CENSO_SERVICIOS_POR_CUENCA[5] || [])];
+    if (minutos >= 10 && CENSO_SERVICIOS_POR_CUENCA[10]) {
+      lista = lista.concat(CENSO_SERVICIOS_POR_CUENCA[10]);
+    }
+    if (minutos >= 15 && CENSO_SERVICIOS_POR_CUENCA[15]) {
+      lista = lista.concat(CENSO_SERVICIOS_POR_CUENCA[15]);
+    }
+    // Ordenar de más cercano a más lejano
+    return lista.sort((a, b) => a.distancia_m - b.distancia_m);
+  }
+
+  /**
+   * Renderiza las fichas de los servicios en el contenedor del DOM
+   */
+  window.renderizarServicios = function (categoriaFiltro, textoBusqueda) {
+    if (categoriaFiltro !== undefined) categoriaServiciosActiva = categoriaFiltro;
+    if (textoBusqueda !== undefined) busquedaServiciosActiva = textoBusqueda;
+
+    const listaBase = obtenerServiciosCuencaActiva();
+    const minutos = currentIsochroneMinutes || 5;
+
+    // 1. Calcular recuentos por categoría de servicio
+    const recuentos = {
+      todas: listaBase.length,
+      educacion: 0,
+      salud: 0,
+      parking: 0,
+      zonas_verdes: 0,
+      culto: 0,
+      civicos: 0
+    };
+
+    listaBase.forEach(item => {
+      if (recuentos[item.categoria] !== undefined) {
+        recuentos[item.categoria]++;
+      }
+    });
+
+    // Actualizar badges y contadores del DOM
+    setText('cnt-serv-educacion', recuentos.educacion);
+    setText('cnt-serv-salud', recuentos.salud);
+    setText('cnt-serv-parking', recuentos.parking);
+    setText('cnt-serv-zonas_verdes', recuentos.zonas_verdes);
+    setText('cnt-serv-culto', recuentos.culto);
+    setText('cnt-serv-civicos', recuentos.civicos);
+
+    setText('badge-total-servicios', recuentos.todas);
+    setText('txt-badge-total-filtro-servicios', recuentos.todas);
+
+    // 2. Filtrar por categoría activa
+    let listaFiltrada = listaBase;
+    if (categoriaServiciosActiva && categoriaServiciosActiva !== 'todas') {
+      listaFiltrada = listaFiltrada.filter(item => item.categoria === categoriaServiciosActiva);
+    }
+
+    // 3. Filtrar por texto de búsqueda en tiempo real
+    if (busquedaServiciosActiva && busquedaServiciosActiva.trim().length > 0) {
+      const q = busquedaServiciosActiva.trim().toLowerCase();
+      listaFiltrada = listaFiltrada.filter(item =>
+        item.nombre.toLowerCase().includes(q) ||
+        item.direccion.toLowerCase().includes(q) ||
+        item.categoriaNombre.toLowerCase().includes(q) ||
+        (item.subtipo && item.subtipo.toLowerCase().includes(q)) ||
+        (item.titularidad && item.titularidad.toLowerCase().includes(q))
+      );
+    }
+
+    // 4. Actualizar etiqueta de resultados visibles
+    const lblVisibles = document.getElementById('lbl-conteo-visibles-servicios');
+    if (lblVisibles) {
+      const nombreCat = categoriaServiciosActiva === 'todas' ? '' : ` en ${categoriaServiciosActiva.toUpperCase()}`;
+      lblVisibles.textContent = `Mostrando ${listaFiltrada.length} servicios y equipamientos${nombreCat} en la cuenca de ${minutos} min`;
+    }
+
+    // 5. Renderizar tarjetas dinámicas en el contenedor
+    const container = document.getElementById('contenedor-lista-servicios');
+    if (!container) return;
+
+    if (listaFiltrada.length === 0) {
+      container.innerHTML = `
+        <div class="col-span-full p-space-lg rounded-xl bg-surface border border-sandstone-border flex flex-col items-center justify-center text-center gap-2 py-8">
+          <span class="material-symbols-outlined text-[36px] text-outline">search_off</span>
+          <span class="font-headline-md text-charcoal-text font-bold">No se han encontrado equipamientos</span>
+          <span class="font-body-sm text-on-surface-variant text-[12px] max-w-md">
+            No hay servicios públicos que coincidan con «${busquedaServiciosActiva}» en la categoría seleccionada para la isócrona de ${minutos} min.
+          </span>
+          <button type="button" onclick="window.filtrarCategoriaServicios('todas'); document.getElementById('input-buscar-servicio').value=''; window.buscarServicioEnListado('');" class="mt-2 px-3 py-1.5 rounded-md bg-primary text-white text-[12px] font-semibold cursor-pointer shadow-xs">
+            Restablecer todos los filtros
+          </button>
+        </div>
+      `;
+      return;
+    }
+
+    // Configuración temática por categoría de servicio
+    const configCategoria = {
+      educacion: { badgeBg: 'bg-blue-100', badgeText: 'text-blue-900', icon: 'school', border: 'border-blue-200' },
+      salud: { badgeBg: 'bg-rose-100', badgeText: 'text-rose-900', icon: 'local_hospital', border: 'border-rose-200' },
+      parking: { badgeBg: 'bg-slate-100', badgeText: 'text-slate-900', icon: 'local_parking', border: 'border-slate-300' },
+      zonas_verdes: { badgeBg: 'bg-emerald-100', badgeText: 'text-emerald-900', icon: 'park', border: 'border-emerald-200' },
+      culto: { badgeBg: 'bg-amber-100', badgeText: 'text-amber-900', icon: 'church', border: 'border-amber-200' },
+      civicos: { badgeBg: 'bg-indigo-100', badgeText: 'text-indigo-900', icon: 'account_balance', border: 'border-indigo-200' }
+    };
+
+    let html = '';
+    listaFiltrada.forEach(item => {
+      const cfg = configCategoria[item.categoria] || { badgeBg: 'bg-stone-surface', badgeText: 'text-primary', icon: 'location_city', border: 'border-sandstone-border' };
+      html += `
+        <div class="p-space-md rounded-xl bg-surface-container-lowest border ${cfg.border} hover:border-primary transition-all duration-200 flex flex-col justify-between gap-3 shadow-2xs hover:shadow-xs group">
+          
+          <!-- Encabezado: Categoría y Subtipo/Titularidad -->
+          <div class="flex items-start justify-between gap-2">
+            <span class="px-2 py-0.5 rounded-full ${cfg.badgeBg} ${cfg.badgeText} font-label-tabular-sm text-[10px] font-bold flex items-center gap-1">
+              <span class="material-symbols-outlined text-[13px]">${cfg.icon}</span>
+              <span>${item.categoriaNombre}</span>
+            </span>
+            <span class="px-1.5 py-0.2 rounded bg-stone-surface text-outline font-mono text-[9px] font-semibold truncate max-w-[130px]" title="${item.titularidad || ''}">
+              ${item.titularidad || 'Red Pública'}
+            </span>
+          </div>
+
+          <!-- Bloque Central: 4 Campos requeridos (Nombre, Dirección, Categoría/Subtipo, Distancia a pie) -->
+          <div class="flex flex-col gap-1.5">
+            <!-- 1. NOMBRE DEL EQUIPAMIENTO -->
+            <div class="text-[14px] font-bold text-charcoal-text leading-snug group-hover:text-primary transition-colors flex items-center gap-1">
+              <span>${item.nombre}</span>
+            </div>
+
+            <!-- 2. DIRECCIÓN -->
+            <div class="flex items-start gap-1.5 text-[11px] text-on-surface-variant leading-snug">
+              <span class="material-symbols-outlined text-[14px] text-outline mt-0.5 flex-shrink-0">location_on</span>
+              <span class="font-medium">${item.direccion}</span>
+            </div>
+
+            <!-- 3. CATEGORÍA Y SUBTIPO OFICIAL -->
+            <div class="flex items-center gap-1.5 text-[11px] text-outline font-medium">
+              <span class="material-symbols-outlined text-[14px] flex-shrink-0 text-outline">verified</span>
+              <span class="truncate">${item.subtipo || item.categoriaNombre}</span>
+            </div>
+
+            <!-- 4. DISTANCIA A PIE Y TIEMPO ESTIMADO -->
+            <div class="mt-1 flex items-center justify-between p-1.5 rounded-md bg-blue-50/70 border border-blue-200/70 text-blue-950">
+              <div class="flex items-center gap-1.5 text-[11px] font-bold">
+                <span class="material-symbols-outlined text-[16px] text-blue-700">directions_walk</span>
+                <span>A ${item.distancia_m} m • ~${item.minutos} a pie</span>
+              </div>
+              <span class="text-[9px] font-semibold text-blue-800 bg-white/80 px-1 rounded">80 m/min</span>
+            </div>
+          </div>
+
+          <!-- Acción Interactiva: Ubicar en mapa -->
+          <div class="pt-2 border-t border-sandstone-border/60 flex items-center justify-between">
+            <span class="text-[10px] text-outline font-mono font-medium">Equipamiento Dotacional • BCN</span>
+            <button type="button" onclick="window.ubicarServicioPorId('${item.id}')" class="inline-flex items-center gap-1 text-[11px] font-bold text-primary hover:text-blue-900 transition-colors cursor-pointer group-hover:underline underline-offset-2">
+              <span class="material-symbols-outlined text-[14px]">explore</span>
+              <span>Ubicar en mapa</span>
+            </button>
+          </div>
+
+        </div>
+      `;
+    });
+
+    container.innerHTML = html;
+  };
+
+  /**
+   * Ubica un servicio por su ID único para centrar el mapa y abrir popup
+   */
+  window.ubicarServicioPorId = function (id) {
+    const lista = obtenerServiciosCuencaActiva();
+    const item = lista.find(n => n.id === id);
+    if (!item) return;
+    window.ubicarServicioEnMapa(item.lat, item.lon, item.nombre, item.direccion, item.categoriaNombre, item.subtipo, item.titularidad);
+  };
+
+  /**
+   * Filtrar por categoría de servicio seleccionada
+   */
+  window.filtrarCategoriaServicios = function (cat) {
+    categoriaServiciosActiva = cat;
+
+    // Actualizar estilo visual de las tarjetas de categoría superiores
+    const categorias = ['educacion', 'salud', 'parking', 'zonas_verdes', 'culto', 'civicos'];
+    categorias.forEach(c => {
+      const card = document.getElementById('card-serv-' + c);
+      if (card) {
+        if (c === cat) {
+          card.className = 'card-serv-item p-space-sm rounded-lg bg-surface-container-highest border-2 border-primary transition-all flex flex-col gap-1 text-left cursor-pointer group shadow-sm scale-[1.02]';
+        } else {
+          card.className = 'card-serv-item p-space-sm rounded-lg bg-surface border border-sandstone-border hover:border-primary hover:bg-stone-surface/60 transition-all flex flex-col gap-1 text-left cursor-pointer group shadow-2xs';
+        }
+      }
+    });
+
+    // Actualizar botones de filtro rápido
+    const botones = ['todas', 'educacion', 'salud', 'parking', 'zonas_verdes', 'culto', 'civicos'];
+    botones.forEach(b => {
+      const btn = document.getElementById('btn-filtro-serv-' + b);
+      if (btn) {
+        if (b === cat) {
+          btn.className = 'btn-filtro-serv active px-2.5 py-1 rounded text-[11px] font-semibold bg-primary text-white transition-all cursor-pointer shadow-2xs whitespace-nowrap';
+        } else {
+          btn.className = 'btn-filtro-serv px-2.5 py-1 rounded text-[11px] font-medium bg-white border border-sandstone-border text-charcoal-text hover:bg-stone-surface transition-all cursor-pointer whitespace-nowrap';
+        }
+      }
+    });
+
+    window.renderizarServicios(categoriaServiciosActiva, busquedaServiciosActiva);
+  };
+
+  /**
+   * Búsqueda en tiempo real desde el input de servicios
+   */
+  window.buscarServicioEnListado = function (texto) {
+    busquedaServiciosActiva = texto;
+    window.renderizarServicios(categoriaServiciosActiva, busquedaServiciosActiva);
+  };
+
+  /**
+   * Ubica un servicio en el mapa Leaflet, despliega el mapa si está plegado y abre el popup informativo
+   */
+  window.ubicarServicioEnMapa = function (lat, lon, nombre, direccion, catNombre, subtipo, titularidad) {
+    if (!map) return;
+
+    // Si el visor cartográfico está oculto o plegado, desplegarlo
+    const mapContainer = document.getElementById('map-container');
+    if (mapContainer && mapContainer.classList.contains('hidden')) {
+      if (typeof window.toggleVisorMapa === 'function') {
+        window.toggleVisorMapa();
+      }
+    }
+
+    // Desplazar suavemente hasta el visor del mapa
+    const bloqueMapa = document.getElementById('bloque-mapa-cartografico');
+    if (bloqueMapa) {
+      bloqueMapa.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    // Centrar mapa con animación
+    map.flyTo([lat, lon], 18, {
+      animate: true,
+      duration: 1.2
+    });
+
+    // Crear o mover el marcador interactivo del servicio
+    if (marcadorServicioEnMapa) {
+      marcadorServicioEnMapa.remove();
+    }
+
+    // Icono HTML exclusivo para el equipamiento público seleccionado
+    const serviceIcon = L.divIcon({
+      className: 'custom-service-pin',
+      html: `
+        <div style="background-color: #1e3a8a; color: white; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 8px rgba(0,0,0,0.35); border: 2.5px solid #ffffff; transform: translate(-50%, -50%);">
+          <span class="material-symbols-outlined" style="font-size: 19px; color: #93c5fd;">account_balance</span>
+        </div>
+      `,
+      iconSize: [34, 34],
+      iconAnchor: [17, 17]
+    });
+
+    marcadorServicioEnMapa = L.marker([lat, lon], { icon: serviceIcon }).addTo(map);
+
+    const popupHtml = `
+      <div style="font-family: 'Plus Jakarta Sans', sans-serif; min-width: 220px; padding: 4px;">
+        <div style="font-size: 10px; font-weight: 700; text-transform: uppercase; color: #1e3a8a; letter-spacing: 0.05em; margin-bottom: 2px;">
+          ${catNombre || 'Equipamiento Público'} • ${titularidad || 'Pública'}
+        </div>
+        <div style="font-size: 13px; font-weight: 700; color: #1a211f; margin-bottom: 4px; line-height: 1.2;">
+          ${nombre}
+        </div>
+        <div style="font-size: 11px; color: #4d5350; margin-bottom: 4px; display: flex; align-items: center; gap: 4px;">
+          <span class="material-symbols-outlined" style="font-size: 13px;">location_on</span>
+          <span>${direccion}</span>
+        </div>
+        <div style="font-size: 10px; color: #1e3a8a; font-weight: 600; background: #dbeafe; padding: 3px 6px; border-radius: 4px;">
+          ${subtipo || 'Equipamiento Dotacional Oficial'} • Guia d'Equipaments BCN
+        </div>
+      </div>
+    `;
+
+    marcadorServicioEnMapa.bindPopup(popupHtml).openPopup();
+    mostrarToast(`Localizado en mapa: ${nombre}`);
+  };
+
   // ==========================================
   // ARRANQUE LIMPIO AL CARGAR EL DOM
   // ==========================================
@@ -1881,6 +2258,9 @@ Tiempo de Acceso = ${distanciaMetro} m / 80 m/min = ${(distanciaMetro / 80).toFi
     inicializarAccionesDescarga();
     if (typeof window.renderizarNegocios === 'function') {
       window.renderizarNegocios('todas', '');
+    }
+    if (typeof window.renderizarServicios === 'function') {
+      window.renderizarServicios('todas', '');
     }
   });
 

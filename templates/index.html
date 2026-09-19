@@ -900,6 +900,11 @@
                   <span>_negocios_en_cercanías</span>
                   <span class="ml-1 px-1.5 py-0.2 rounded-full bg-primary/10 text-primary font-mono text-[10px] font-bold" id="badge-total-negocios">28</span>
                 </button>
+                <button class="tab-btn px-3.5 py-2 rounded-t-md font-headline-md text-[13px] font-medium flex items-center gap-1.5 transition-all text-on-surface-variant hover:text-primary hover:bg-stone-surface cursor-pointer" id="btn-tab-servicios" onclick="window.cambiarTab('tab-servicios')" type="button">
+                  <span class="material-symbols-outlined text-[16px]">account_balance</span>
+                  <span>_servicios_en_cercanías</span>
+                  <span class="ml-1 px-1.5 py-0.2 rounded-full bg-blue-100 text-blue-900 font-mono text-[10px] font-bold" id="badge-total-servicios">18</span>
+                </button>
                 <button class="tab-btn px-3.5 py-2 rounded-t-md font-headline-md text-[13px] font-medium flex items-center gap-1.5 transition-all text-on-surface-variant hover:text-primary hover:bg-stone-surface cursor-pointer" id="btn-tab-clima" onclick="window.cambiarTab('tab-clima')" type="button">
                   <span class="material-symbols-outlined text-[16px]">wb_sunny</span>
                   <span>_clima_365_días</span>
@@ -1675,6 +1680,164 @@
 
                 </div>
 
+                <!-- TAB 5B: SERVICIOS Y EQUIPAMIENTOS EN CERCANÍAS (GUIA D'EQUIPAMENTS BCN & B:SM) -->
+                <div class="tab-pane hidden flex flex-col gap-space-md" id="tab-servicios">
+                  
+                  <!-- Cabecera de Pestaña con Filtro de Cuenca -->
+                  <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-space-xs border-b border-sandstone-border/60 gap-2">
+                    <div class="flex flex-col">
+                      <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[20px] text-primary">account_balance</span>
+                        <span class="font-headline-md text-headline-md font-bold text-primary">_servicios_&amp;_equipamientos_en_cercanías</span>
+                      </div>
+                      <span class="font-body-sm text-body-sm text-on-surface-variant">Colegios, centros médicos, aparcamientos públicos, zonas verdes, centros de culto y servicios cívicos en la cuenca peatonal</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <span class="px-2.5 py-1 rounded-full bg-blue-50 text-blue-900 border border-blue-200 font-label-tabular-sm text-[11px] font-bold flex items-center gap-1.5 shadow-xs" id="lbl-servicios-cuenca-activa">
+                        <span class="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
+                        <span>Cuenca activa: 5 min (~300 m)</span>
+                      </span>
+                      <span class="px-2.5 py-1 rounded bg-stone-surface border border-sandstone-border font-label-tabular-sm text-label-tabular-sm text-primary font-semibold hidden md:inline">Guia Equipaments Ajuntament &amp; B:SM</span>
+                    </div>
+                  </div>
+
+                  <!-- REJILLA RESUMEN: 6 CATEGORÍAS DE SERVICIOS PÚBLICOS CON RECUENTO DINÁMICO -->
+                  <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-space-sm" id="grid-categorias-servicios">
+                    
+                    <!-- 1. Colegios & Educación -->
+                    <button type="button" onclick="window.filtrarCategoriaServicios('educacion')" class="card-serv-item p-space-sm rounded-lg bg-surface border-2 border-primary/20 hover:border-primary hover:bg-stone-surface/60 transition-all flex flex-col gap-1 text-left cursor-pointer group shadow-2xs" id="card-serv-educacion">
+                      <div class="flex items-center justify-between">
+                        <span class="material-symbols-outlined text-[18px] text-blue-800">school</span>
+                        <span class="px-1.5 py-0.2 rounded bg-blue-100 text-blue-900 font-mono text-[10px] font-bold" id="cnt-serv-educacion">3</span>
+                      </div>
+                      <span class="text-[11px] font-bold text-charcoal-text truncate group-hover:text-primary transition-colors">Colegios &amp; Escuelas</span>
+                      <span class="text-[9px] text-on-surface-variant leading-tight">Públicos, CEIP &amp; IES</span>
+                    </button>
+
+                    <!-- 2. Salud & Centros Médicos -->
+                    <button type="button" onclick="window.filtrarCategoriaServicios('salud')" class="card-serv-item p-space-sm rounded-lg bg-surface border border-sandstone-border hover:border-primary hover:bg-stone-surface/60 transition-all flex flex-col gap-1 text-left cursor-pointer group shadow-2xs" id="card-serv-salud">
+                      <div class="flex items-center justify-between">
+                        <span class="material-symbols-outlined text-[18px] text-rose-800">local_hospital</span>
+                        <span class="px-1.5 py-0.2 rounded bg-rose-100 text-rose-900 font-mono text-[10px] font-bold" id="cnt-serv-salud">3</span>
+                      </div>
+                      <span class="text-[11px] font-bold text-charcoal-text truncate group-hover:text-primary transition-colors">Salud &amp; Centros Médicos</span>
+                      <span class="text-[9px] text-on-surface-variant leading-tight">CAPs CatSalut &amp; CUAP 24h</span>
+                    </button>
+
+                    <!-- 3. Aparcamientos Públicos -->
+                    <button type="button" onclick="window.filtrarCategoriaServicios('parking')" class="card-serv-item p-space-sm rounded-lg bg-surface border border-sandstone-border hover:border-primary hover:bg-stone-surface/60 transition-all flex flex-col gap-1 text-left cursor-pointer group shadow-2xs" id="card-serv-parking">
+                      <div class="flex items-center justify-between">
+                        <span class="material-symbols-outlined text-[18px] text-slate-800">local_parking</span>
+                        <span class="px-1.5 py-0.2 rounded bg-slate-100 text-slate-900 font-mono text-[10px] font-bold" id="cnt-serv-parking">3</span>
+                      </div>
+                      <span class="text-[11px] font-bold text-charcoal-text truncate group-hover:text-primary transition-colors">Aparcamientos Públicos</span>
+                      <span class="text-[9px] text-on-surface-variant leading-tight">Parkings B:SM &amp; rotación</span>
+                    </button>
+
+                    <!-- 4. Parques & Zonas Verdes -->
+                    <button type="button" onclick="window.filtrarCategoriaServicios('zonas_verdes')" class="card-serv-item p-space-sm rounded-lg bg-surface border border-sandstone-border hover:border-primary hover:bg-stone-surface/60 transition-all flex flex-col gap-1 text-left cursor-pointer group shadow-2xs" id="card-serv-zonas_verdes">
+                      <div class="flex items-center justify-between">
+                        <span class="material-symbols-outlined text-[18px] text-emerald-800">park</span>
+                        <span class="px-1.5 py-0.2 rounded bg-emerald-100 text-emerald-900 font-mono text-[10px] font-bold" id="cnt-serv-zonas_verdes">3</span>
+                      </div>
+                      <span class="text-[11px] font-bold text-charcoal-text truncate group-hover:text-primary transition-colors">Parques &amp; Jardines</span>
+                      <span class="text-[9px] text-on-surface-variant leading-tight">Interiores Cerdà &amp; plazas</span>
+                    </button>
+
+                    <!-- 5. Centros Religiosos & Culto -->
+                    <button type="button" onclick="window.filtrarCategoriaServicios('culto')" class="card-serv-item p-space-sm rounded-lg bg-surface border border-sandstone-border hover:border-primary hover:bg-stone-surface/60 transition-all flex flex-col gap-1 text-left cursor-pointer group shadow-2xs" id="card-serv-culto">
+                      <div class="flex items-center justify-between">
+                        <span class="material-symbols-outlined text-[18px] text-amber-800">church</span>
+                        <span class="px-1.5 py-0.2 rounded bg-amber-100 text-amber-900 font-mono text-[10px] font-bold" id="cnt-serv-culto">3</span>
+                      </div>
+                      <span class="text-[11px] font-bold text-charcoal-text truncate group-hover:text-primary transition-colors">Centros Religiosos</span>
+                      <span class="text-[9px] text-on-surface-variant leading-tight">Parroquias &amp; templos</span>
+                    </button>
+
+                    <!-- 6. Cívicos, Cultura & Seguridad -->
+                    <button type="button" onclick="window.filtrarCategoriaServicios('civicos')" class="card-serv-item p-space-sm rounded-lg bg-surface border border-sandstone-border hover:border-primary hover:bg-stone-surface/60 transition-all flex flex-col gap-1 text-left cursor-pointer group shadow-2xs" id="card-serv-civicos">
+                      <div class="flex items-center justify-between">
+                        <span class="material-symbols-outlined text-[18px] text-indigo-800">account_balance</span>
+                        <span class="px-1.5 py-0.2 rounded bg-indigo-100 text-indigo-900 font-mono text-[10px] font-bold" id="cnt-serv-civicos">3</span>
+                      </div>
+                      <span class="text-[11px] font-bold text-charcoal-text truncate group-hover:text-primary transition-colors">Cívicos &amp; Seguridad</span>
+                      <span class="text-[9px] text-on-surface-variant leading-tight">Bibliotecas &amp; comisarías</span>
+                    </button>
+
+                  </div>
+
+                  <!-- BARRA DE BÚSQUEDA Y FILTROS RÁPIDOS DE SERVICIOS -->
+                  <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 p-2.5 rounded-lg bg-stone-surface/40 border border-sandstone-border">
+                    <div class="relative flex-1">
+                      <span class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-[18px] text-outline">search</span>
+                      <input type="text" id="input-buscar-servicio" oninput="window.buscarServicioEnListado(this.value)" placeholder="Buscar por nombre de equipamiento, calle o tipología..." class="w-full pl-9 pr-3 py-1.5 rounded-md bg-white border border-sandstone-border text-[12px] text-charcoal-text placeholder:text-outline focus:outline-none focus:border-primary transition-colors shadow-2xs">
+                    </div>
+                    <div class="flex items-center gap-1.5 overflow-x-auto scrollbar-none">
+                      <button type="button" onclick="window.filtrarCategoriaServicios('todas')" class="btn-filtro-serv active px-2.5 py-1 rounded text-[11px] font-semibold bg-primary text-white transition-all cursor-pointer shadow-2xs whitespace-nowrap" id="btn-filtro-serv-todas">
+                        <span>Todos</span> (<span id="txt-badge-total-filtro-servicios">18</span>)
+                      </button>
+                      <button type="button" onclick="window.filtrarCategoriaServicios('educacion')" class="btn-filtro-serv px-2.5 py-1 rounded text-[11px] font-medium bg-white border border-sandstone-border text-charcoal-text hover:bg-stone-surface transition-all cursor-pointer whitespace-nowrap" id="btn-filtro-serv-educacion">
+                        Colegios
+                      </button>
+                      <button type="button" onclick="window.filtrarCategoriaServicios('salud')" class="btn-filtro-serv px-2.5 py-1 rounded text-[11px] font-medium bg-white border border-sandstone-border text-charcoal-text hover:bg-stone-surface transition-all cursor-pointer whitespace-nowrap" id="btn-filtro-serv-salud">
+                        Centros Médicos
+                      </button>
+                      <button type="button" onclick="window.filtrarCategoriaServicios('parking')" class="btn-filtro-serv px-2.5 py-1 rounded text-[11px] font-medium bg-white border border-sandstone-border text-charcoal-text hover:bg-stone-surface transition-all cursor-pointer whitespace-nowrap" id="btn-filtro-serv-parking">
+                        Aparcamientos
+                      </button>
+                      <button type="button" onclick="window.filtrarCategoriaServicios('zonas_verdes')" class="btn-filtro-serv px-2.5 py-1 rounded text-[11px] font-medium bg-white border border-sandstone-border text-charcoal-text hover:bg-stone-surface transition-all cursor-pointer whitespace-nowrap" id="btn-filtro-serv-zonas_verdes">
+                        Parques
+                      </button>
+                      <button type="button" onclick="window.filtrarCategoriaServicios('culto')" class="btn-filtro-serv px-2.5 py-1 rounded text-[11px] font-medium bg-white border border-sandstone-border text-charcoal-text hover:bg-stone-surface transition-all cursor-pointer whitespace-nowrap" id="btn-filtro-serv-culto">
+                        Culto
+                      </button>
+                      <button type="button" onclick="window.filtrarCategoriaServicios('civicos')" class="btn-filtro-serv px-2.5 py-1 rounded text-[11px] font-medium bg-white border border-sandstone-border text-charcoal-text hover:bg-stone-surface transition-all cursor-pointer whitespace-nowrap" id="btn-filtro-serv-civicos">
+                        Cívicos
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- CONTADOR DE RESULTADOS VISIBLES DE SERVICIOS -->
+                  <div class="flex items-center justify-between text-[11px] text-on-surface-variant px-1 font-medium">
+                    <span id="lbl-conteo-visibles-servicios">Mostrando 18 servicios y equipamientos en la cuenca de 5 min</span>
+                    <span class="text-outline text-[10px] hidden sm:inline">Haz clic en «Ubicar en mapa» para centrar el visor</span>
+                  </div>
+
+                  <!-- LISTADO DINÁMICO DE SERVICIOS (INYECCIÓN DESDE JS) -->
+                  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-space-sm" id="contenedor-lista-servicios">
+                    <!-- Las fichas de servicios con Nombre, Dirección, Categoría/Subtipo y Distancia a pie se renderizan aquí dinámicamente -->
+                  </div>
+
+                  <!-- BLOQUE DESPLEGABLE: PROCEDENCIA OFICIAL Y CÁLCULO DE DISTANCIA A PIE DE SERVICIOS -->
+                  <details class="group mt-2 pt-3 border-t border-sandstone-border/60 cursor-pointer">
+                    <summary class="list-none flex items-center justify-between text-[11px] font-bold text-primary uppercase font-label-caps hover:text-terracotta-accent transition-colors select-none py-1">
+                      <span class="flex items-center gap-1.5">
+                        <span class="material-symbols-outlined text-[15px] text-terracotta-accent">verified</span>
+                        <span>¿De dónde salen estos datos de equipamientos y cómo se calcula la distancia a pie?</span>
+                      </span>
+                      <span class="material-symbols-outlined text-[17px] text-outline transition-transform duration-200 group-open:rotate-180">expand_more</span>
+                    </summary>
+                    <div class="mt-2 p-3 rounded-lg bg-stone-surface/50 border border-sandstone-border text-[11px] text-on-surface-variant leading-relaxed space-y-2">
+                      <div>
+                        <strong>1. Fuentes Oficiales de la Red Dotacional:</strong>
+                        <br>
+                        Datos procedentes del censo institucional de la <em>Guia d'Equipaments de l'Ajuntament de Barcelona</em> (Open Data BCN), el <em>Servei Català de la Salut (CatSalut / ICS)</em>, el <em>Consorci d'Educació de Barcelona</em>, la red municipal de movilidad <em>B:SM (Barcelona de Serveis Municipals)</em> y el <em>Arquebisbat de Barcelona</em>.
+                      </div>
+                      <div>
+                        <strong>2. Clasificación Urbanística Dotacional:</strong>
+                        <br>
+                        Se catalogan los suelos y equipamientos reservados según el Plan General Metropolitano (PGM): Clave 7 (Dotaciones docentes, sanitarias, asistenciales, culturales y de seguridad) y Clave 6 (Espacios libres, parques y jardines públicos).
+                      </div>
+                      <div>
+                        <strong>3. Cálculo Exacto de la Distancia a Pie y Tiempos:</strong>
+                        <br>
+                        La distancia se computa mediante el grafo de la malla vial urbana del <em>Eixample (Manzanas Cerdà de 113,3 m x 113,3 m)</em>. El tiempo estimado a pie se calcula con el estándar técnico internacional de movilidad peatonal urbana: <strong>velocidad promedio de 4,8 km/h = 80 metros por minuto</strong>.
+                      </div>
+                    </div>
+                  </details>
+
+                </div>
+
                 <!-- TAB 6: CLIMA 365 DÍAS -->
                 <div class="tab-pane hidden flex flex-col gap-space-lg" id="tab-clima">
                   <div class="flex items-center justify-between pb-space-xs border-b border-sandstone-border/60">
@@ -1805,6 +1968,9 @@
               }
               if (tabId === 'tab-negocios' && typeof window.renderizarNegocios === 'function') {
                 window.renderizarNegocios();
+              }
+              if (tabId === 'tab-servicios' && typeof window.renderizarServicios === 'function') {
+                window.renderizarServicios();
               }
               if (window.leafletMap) {
                 setTimeout(function() {
