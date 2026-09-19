@@ -680,27 +680,67 @@
                 <button id="btn-recalcular" type="button"></button>
             </div>
 
-            <!-- 2. IDENTIFICACIÓN CATASTRAL OFICIAL (SEDE ELECTRÓNICA OVC) -->
-            <div class="p-space-sm rounded-lg bg-surface border border-sandstone-border flex flex-col gap-1.5 shadow-xs" id="panel-catastro-sidebar">
+            <!-- 2. IDENTIFICACIÓN CATASTRAL Y REGISTRAL OFICIAL -->
+            <div class="p-space-sm rounded-lg bg-surface border border-sandstone-border flex flex-col gap-2 shadow-xs" id="panel-catastro-sidebar">
+              <!-- Header Catastro -->
               <div class="flex items-center justify-between border-b border-sandstone-border/60 pb-1">
                 <div class="flex items-center gap-1.5 text-primary font-semibold text-[11px] uppercase tracking-wider font-label-caps">
                   <span class="material-symbols-outlined text-[16px] text-primary">badge</span>
-                  <span>_identificación_catastral</span>
+                  <span>_catastro_&amp;_registro</span>
                 </div>
-                <span class="px-1.5 py-0.5 rounded bg-stone-surface text-outline font-label-tabular-sm text-[9px] font-medium">Sede OVC</span>
+                <span class="px-1.5 py-0.5 rounded bg-stone-surface text-outline font-label-tabular-sm text-[9px] font-medium">Sede OVC / Registradores</span>
               </div>
+              
+              <!-- Ref Catastral -->
               <div class="flex flex-col gap-0.5 bg-stone-surface/40 p-2 rounded border border-sandstone-border/60">
                 <span class="font-label-caps text-outline text-[9px] uppercase font-semibold">Referencia Catastral</span>
                 <div class="flex items-center justify-between gap-1">
                   <span class="font-label-tabular text-[12px] font-bold text-primary tracking-wide font-mono truncate" id="val-ref-catastral-side">08019A014000320001KL</span>
+                  <span class="hidden" id="val-ref-catastral">08019A014000320001KL</span>
                   <button class="p-1 rounded hover:bg-stone-surface text-outline hover:text-primary transition-colors cursor-pointer" onclick="window.copiarRefCatastral()" title="Copiar referencia" type="button">
                     <span class="material-symbols-outlined text-[15px]">content_copy</span>
                   </button>
                 </div>
               </div>
-              <div class="flex items-center justify-between text-[11px] text-on-surface-variant pt-0.5">
-                <span class="text-outline text-[10px] uppercase font-label-caps font-semibold">Calificación:</span>
-                <span class="font-semibold text-charcoal-text text-[11px]" id="val-calificacion-side">Clave 13b (Densificada)</span>
+              
+              <!-- Calificación y Municipio/Distrito -->
+              <div class="grid grid-cols-2 gap-1.5 text-[11px]">
+                <div class="flex flex-col bg-stone-surface/30 p-1.5 rounded border border-sandstone-border/40">
+                  <span class="text-outline text-[9px] uppercase font-label-caps font-semibold">Calificación PGM</span>
+                  <span class="font-semibold text-charcoal-text text-[11px]" id="val-calificacion-side">Clave 13b (Densif.)</span>
+                </div>
+                <div class="flex flex-col bg-stone-surface/30 p-1.5 rounded border border-sandstone-border/40">
+                  <span class="text-outline text-[9px] uppercase font-label-caps font-semibold">Distrito</span>
+                  <span class="font-semibold text-charcoal-text text-[11px] truncate" id="val-municipio-distrito">L'Eixample</span>
+                </div>
+              </div>
+
+              <!-- Registro de la Propiedad Competente -->
+              <div class="flex flex-col gap-1.5 pt-1.5 border-t border-sandstone-border/60">
+                <div class="flex items-center justify-between">
+                  <span class="text-outline text-[9px] uppercase font-label-caps font-semibold flex items-center gap-1 text-primary">
+                    <span class="material-symbols-outlined text-[13px]">account_balance</span>
+                    <span>Registro Competente</span>
+                  </span>
+                  <span class="px-1 py-0.2 rounded bg-emerald-100 text-emerald-800 font-label-tabular-sm text-[8px] font-bold">Jurisdicción OK</span>
+                </div>
+                <div class="font-bold text-charcoal-text text-[11px] leading-tight" id="val-registro-num">
+                  Registro de la Propiedad Nº 14 de Barcelona
+                </div>
+                <div class="text-on-surface-variant flex items-start gap-1 leading-snug" id="val-registro-sede">
+                  <span class="material-symbols-outlined text-[13px] text-outline mt-0.5 flex-shrink-0">location_on</span>
+                  <span class="text-[10px]">Carrer de Bergara, 10, 4ª Planta, 08002 BCN</span>
+                </div>
+                <div class="flex items-center justify-between pt-0.5">
+                  <span class="text-secondary flex items-center gap-1 font-semibold text-[10px]" id="val-registro-tel">
+                    <span class="material-symbols-outlined text-[12px]">call</span>
+                    <span>+34 933 01 24 55</span>
+                  </span>
+                  <a class="text-primary hover:text-forest-muted font-label-tabular-sm text-[10px] font-semibold flex items-center gap-0.5 underline underline-offset-2 cursor-pointer" href="#" onclick="event.preventDefault(); window.mostrarToast('Descargando Nota Simple preliminar...');">
+                    <span class="material-symbols-outlined text-[13px] text-terracotta-accent">file_open</span>
+                    <span>Nota Simple</span>
+                  </a>
+                </div>
               </div>
             </div>
 
@@ -824,16 +864,35 @@
               </div>
             </div>
 
-            <!-- 5. CENTRAL TABBED ANALYSIS ENGINE (6 TABS) -->
+            <!-- 4.1 VISOR CARTOGRÁFICO INTERACTIVO (LEAFLET.JS & ISÓCRONAS) -->
+            <div class="bg-surface-container-lowest rounded-xl border border-sandstone-border shadow-[0_1px_3px_rgba(27,28,26,0.03)] overflow-hidden p-space-sm flex flex-col gap-2" id="bloque-mapa-cartografico">
+              <div class="flex items-center justify-between px-1">
+                <div class="flex items-center gap-2">
+                  <span class="material-symbols-outlined text-[16px] text-primary">map</span>
+                  <span class="font-label-caps text-primary uppercase text-[10px] font-bold">_visor_cartográfico_icgc_&amp;_osm</span>
+                  <span class="px-1.5 py-0.2 rounded bg-stone-surface font-label-tabular-sm text-primary font-semibold text-[10px]">Leaflet v1.9.4</span>
+                  <span class="font-label-tabular-sm text-outline text-[10px] hidden sm:inline">EPSG:25831 / WGS84 • Isócronas 5-10-15 min</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <button type="button" id="btn-toggle-map" onclick="window.toggleVisorMapa()" class="text-xs text-outline hover:text-primary flex items-center gap-0.5 cursor-pointer font-medium px-2 py-0.5 rounded hover:bg-stone-surface transition-colors">
+                    <span id="txt-toggle-map">Plegar mapa</span>
+                    <span class="material-symbols-outlined text-[16px]" id="icon-toggle-map">expand_less</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Leaflet Dynamic Map Container -->
+              <div class="relative w-full h-[260px] transition-all duration-300 rounded-lg overflow-hidden border border-sandstone-border" id="map-container">
+                <div id="leaflet-map" class="w-full h-full min-h-[260px]"></div>
+              </div>
+            </div>
+
+            <!-- 5. CENTRAL TABBED ANALYSIS ENGINE -->
             <div class="bg-surface-container-lowest rounded-xl border border-sandstone-border shadow-[0_1px_3px_rgba(27,28,26,0.03)] overflow-hidden flex flex-col min-h-[560px]">
               
               <!-- Tab Navigation Bar -->
               <div class="flex items-center overflow-x-auto bg-stone-surface/40 px-space-md pt-2 gap-1 border-b border-sandstone-border scrollbar-none">
-                <button class="tab-btn active px-3.5 py-2 rounded-t-md font-headline-md text-[13px] font-semibold flex items-center gap-1.5 transition-all bg-surface-container-lowest text-primary border-t-2 border-primary shadow-sm cursor-pointer" id="btn-tab-catastro" onclick="window.cambiarTab('tab-catastro')" type="button">
-                  <span class="material-symbols-outlined text-[16px]">map</span>
-                  <span>_catastro_y_registro</span>
-                </button>
-                <button class="tab-btn px-3.5 py-2 rounded-t-md font-headline-md text-[13px] font-medium flex items-center gap-1.5 transition-all text-on-surface-variant hover:text-primary hover:bg-stone-surface cursor-pointer" id="btn-tab-finanzas" onclick="window.cambiarTab('tab-finanzas')" type="button">
+                <button class="tab-btn active px-3.5 py-2 rounded-t-md font-headline-md text-[13px] font-semibold flex items-center gap-1.5 transition-all bg-surface-container-lowest text-primary border-t-2 border-primary shadow-sm cursor-pointer" id="btn-tab-finanzas" onclick="window.cambiarTab('tab-finanzas')" type="button">
                   <span class="material-symbols-outlined text-[16px]">receipt_long</span>
                   <span>_incasòl_&amp;_ibi</span>
                 </button>
@@ -854,94 +913,8 @@
               <!-- TAB CONTENT CONTAINER -->
               <div class="p-space-lg flex-1 bg-surface-container-lowest">
                 
-                <!-- TAB 1: CATASTRO Y REGISTRO -->
-                <div class="tab-pane flex flex-col gap-space-lg" id="tab-catastro">
-                  <div class="grid grid-cols-1 lg:grid-cols-12 gap-space-md">
-                    
-                    <!-- Cadastral Attributes & Legal Registry Cards -->
-                    <div class="lg:col-span-5 flex flex-col gap-space-md">
-                      
-                      <!-- Cadastral Identification -->
-                      <div class="p-space-md rounded-lg bg-surface border border-sandstone-border flex flex-col gap-space-sm">
-                        <div class="flex items-center justify-between pb-1 border-b border-sandstone-border/60">
-                          <span class="font-label-caps text-primary uppercase text-[10px] font-bold">_ficha_catastral_oficial</span>
-                          <span class="font-label-tabular-sm text-outline">Sede Electrónica</span>
-                        </div>
-                        <div class="flex flex-col gap-1 bg-stone-surface/40 p-space-sm rounded border border-sandstone-border/60">
-                          <span class="font-label-caps text-outline text-[10px]">Referencia Catastral</span>
-                          <div class="flex items-center justify-between gap-2">
-                            <span class="font-label-tabular text-label-tabular font-bold text-primary tracking-wider" id="val-ref-catastral">08019A014000320001KL</span>
-                            <button class="p-1 rounded hover:bg-stone-surface text-outline hover:text-primary transition-colors cursor-pointer" onclick="window.copiarRefCatastral()" title="Copiar referencia" type="button">
-                              <span class="material-symbols-outlined text-[16px]">content_copy</span>
-                            </button>
-                          </div>
-                        </div>
-                        <div class="grid grid-cols-2 gap-space-sm">
-                          <div class="flex flex-col bg-stone-surface/40 p-space-sm rounded border border-sandstone-border/60">
-                            <span class="font-label-caps text-outline text-[10px]">Año Construcción</span>
-                            <span class="font-body-sm text-body-sm font-semibold text-charcoal-text" id="val-ano">1928 (Finca Clásica)</span>
-                          </div>
-                          <div class="flex flex-col bg-stone-surface/40 p-space-sm rounded border border-sandstone-border/60">
-                            <span class="font-label-caps text-outline text-[10px]">Calificación Urbanística</span>
-                            <span class="font-body-sm text-body-sm font-semibold text-charcoal-text">Clave 13b (Eixample)</span>
-                          </div>
-                        </div>
-                        <div class="flex flex-col bg-stone-surface/40 p-space-sm rounded border border-sandstone-border/60">
-                          <span class="font-label-caps text-outline text-[10px]">Municipio y Distrito</span>
-                          <span class="font-body-sm text-body-sm font-semibold text-charcoal-text" id="val-municipio-distrito">Barcelona • L'Eixample - La Dreta de l'Eixample</span>
-                        </div>
-                      </div>
-
-                      <!-- Competent Land Registry Card -->
-                      <div class="p-space-md rounded-lg bg-surface border border-sandstone-border flex flex-col gap-space-sm">
-                        <div class="flex items-center justify-between pb-1 border-b border-sandstone-border/60">
-                          <span class="font-label-caps text-primary uppercase text-[10px] font-bold">_registro_propiedad_competente</span>
-                          <span class="font-label-tabular-sm text-emerald-700 font-semibold">Jurisdicción Validada</span>
-                        </div>
-                        <div class="flex flex-col gap-0.5">
-                          <span class="font-body-md text-body-md font-bold text-charcoal-text" id="val-registro-num">Registro de la Propiedad Nº 14 de Barcelona</span>
-                          <span class="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-1" id="val-registro-sede">
-                            <span class="material-symbols-outlined text-[14px] text-outline">location_on</span>
-                            <span>Carrer de Bergara, 10, 4ª Planta, 08002 Barcelona</span>
-                          </span>
-                          <span class="font-label-tabular-sm text-label-tabular-sm text-secondary flex items-center gap-1 mt-1 font-semibold" id="val-registro-tel">
-                            <span class="material-symbols-outlined text-[14px]">call</span>
-                            <span>+34 933 01 24 55</span>
-                          </span>
-                        </div>
-                        <div class="pt-2 flex items-center justify-between border-t border-sandstone-border/50">
-                          <a class="text-primary hover:text-forest-muted font-body-sm text-body-sm font-semibold flex items-center gap-1 underline underline-offset-2" href="#" onclick="event.preventDefault(); window.mostrarToast('Descargando Nota Simple preliminar...');">
-                            <span class="material-symbols-outlined text-[16px] text-terracotta-accent">file_open</span>
-                            <span>Solicitar Nota Simple Registral</span>
-                          </a>
-                          <span class="font-label-tabular-sm text-label-tabular-sm text-outline">Arancel: 9,02 €</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <!-- 4. VISOR CARTOGRÁFICO INTERACTIVO (LEAFLET.JS) -->
-                    <div class="lg:col-span-7 flex flex-col gap-space-xs">
-                      <div class="flex items-center justify-between px-space-xs">
-                        <div class="flex items-center gap-2">
-                          <span class="font-label-caps text-outline uppercase text-[10px] font-semibold">_visor_cartográfico_icgc_&amp;_osm</span>
-                          <span class="px-1.5 py-0.2 rounded bg-stone-surface font-label-tabular-sm text-label-tabular-sm text-primary font-semibold text-[10px]">Leaflet v1.9.4</span>
-                        </div>
-                        <div class="flex items-center gap-2">
-                          <span class="font-label-tabular-sm text-label-tabular-sm text-outline">EPSG:25831 / WGS84</span>
-                        </div>
-                      </div>
-
-                      <!-- Leaflet Dynamic Map Container -->
-                      <div class="relative w-full h-[380px] rounded-lg overflow-hidden border border-sandstone-border" id="map-container">
-                        <div id="leaflet-map" class="w-full h-full min-h-[380px]"></div>
-                      </div>
-                    </div>
-
-                  </div>
-                </div>
-
-                <!-- TAB 2: INCASÒL & IBI (DATOS EXCLUSIVOS ESENCIALES) -->
-                <div class="tab-pane hidden flex flex-col gap-space-md" id="tab-finanzas">
+                <!-- TAB 1: INCASÒL & IBI (DATOS EXCLUSIVOS ESENCIALES) -->
+                <div class="tab-pane flex flex-col gap-space-md" id="tab-finanzas">
                   <div class="flex items-center justify-between pb-space-xs border-b border-sandstone-border/60">
                     <div class="flex flex-col">
                       <span class="font-headline-md text-headline-md font-bold text-primary">_rentas_oficiales_incasòl_&amp;_ibi</span>
@@ -1560,6 +1533,9 @@
 
             // Tab switching engine con soporte para secciones integradas
             window.cambiarTab = function(tabId, scrollTargetId) {
+              if (tabId === 'tab-catastro') {
+                tabId = 'tab-finanzas';
+              }
               if (tabId === 'tab-acustica') {
                 tabId = 'tab-entorno';
                 scrollTargetId = scrollTargetId || 'seccion-acustica-entorno';
@@ -1571,6 +1547,11 @@
               var activePane = document.getElementById(tabId);
               if (activePane) {
                 activePane.classList.remove('hidden');
+              }
+              if (window.leafletMap) {
+                setTimeout(function() {
+                  window.leafletMap.invalidateSize();
+                }, 100);
               }
 
               var tabBtns = document.querySelectorAll('.tab-btn');
@@ -1612,10 +1593,30 @@
               window.mostrarToast('Isócrona fijada a ' + minutos + ' min a pie');
             };
 
+            // Alternar visibilidad/plegado del Visor Cartográfico
+            window.toggleVisorMapa = function() {
+              var mapCont = document.getElementById('map-container');
+              var txtToggle = document.getElementById('txt-toggle-map');
+              var iconToggle = document.getElementById('icon-toggle-map');
+              if (!mapCont) return;
+              if (mapCont.classList.contains('hidden')) {
+                mapCont.classList.remove('hidden');
+                if (txtToggle) txtToggle.textContent = 'Plegar mapa';
+                if (iconToggle) iconToggle.textContent = 'expand_less';
+                setTimeout(function() {
+                  if (window.leafletMap) window.leafletMap.invalidateSize();
+                }, 150);
+              } else {
+                mapCont.classList.add('hidden');
+                if (txtToggle) txtToggle.textContent = 'Ver mapa';
+                if (iconToggle) iconToggle.textContent = 'expand_more';
+              }
+            };
+
             // Copy Cadastral Reference
             window.copiarRefCatastral = function() {
-              var refEl = document.getElementById('val-ref-catastral');
-              var ref = refEl ? refEl.textContent : '';
+              var refEl = document.getElementById('val-ref-catastral-side') || document.getElementById('val-ref-catastral');
+              var ref = refEl ? refEl.textContent.trim() : '';
               if (navigator.clipboard && ref) {
                 navigator.clipboard.writeText(ref).then(function() {
                   window.mostrarToast('Referencia ' + ref + ' copiada al portapapeles');

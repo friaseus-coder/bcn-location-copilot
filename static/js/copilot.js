@@ -69,6 +69,12 @@
 
     // Marcador inicial por defecto
     actualizarMarcadorYIsocronas(defLat, defLon, 'Carrer de Balmes, 12, Barcelona', '08019A014000320001KL');
+
+    // Exponer mapa globalmente y redimensionar
+    window.leafletMap = map;
+    setTimeout(() => {
+      if (map) map.invalidateSize();
+    }, 250);
   }
 
   /**
@@ -448,7 +454,8 @@
     // B. Referencia Catastral y Ficha Registral
     setText('val-ref-catastral', activo.ref_catastral || '08019A014000320001KL');
     setText('val-ref-catastral-side', activo.ref_catastral || '08019A014000320001KL');
-    setText('val-municipio-distrito', `${activo.municipio || 'Barcelona'} • ${activo.distrito || 'Eixample'}`);
+    setText('val-calificacion-side', activo.calificacion_urbanistica || 'Clave 13b (Densif.)');
+    setText('val-municipio-distrito', activo.distrito || activo.municipio || 'L\'Eixample');
     setText('val-municipio-distrito-badge', `${activo.municipio || 'Barcelona'} • ${activo.distrito || 'Eixample'}`);
 
     const reg = activo.registro || {};
