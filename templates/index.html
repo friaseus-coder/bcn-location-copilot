@@ -154,85 +154,24 @@
 </head>
 <body class="bg-background font-body-md text-body-md text-on-surface antialiased selection:bg-primary-fixed selection:text-primary">
 
-  <!-- LEFT NAVIGATION DRAWER (INSTITUTIONAL BRANDING) -->
-  <aside class="fixed left-0 top-0 h-full w-64 bg-surface-container-lowest border-r border-sandstone-border z-50 flex flex-col justify-between shadow-[0_1px_4px_rgba(27,28,26,0.03)]">
-    <div class="flex flex-col">
-      <!-- Institutional Header Crest -->
-      <div class="h-16 px-space-lg flex items-center gap-space-sm border-b border-sandstone-border bg-stone-surface/40">
+  <div class="w-full">
+    <!-- TOP MULTIDATA PROVINCIAL HEADER (FULL WIDTH) -->
+    <header class="fixed top-0 left-0 right-0 h-16 bg-surface-container-lowest/95 backdrop-blur-md border-b border-sandstone-border z-40 px-space-md flex items-center justify-between gap-space-md shadow-[0_1px_4px_rgba(27,28,26,0.03)]">
+      
+      <!-- Institutional Logo & Brand Crest -->
+      <div class="flex items-center gap-2 flex-shrink-0 pr-3 border-r border-sandstone-border/60">
         <div class="w-8 h-8 rounded bg-primary flex items-center justify-center text-on-primary shadow-sm">
           <span class="material-symbols-outlined text-[19px]">account_balance</span>
         </div>
-        <div class="flex flex-col pl-2">
+        <div class="flex flex-col">
           <div class="flex items-center gap-1.5">
             <span class="font-headline-md text-[13px] font-bold tracking-tight text-primary leading-none">BCN COPILOT</span>
-            <span class="px-1.5 py-0.5 rounded bg-primary text-on-primary font-label-tabular-sm text-[9px] font-medium tracking-wide">v3.0</span>
+            <span class="px-1.5 py-0.2 rounded bg-primary text-on-primary font-label-tabular-sm text-[9px] font-medium tracking-wide">v3.0</span>
           </div>
           <span class="font-label-caps text-[9px] text-outline uppercase tracking-wider mt-0.5 font-medium">Província de Barcelona</span>
         </div>
       </div>
 
-      <div class="px-space-md py-space-sm border-b border-sandstone-border/60 bg-surface">
-        <div class="flex items-center justify-between">
-          <span class="font-label-caps text-outline uppercase text-[10px] tracking-wider">_ámbito_territorial</span>
-          <span class="font-label-tabular-sm text-secondary font-semibold">311 Municipios</span>
-        </div>
-      </div>
-
-      <!-- Navigation Modules -->
-      <nav class="flex flex-col gap-1 p-space-md" data-active-classes="bg-primary text-on-primary font-semibold rounded-lg shadow-sm">
-        <div class="px-2 pt-2 pb-1 font-label-caps text-outline uppercase text-[10px] tracking-wider font-semibold">_módulos_de_análisis</div>
-        <a class="flex items-center gap-space-sm px-3 py-2 rounded-lg text-charcoal-text/80 hover:bg-stone-surface/60 hover:text-primary transition-colors text-body-sm font-medium" data-path="analisis-predial" href="#" onclick="window.cambiarTab('tab-catastro'); return false;">
-          <span class="material-symbols-outlined text-[17px] text-primary">apartment</span>
-          <span>_análisis_predial</span>
-        </a>
-        <a class="flex items-center gap-space-sm px-3 py-2 rounded-lg text-charcoal-text/80 hover:bg-stone-surface/60 hover:text-primary transition-colors text-body-sm font-medium" data-path="movilidad-e-isocronas" href="#" onclick="window.cambiarTab('tab-movilidad'); return false;">
-          <span class="material-symbols-outlined text-[17px] text-terracotta-accent">alt_route</span>
-          <span>_movilidad_e_isócronas</span>
-        </a>
-        <a class="flex items-center gap-space-sm px-3 py-2 rounded-lg text-charcoal-text/80 hover:bg-stone-surface/60 hover:text-primary transition-colors text-body-sm font-medium" data-path="viabilidad-financiera" href="#" onclick="window.cambiarTab('tab-finanzas'); return false;">
-          <span class="material-symbols-outlined text-[17px] text-primary">account_balance_wallet</span>
-          <span>_viabilidad_financiera</span>
-        </a>
-        <a class="flex items-center gap-space-sm px-3 py-2 rounded-lg text-charcoal-text/80 hover:bg-stone-surface/60 hover:text-primary transition-colors text-body-sm font-medium" data-path="regulacion-y-pla-dusos" href="#" onclick="window.cambiarTab('tab-entorno'); return false;">
-          <span class="material-symbols-outlined text-[17px] text-terracotta-accent">gavel</span>
-          <span>_regulación_pla_d'usos</span>
-        </a>
-
-        <div class="px-2 pt-space-md pb-1 font-label-caps text-outline uppercase text-[10px] tracking-wider font-semibold">_cartera_&amp;_informes</div>
-        <a class="flex items-center gap-space-sm px-3 py-2 rounded-lg text-charcoal-text/80 hover:bg-stone-surface/60 hover:text-primary transition-colors text-body-sm font-medium" data-path="pipeline-institucional" href="#" onclick="window.mostrarToast('Módulo Pipeline Institucional activo'); return false;">
-          <span class="material-symbols-outlined text-[17px] text-outline">folder_open</span>
-          <span>_pipeline_institucional</span>
-        </a>
-        <a class="flex items-center gap-space-sm px-3 py-2 rounded-lg text-charcoal-text/80 hover:bg-stone-surface/60 hover:text-primary transition-colors text-body-sm font-medium" data-path="informes-icgc-catastro" href="#" onclick="window.mostrarToast('Generando dossier cartográfico ICGC...'); return false;">
-          <span class="material-symbols-outlined text-[17px] text-outline">description</span>
-          <span>_informes_icgc_catastro</span>
-        </a>
-      </nav>
-    </div>
-
-    <!-- Infrastructure Status -->
-    <div class="p-space-md border-t border-sandstone-border bg-stone-surface/30 flex flex-col gap-2">
-      <div class="flex items-center justify-between text-on-surface-variant">
-        <span class="font-label-caps text-[10px] uppercase text-outline">_motor_catastral</span>
-        <div class="flex items-center gap-1.5">
-          <span class="inline-block w-2 h-2 rounded-full bg-emerald-600"></span>
-          <span class="font-label-tabular-sm text-primary font-semibold">Online 99.8%</span>
-        </div>
-      </div>
-      <div class="p-2 rounded bg-surface-container-lowest border border-sandstone-border flex items-center justify-between">
-        <div class="flex flex-col">
-          <span class="font-label-caps text-primary font-semibold text-[10px]" id="val-municipio-distrito-badge">Barcelona • Eixample</span>
-          <span class="font-label-tabular-sm text-outline text-[11px]">WGS84 EPSG:25831</span>
-        </div>
-        <span class="material-symbols-outlined text-outline text-[16px]">satellite_alt</span>
-      </div>
-    </div>
-  </aside>
-
-  <div class="pl-64">
-    <!-- TOP MULTIDATA PROVINCIAL HEADER -->
-    <header class="fixed top-0 left-64 right-0 h-16 bg-surface-container-lowest/95 backdrop-blur-md border-b border-sandstone-border z-40 px-space-lg flex items-center justify-between gap-space-md shadow-[0_1px_4px_rgba(27,28,26,0.03)]">
-      
       <!-- 3. BARRA DE BÚSQUEDA MULTIDATO PROVINCIAL (ERGONÓMICA) -->
       <div class="relative flex items-center gap-2 flex-1 max-w-3xl">
         <!-- Municipio Selector -->
