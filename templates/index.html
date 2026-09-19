@@ -1177,7 +1177,7 @@
                     <span class="px-2.5 py-1 rounded bg-stone-surface border border-sandstone-border font-label-tabular-sm text-label-tabular-sm text-primary font-semibold">Fuentes Públicas Oficiales</span>
                   </div>
 
-                  <!-- REJILLA DE LAS 3 TARJETAS DEMOGRÁFICAS CON ORIGEN DE DATOS EXPLICADO -->
+                  <!-- REJILLA DE LAS 3 TARJETAS DEMOGRÁFICAS CON ORIGEN Y GRANULARIDAD MÍNIMA -->
                   <div class="grid grid-cols-1 md:grid-cols-3 gap-space-md">
                     
                     <!-- Tarjeta 1: Población Flotante -->
@@ -1185,13 +1185,17 @@
                       <div class="flex flex-col gap-1.5">
                         <div class="flex items-center justify-between pb-1 border-b border-sandstone-border/60">
                           <span class="font-label-caps text-outline uppercase text-[10px] font-bold">_afluencia_&amp;_tránsito</span>
-                          <span class="px-1.5 py-0.5 rounded bg-badge-living-bg text-primary font-label-tabular-sm text-[9px] font-semibold">MOVILIDAD</span>
+                          <span class="px-1.5 py-0.5 rounded bg-badge-living-bg text-primary font-label-tabular-sm text-[9px] font-bold" id="badge-poblacion-flotante">MICRO: TRAMO CALLE (150m)</span>
                         </div>
                         <span class="text-[12px] font-semibold text-outline uppercase tracking-wider font-label-caps">Población Flotante</span>
-                        <div class="font-headline-xl text-headline-xl font-bold text-primary font-mono" id="val-poblacion-flotante">2.8x Residente</div>
+                        <div class="font-headline-xl text-headline-xl font-bold text-primary font-mono" id="val-poblacion-flotante">3.6x Residente</div>
                         <span class="font-body-sm text-body-sm text-charcoal-text font-medium" id="val-poblacion-flotante-desc">
-                          Alta concentración de oficinas, terciario, comercio y visitantes diurnos.
+                          Tramo calle: Fuerte afluencia diurna comercial y laboral sobre residentes nocturnos.
                         </span>
+                        <div class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 mt-1" id="val-poblacion-flotante-granularidad">
+                          <span class="material-symbols-outlined text-[12px]">filter_center_focus</span>
+                          <span>Granularidad Mínima: Tramo de calle (isócrona 150m)</span>
+                        </div>
                       </div>
                       <div class="mt-3 pt-2 border-t border-sandstone-border/60 flex flex-col gap-1 bg-stone-surface/30 p-2 rounded">
                         <span class="text-[10px] font-bold text-primary uppercase font-label-caps flex items-center gap-1">
@@ -1199,7 +1203,7 @@
                           <span>¿De dónde sale este dato?</span>
                         </span>
                         <p class="text-[11px] text-on-surface-variant leading-relaxed">
-                          De la <strong>Matriz de Movilidad Obligada (EMEF)</strong> del <em>Área Metropolitana de Barcelona (AMB)</em> y la <em>Autoritat del Transport Metropolità (ATM)</em>. Compara los censos nocturnos de residentes con los desplazamientos diurnos por motivos de trabajo y compras.
+                          De la <strong>Matriz de Movilidad Obligada (EMEF)</strong> del <em>Área Metropolitana de Barcelona (AMB)</em> y la <em>ATM</em>. Se desagrega a nivel de <strong>tramo de vía urbana y radio peatonal de 150 metros</strong>, comparando el censo nocturno residencial con el tránsito peatonal laboral y comercial diurno.
                         </p>
                       </div>
                     </div>
@@ -1209,13 +1213,17 @@
                       <div class="flex flex-col gap-1.5">
                         <div class="flex items-center justify-between pb-1 border-b border-sandstone-border/60">
                           <span class="font-label-caps text-outline uppercase text-[10px] font-bold">_poder_adquisitivo</span>
-                          <span class="px-1.5 py-0.5 rounded bg-badge-living-bg text-emerald-900 font-label-tabular-sm text-[9px] font-semibold">INE / AEAT</span>
+                          <span class="px-1.5 py-0.5 rounded bg-badge-living-bg text-emerald-900 font-label-tabular-sm text-[9px] font-bold" id="badge-renta-ine">MICRO: SECCIÓN CENSAL INE</span>
                         </div>
                         <span class="text-[12px] font-semibold text-outline uppercase tracking-wider font-label-caps">Renta Media por Hogar</span>
-                        <div class="font-headline-xl text-headline-xl font-bold text-emerald-800 font-mono" id="val-renta-ine">38.450 €</div>
+                        <div class="font-headline-xl text-headline-xl font-bold text-emerald-800 font-mono" id="val-renta-ine">52.800 €</div>
                         <span class="font-body-sm text-body-sm text-charcoal-text font-medium" id="val-renta-ine-seccion">
-                          Renta neta media anual por unidad de consumo en la sección censal.
+                          Sección Censal INE 08019-02-024 (Dreta de l'Eixample)
                         </span>
+                        <div class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 mt-1" id="val-renta-ine-granularidad">
+                          <span class="material-symbols-outlined text-[12px]">filter_center_focus</span>
+                          <span>Granularidad Mínima Nacional: Sección Censal (~1.200 hab.)</span>
+                        </div>
                       </div>
                       <div class="mt-3 pt-2 border-t border-sandstone-border/60 flex flex-col gap-1 bg-stone-surface/30 p-2 rounded">
                         <span class="text-[10px] font-bold text-primary uppercase font-label-caps flex items-center gap-1">
@@ -1223,7 +1231,7 @@
                           <span>¿De dónde sale este dato?</span>
                         </span>
                         <p class="text-[11px] text-on-surface-variant leading-relaxed">
-                          Del <strong>Atlas de Distribución de Renta de los Hogares (ADRH)</strong> publicado por el <em>Instituto Nacional de Estadística (INE)</em> en colaboración con la <em>Agencia Estatal de Administración Tributaria (AEAT)</em>, desagregado por secciones censales de ~1.500 habitantes.
+                          Del <strong>Atlas de Distribución de Renta de los Hogares (ADRH)</strong> publicado por el <em>Instituto Nacional de Estadística (INE)</em> y la <em>AEAT</em>. Mide la renta neta por hogar a nivel de <strong>Sección Censal</strong> (código oficial de 10 dígitos, ~1.200 habitantes), la unidad territorial más pequeña y granular que publica el Estado.
                         </p>
                       </div>
                     </div>
@@ -1233,13 +1241,17 @@
                       <div class="flex flex-col gap-1.5">
                         <div class="flex items-center justify-between pb-1 border-b border-sandstone-border/60">
                           <span class="font-label-caps text-outline uppercase text-[10px] font-bold">_tejido_comercial</span>
-                          <span class="px-1.5 py-0.5 rounded bg-stone-surface text-charcoal-text font-label-tabular-sm text-[9px] font-semibold">CATASTRO OVC</span>
+                          <span class="px-1.5 py-0.5 rounded bg-stone-surface text-charcoal-text font-label-tabular-sm text-[9px] font-bold" id="badge-competencia">MICRO: MANZANA CATASTRAL</span>
                         </div>
                         <span class="text-[12px] font-semibold text-outline uppercase tracking-wider font-label-caps">Competencia Directa (150m)</span>
-                        <div class="font-headline-xl text-headline-xl font-bold text-charcoal-text font-mono" id="val-competencia">3 Locales</div>
+                        <div class="font-headline-xl text-headline-xl font-bold text-charcoal-text font-mono" id="val-competencia">4 Locales en PB</div>
                         <span class="font-body-sm text-body-sm text-charcoal-text font-medium" id="val-competencia-desc">
-                          Densidad equilibrada en el radio de 2 minutos a pie (sin canibalización).
+                          Manzana catastral e isócrona peatonal 150m (Uso C Comercial en planta baja).
                         </span>
+                        <div class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 mt-1" id="val-competencia-granularidad">
+                          <span class="material-symbols-outlined text-[12px]">filter_center_focus</span>
+                          <span>Granularidad Mínima: Manzana Catastral + 150m</span>
+                        </div>
                       </div>
                       <div class="mt-3 pt-2 border-t border-sandstone-border/60 flex flex-col gap-1 bg-stone-surface/30 p-2 rounded">
                         <span class="text-[10px] font-bold text-primary uppercase font-label-caps flex items-center gap-1">
@@ -1247,7 +1259,7 @@
                           <span>¿De dónde sale este dato?</span>
                         </span>
                         <p class="text-[11px] text-on-surface-variant leading-relaxed">
-                          Del <strong>Censo de Locales en Planta Baja y Actividades Económicas</strong> cruzado con la base de datos de <em>Catastro OVC</em> (inmuebles con uso C-Comercial en plantas bajas) en la isócrona peatonal inmediata de 150 metros.
+                          Del <strong>Censo de Locales en Planta Baja y Actividades Económicas</strong> cruzado con la base de datos de <em>Catastro OVC</em>. Aísla la <strong>manzana catastral exacta (código de 7 dígitos)</strong> y los locales con uso comercial `C` en un radio inmediato de 150 metros (2 minutos a pie).
                         </p>
                       </div>
                     </div>

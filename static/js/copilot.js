@@ -535,10 +535,41 @@
     if (finanzas.cap_rate) setText('box-cap-rate', `${formatDec.format(finanzas.cap_rate)} %`);
     if (finanzas.tir) setText('box-tir', `${formatDec.format(finanzas.tir)} %`);
 
-    // F. Entorno & Modelo OCR Inverso
+    // F. Entorno Demográfico y Comercial - Granularidad Mínima
     if (entorno.renta_ine) {
       setText('val-renta-ine', formatEuro.format(entorno.renta_ine));
     }
+    if (entorno.renta_ine_seccion) {
+      setText('val-renta-ine-seccion', entorno.renta_ine_seccion);
+    }
+    if (entorno.renta_ine_granularidad) {
+      setText('val-renta-ine-granularidad', entorno.renta_ine_granularidad);
+    }
+    if (entorno.poblacion_flotante) {
+      setText('val-poblacion-flotante', entorno.poblacion_flotante);
+    }
+    if (entorno.poblacion_flotante_desc) {
+      setText('val-poblacion-flotante-desc', entorno.poblacion_flotante_desc);
+    }
+    if (entorno.poblacion_flotante_badge) {
+      setText('badge-poblacion-flotante', entorno.poblacion_flotante_badge);
+    }
+    if (entorno.poblacion_flotante_granularidad) {
+      setText('val-poblacion-flotante-granularidad', entorno.poblacion_flotante_granularidad);
+    }
+    if (entorno.competencia) {
+      setText('val-competencia', entorno.competencia);
+    }
+    if (entorno.competencia_desc) {
+      setText('val-competencia-desc', entorno.competencia_desc);
+    }
+    if (entorno.competencia_badge) {
+      setText('badge-competencia', entorno.competencia_badge);
+    }
+    if (entorno.competencia_granularidad) {
+      setText('val-competencia-granularidad', entorno.competencia_granularidad);
+    }
+
     if (ocr.facturacion_mensual_req) {
       setText('val-ocr-facturacion', formatEuro.format(ocr.facturacion_mensual_req));
     }
