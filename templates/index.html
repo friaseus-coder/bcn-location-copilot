@@ -575,22 +575,34 @@
           <span class="font-body-sm text-body-sm font-medium" id="toast-text">Modelo actualizado correctamente</span>
         </div>
 
+        <!-- Botón flotante para desplegar la barra lateral cuando está escondida -->
+        <button type="button" id="btn-desplegar-sidebar" onclick="window.toggleSidebarIzquierdo()" title="Desplegar Ficha Técnica y Catastro" class="hidden fixed left-0 top-24 z-40 bg-surface-container-lowest border-2 border-l-0 border-primary/40 hover:border-primary shadow-lg rounded-r-xl px-2.5 py-2.5 text-primary hover:bg-stone-surface transition-all flex items-center gap-1.5 cursor-pointer group">
+          <span class="material-symbols-outlined text-[22px] group-hover:translate-x-0.5 transition-transform text-primary">keyboard_double_arrow_right</span>
+          <span class="font-label-caps text-[10px] font-bold uppercase tracking-wider text-charcoal-text hidden md:inline">Ficha Técnica</span>
+        </button>
+
         <div class="p-space-lg flex flex-col xl:flex-row gap-space-lg items-start">
           
           <!-- 1. LEFT COLLAPSIBLE UNDERWRITING CONTROL SIDEBAR (320px) -->
-          <aside class="w-full xl:w-[320px] flex-shrink-0 flex flex-col gap-space-md bg-surface-container-lowest rounded-xl p-space-md border border-sandstone-border shadow-[0_1px_3px_rgba(27,28,26,0.03)]">
+          <aside class="w-full xl:w-[320px] flex-shrink-0 flex flex-col gap-space-md bg-surface-container-lowest rounded-xl p-space-md border border-sandstone-border shadow-[0_1px_3px_rgba(27,28,26,0.03)] transition-all duration-300" id="sidebar-control">
             <!-- Institutional Module Crest (Informativo Oficial) -->
-            <div class="flex items-center gap-space-sm pb-space-sm bg-stone-surface/40 p-space-sm rounded-lg border border-sandstone-border/60">
-              <div class="w-9 h-9 rounded bg-primary flex items-center justify-center flex-shrink-0 text-on-primary shadow-sm">
-                <span class="material-symbols-outlined text-[19px]">domain</span>
-              </div>
-              <div class="flex flex-col min-w-0">
-                <div class="flex items-center gap-1.5">
-                  <span class="font-headline-md text-[14px] font-bold text-primary truncate leading-tight">Ficha Técnica Oficial</span>
-                  <span class="px-1.5 py-0.2 rounded bg-primary text-on-primary font-label-tabular-sm text-[9px] font-medium">Catastro OVC</span>
+            <div class="flex items-center justify-between gap-space-sm pb-space-sm bg-stone-surface/40 p-space-sm rounded-lg border border-sandstone-border/60">
+              <div class="flex items-center gap-space-sm min-w-0">
+                <div class="w-9 h-9 rounded bg-primary flex items-center justify-center flex-shrink-0 text-on-primary shadow-sm">
+                  <span class="material-symbols-outlined text-[19px]">domain</span>
                 </div>
-                <span class="font-label-caps text-outline uppercase text-[9px] tracking-wider truncate font-medium">Auditoría Territorial Verificada</span>
+                <div class="flex flex-col min-w-0">
+                  <div class="flex items-center gap-1.5">
+                    <span class="font-headline-md text-[14px] font-bold text-primary truncate leading-tight">Ficha Técnica Oficial</span>
+                    <span class="px-1.5 py-0.2 rounded bg-primary text-on-primary font-label-tabular-sm text-[9px] font-medium">Catastro OVC</span>
+                  </div>
+                  <span class="font-label-caps text-outline uppercase text-[9px] tracking-wider truncate font-medium">Auditoría Territorial Verificada</span>
+                </div>
               </div>
+              <!-- Botón para esconder la barra a la izquierda -->
+              <button type="button" onclick="window.toggleSidebarIzquierdo()" title="Esconder barra lateral a la izquierda" class="p-1 rounded-md hover:bg-stone-surface text-outline hover:text-primary transition-colors cursor-pointer flex items-center justify-center flex-shrink-0" id="btn-colapsar-sidebar">
+                <span class="material-symbols-outlined text-[20px]">keyboard_double_arrow_left</span>
+              </button>
             </div>
 
             <!-- Ficha Técnica del Inmueble (100% Solo Lectura Informativo) -->
@@ -706,15 +718,6 @@
 
             <!-- 2. IDENTIFICACIÓN CATASTRAL Y REGISTRAL OFICIAL -->
             <div class="p-space-sm rounded-lg bg-surface border border-sandstone-border flex flex-col gap-2 shadow-xs" id="panel-catastro-sidebar">
-              <!-- Header Catastro -->
-              <div class="flex items-center justify-between border-b border-sandstone-border/60 pb-1">
-                <div class="flex items-center gap-1.5 text-primary font-semibold text-[11px] uppercase tracking-wider font-label-caps">
-                  <span class="material-symbols-outlined text-[16px] text-primary">badge</span>
-                  <span>_catastro_&amp;_registro</span>
-                </div>
-                <span class="px-1.5 py-0.5 rounded bg-stone-surface text-outline font-label-tabular-sm text-[9px] font-medium">Sede OVC / Registradores</span>
-              </div>
-              
               <!-- Ref Catastral -->
               <div class="flex flex-col gap-0.5 bg-stone-surface/40 p-2 rounded border border-sandstone-border/60">
                 <span class="font-label-caps text-outline text-[9px] uppercase font-semibold">Referencia Catastral</span>
@@ -739,33 +742,34 @@
                 </div>
               </div>
 
-              <!-- Registro de la Propiedad Competente -->
-              <div class="flex flex-col gap-1.5 pt-1.5 border-t border-sandstone-border/60">
-                <div class="flex items-center justify-between">
-                  <span class="text-outline text-[9px] uppercase font-label-caps font-semibold flex items-center gap-1 text-primary">
+              <!-- Registro de la Propiedad Competente (Plegable, de base plegado) -->
+              <details class="group pt-1.5 border-t border-sandstone-border/60 cursor-pointer" id="details-registro-competente">
+                <summary class="list-none flex items-center justify-between select-none py-0.5 hover:text-primary transition-colors">
+                  <span class="text-outline text-[9px] uppercase font-label-caps font-semibold flex items-center gap-1 text-primary group-hover:text-terracotta-accent transition-colors">
                     <span class="material-symbols-outlined text-[13px]">account_balance</span>
                     <span>Registro Competente</span>
                   </span>
-                  <span class="px-1 py-0.2 rounded bg-emerald-100 text-emerald-800 font-label-tabular-sm text-[8px] font-bold">Jurisdicción OK</span>
+                  <div class="flex items-center gap-1">
+                    <span class="px-1 py-0.2 rounded bg-emerald-100 text-emerald-800 font-label-tabular-sm text-[8px] font-bold">Jurisdicción OK</span>
+                    <span class="material-symbols-outlined text-[15px] text-outline transition-transform duration-200 group-open:rotate-180">expand_more</span>
+                  </div>
+                </summary>
+                <div class="flex flex-col gap-1.5 pt-1.5 mt-1 border-t border-sandstone-border/40 cursor-default">
+                  <div class="font-bold text-charcoal-text text-[11px] leading-tight" id="val-registro-num">
+                    Registro de la Propiedad Nº 14 de Barcelona
+                  </div>
+                  <div class="text-on-surface-variant flex items-start gap-1 leading-snug" id="val-registro-sede">
+                    <span class="material-symbols-outlined text-[13px] text-outline mt-0.5 flex-shrink-0">location_on</span>
+                    <span class="text-[10px]">Carrer de Bergara, 10, 4ª Planta, 08002 BCN</span>
+                  </div>
+                  <div class="flex items-center justify-between pt-0.5">
+                    <span class="text-secondary flex items-center gap-1 font-semibold text-[10px]" id="val-registro-tel">
+                      <span class="material-symbols-outlined text-[12px]">call</span>
+                      <span>+34 933 01 24 55</span>
+                    </span>
+                  </div>
                 </div>
-                <div class="font-bold text-charcoal-text text-[11px] leading-tight" id="val-registro-num">
-                  Registro de la Propiedad Nº 14 de Barcelona
-                </div>
-                <div class="text-on-surface-variant flex items-start gap-1 leading-snug" id="val-registro-sede">
-                  <span class="material-symbols-outlined text-[13px] text-outline mt-0.5 flex-shrink-0">location_on</span>
-                  <span class="text-[10px]">Carrer de Bergara, 10, 4ª Planta, 08002 BCN</span>
-                </div>
-                <div class="flex items-center justify-between pt-0.5">
-                  <span class="text-secondary flex items-center gap-1 font-semibold text-[10px]" id="val-registro-tel">
-                    <span class="material-symbols-outlined text-[12px]">call</span>
-                    <span>+34 933 01 24 55</span>
-                  </span>
-                  <a class="text-primary hover:text-forest-muted font-label-tabular-sm text-[10px] font-semibold flex items-center gap-0.5 underline underline-offset-2 cursor-pointer" href="#" onclick="event.preventDefault(); window.mostrarToast('Descargando Nota Simple preliminar...');">
-                    <span class="material-symbols-outlined text-[13px] text-terracotta-accent">file_open</span>
-                    <span>Nota Simple</span>
-                  </a>
-                </div>
-              </div>
+              </details>
             </div>
 
             <!-- 3. PLAN DE USOS & MARCO REGULATORIO URBANÍSTICO (DEBAJO DE FICHA TÉCNICA Y DEL CATASTRAL) -->
@@ -1947,6 +1951,34 @@
                 toast.classList.remove('translate-y-0', 'opacity-100');
                 toast.classList.add('translate-y-20', 'opacity-0');
               }, 3000);
+            };
+
+            // Toggle sidebar izquierdo (esconder a la izquierda o desplegar)
+            window.toggleSidebarIzquierdo = function() {
+              var sidebar = document.getElementById('sidebar-control');
+              var btnDesplegar = document.getElementById('btn-desplegar-sidebar');
+              if (!sidebar) return;
+
+              var estaOculto = sidebar.classList.contains('hidden');
+              if (estaOculto) {
+                sidebar.classList.remove('hidden');
+                if (btnDesplegar) btnDesplegar.classList.add('hidden');
+                if (typeof window.mostrarToast === 'function') {
+                  window.mostrarToast('Barra lateral desplegada');
+                }
+              } else {
+                sidebar.classList.add('hidden');
+                if (btnDesplegar) btnDesplegar.classList.remove('hidden');
+                if (typeof window.mostrarToast === 'function') {
+                  window.mostrarToast('Barra lateral escondida (espacio expandido)');
+                }
+              }
+
+              if (window.leafletMap) {
+                setTimeout(function() {
+                  window.leafletMap.invalidateSize();
+                }, 150);
+              }
             };
 
             // Tab switching engine con soporte para secciones integradas
