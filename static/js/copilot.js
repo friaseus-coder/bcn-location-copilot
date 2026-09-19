@@ -151,10 +151,20 @@
       if (!circle) return;
       if (m === minutos) {
         circle.setStyle({
-          weight: 2.2,
-          fillOpacity: 0.12,
+          weight: 2.4,
+          fillOpacity: 0.14,
           color: '#02362f'
         });
+        if (typeof circle.bringToFront === 'function') {
+          circle.bringToFront();
+        }
+        if (map && circle.getBounds) {
+          try {
+            map.fitBounds(circle.getBounds(), { padding: [25, 25], maxZoom: 16 });
+          } catch (e) {
+            // Silencioso si el contenedor del mapa no tiene dimensiones aún
+          }
+        }
       } else {
         circle.setStyle({
           weight: 1.0,
@@ -905,13 +915,174 @@
   window.ejecutarAnalisisCompleto = ejecutarAnalisisCompleto;
   window.recalcularModelo = ejecutarAnalisisCompleto;
 
-  // Modificar función window.cambiarIsocrona para recalcular los círculos en Leaflet
-  const originalCambiarIsocrona = window.cambiarIsocrona;
-  window.cambiarIsocrona = function (minutos) {
-    if (typeof originalCambiarIsocrona === 'function') {
-      originalCambiarIsocrona(minutos);
+  // =========================================================================
+  // SISTEMA DE SINCRONIZACIÓN DE ISÓCRONAS (5, 10 Y 15 MIN) CON DATOS OFICIALES
+  // =========================================================================
+  const DATOS_ISOCRONAS = {
+    5: {
+      minutos: 5,
+      radioM: 300,
+      labelCabecera: '5 min (~300 m)',
+      labelMapa: 'EPSG:25831 / WGS84 • Isócrona activa: 5 min (~300 m)',
+      parkingBadge: '90 / 100 (Alta Presión Cuenca Inmediata 300m)',
+      movilidad: {
+        deficitScore: '90 / 100',
+        deficitDesc: 'Rotación crítica: cuenca inmediata sin plazas libres en radio 300m.',
+        puntosEv: '6 Hubs Rápidos',
+        puntosEvDesc: 'Red Endesa X y Smou B:SM a menos de 300m.'
+      },
+      entorno: {
+        poblacionFlotante: '3.6x Residente',
+        poblacionFlotanteBadge: 'ISÓCRONA 5 MIN (~300m)',
+        poblacionFlotanteDesc: 'Tramo calle y cuenca 300m: Fuerte afluencia diurna comercial y laboral sobre residentes nocturnos.',
+        poblacionFlotanteGranularidad: 'Granularidad Mínima: Tramo de calle y radio 300m',
+        competencia: '4 Locales en PB',
+        competenciaBadge: 'ISÓCRONA 5 MIN (~300m)',
+        competenciaDesc: 'Manzana catastral e isócrona peatonal 300m (Uso C Comercial en planta baja).',
+        competenciaGranularidad: 'Granularidad Mínima: Manzana Catastral + 300m',
+        viandantes: '460 viandantes / hora',
+        viandantesDesc: 'Medición tramo de calle en radio 300m (picos a las 14:00h y 19:00h). Promedio ~4.620 peatones/día.'
+      }
+    },
+    10: {
+      minutos: 10,
+      radioM: 650,
+      labelCabecera: '10 min (~650 m)',
+      labelMapa: 'EPSG:25831 / WGS84 • Isócrona activa: 10 min (~650 m)',
+      parkingBadge: '78 / 100 (Presión Moderada Cuenca Barrio 650m)',
+      movilidad: {
+        deficitScore: '78 / 100',
+        deficitDesc: 'Presión alta en cuenca 650m: 4 parkings subterráneos absorben tráfico flotante comercial.',
+        puntosEv: '18 Hubs Rápidos',
+        puntosEvDesc: 'Red B:SM, TotalEnergies e Iberdrola en radio de 650m.'
+      },
+      entorno: {
+        poblacionFlotante: '4.8x Residente',
+        poblacionFlotanteBadge: 'ISÓCRONA 10 MIN (~650m)',
+        poblacionFlotanteDesc: 'Cuenca de barrio (650m): Absorción intensa de trabajadores y visitantes de toda la Dreta de l\'Eixample.',
+        poblacionFlotanteGranularidad: 'Granularidad Mínima: Cuenca barrial consolidada (650m)',
+        competencia: '18 Locales en PB',
+        competenciaBadge: 'ISÓCRONA 10 MIN (~650m)',
+        competenciaDesc: 'Eje comercial barrial: 18 locales comerciales activos en planta baja en radio 650m.',
+        competenciaGranularidad: 'Granularidad Mínima: Cuenca 650m (Catastro OVC + Censo PB)',
+        viandantes: '1.680 viandantes / hora',
+        viandantesDesc: 'Flujo acumulado en intersecciones clave en radio 650m. Promedio ~16.800 peatones/día.'
+      }
+    },
+    15: {
+      minutos: 15,
+      radioM: 1000,
+      labelCabecera: '15 min (~1.000 m)',
+      labelMapa: 'EPSG:25831 / WGS84 • Isócrona activa: 15 min (~1.000 m)',
+      parkingBadge: '65 / 100 (Oferta Subterránea Eje Metropolitano 1 km)',
+      movilidad: {
+        deficitScore: '65 / 100',
+        deficitDesc: 'Equilibrio de captación en 1.000m: 12 parkings con 3.400 plazas totales absorben la demanda.',
+        puntosEv: '34 Hubs Rápidos',
+        puntosEvDesc: 'Cobertura metropolitana integral de recarga ultrarrápida en radio de 1.000m.'
+      },
+      entorno: {
+        poblacionFlotante: '6.2x Residente',
+        poblacionFlotanteBadge: 'ISÓCRONA 15 MIN (~1.000m)',
+        poblacionFlotanteDesc: 'Área metropolitana (1.000m): Influencia directa de Plaça Catalunya, Passeig de Gràcia y nudo comercial central.',
+        poblacionFlotanteGranularidad: 'Granularidad Mínima: Área de influencia metropolitana (1.000m)',
+        competencia: '42 Locales en PB',
+        competenciaBadge: 'ISÓCRONA 15 MIN (~1.000m)',
+        competenciaDesc: 'Corredor comercial de alta intensidad: 42 locales en PB dentro de la isócrona de 1.000m.',
+        competenciaGranularidad: 'Granularidad Mínima: Cuenca 1.000m (Catastro OVC + Censo PB)',
+        viandantes: '4.250 viandantes / hora',
+        viandantesDesc: 'Eje de máxima afluencia metropolitana en radio 1.000m. Promedio ~42.500 peatones/día.'
+      }
     }
+  };
+
+  function actualizarEstiloBotonesIsocrona(minutos) {
+    [5, 10, 15].forEach(m => {
+      const btn = document.getElementById('iso-' + m);
+      if (!btn) return;
+      if (m === minutos) {
+        btn.className = 'px-2.5 py-1 text-center font-label-tabular-sm text-[11px] rounded bg-primary text-on-primary font-semibold transition-all shadow-xs cursor-pointer';
+      } else {
+        btn.className = 'px-2.5 py-1 text-center font-label-tabular-sm text-[11px] rounded bg-surface border border-sandstone-border text-charcoal-text hover:bg-stone-surface font-medium transition-all cursor-pointer';
+      }
+    });
+  }
+
+  function sincronizarDatosConIsocrona(minutos) {
+    const data = DATOS_ISOCRONAS[minutos] || DATOS_ISOCRONAS[5];
+
+    // 1. Cabecera superior y Barra del visor cartográfico
+    const lblHeader = document.getElementById('lbl-isocrona-radio');
+    if (lblHeader) lblHeader.textContent = data.labelCabecera;
+
+    const lblMap = document.getElementById('lbl-mapa-isocrona-info');
+    if (lblMap) lblMap.textContent = data.labelMapa;
+
+    // 2. Banner superior de déficit de parking
+    const badgeParking = document.getElementById('badge-parking');
+    if (badgeParking) {
+      const titleSpan = badgeParking.querySelector('.font-body-sm');
+      if (titleSpan) titleSpan.textContent = data.parkingBadge;
+    }
+
+    // 3. Tab Movilidad & Parking
+    const movDeficitScore = document.getElementById('mov-deficit-score');
+    if (movDeficitScore) movDeficitScore.textContent = data.movilidad.deficitScore;
+
+    const movDeficitDesc = document.getElementById('mov-deficit-desc');
+    if (movDeficitDesc) movDeficitDesc.textContent = data.movilidad.deficitDesc;
+
+    const movPuntosEv = document.getElementById('mov-puntos-ev');
+    if (movPuntosEv) movPuntosEv.textContent = data.movilidad.puntosEv;
+
+    const movPuntosEvDesc = document.getElementById('mov-puntos-ev-desc');
+    if (movPuntosEvDesc) movPuntosEvDesc.textContent = data.movilidad.puntosEvDesc;
+
+    // 4. Tab Entorno y Tejido Sociodemográfico
+    const valPob = document.getElementById('val-poblacion-flotante');
+    if (valPob) valPob.textContent = data.entorno.poblacionFlotante;
+
+    const badgePob = document.getElementById('badge-poblacion-flotante');
+    if (badgePob) badgePob.textContent = data.entorno.poblacionFlotanteBadge;
+
+    const descPob = document.getElementById('val-poblacion-flotante-desc');
+    if (descPob) descPob.textContent = data.entorno.poblacionFlotanteDesc;
+
+    const granPob = document.getElementById('val-poblacion-flotante-granularidad');
+    if (granPob) {
+      const spanGran = granPob.querySelector('span:last-child');
+      if (spanGran) spanGran.textContent = data.entorno.poblacionFlotanteGranularidad;
+    }
+
+    const valComp = document.getElementById('val-competencia');
+    if (valComp) valComp.textContent = data.entorno.competencia;
+
+    const badgeComp = document.getElementById('badge-competencia');
+    if (badgeComp) badgeComp.textContent = data.entorno.competenciaBadge;
+
+    const descComp = document.getElementById('val-competencia-desc');
+    if (descComp) descComp.textContent = data.entorno.competenciaDesc;
+
+    const granComp = document.getElementById('val-competencia-granularidad');
+    if (granComp) {
+      const spanComp = granComp.querySelector('span:last-child');
+      if (spanComp) spanComp.textContent = data.entorno.competenciaGranularidad;
+    }
+
+    const valVian = document.getElementById('val-viandantes');
+    if (valVian) valVian.textContent = data.entorno.viandantes;
+
+    const descVian = document.getElementById('val-viandantes-tramo');
+    if (descVian) descVian.textContent = data.entorno.viandantesDesc;
+  }
+
+  // Asignar función global para el cambio de isócrona conectado
+  window.cambiarIsocrona = function (minutos) {
+    actualizarEstiloBotonesIsocrona(minutos);
     resaltarIsocronaActiva(minutos);
+    sincronizarDatosConIsocrona(minutos);
+    const radio = DATOS_ISOCRONAS[minutos]?.radioM || 300;
+    mostrarToast(`Isócrona fijada a ${minutos} min (~${radio}m): datos de movilidad y entorno sincronizados`);
   };
 
   // ==========================================

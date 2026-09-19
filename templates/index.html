@@ -534,17 +534,23 @@
         </button>
       </div>
 
-      <!-- Header Right: Institutional Neutral Brand & Status -->
+      <!-- Header Right: Selector Global de Isócronas Conectadas & Brand -->
       <div class="flex items-center gap-space-md">
-        <div class="hidden 2xl:flex items-center gap-1.5 px-3 py-1 rounded bg-stone-surface/60 border border-sandstone-border">
-          <span class="inline-block w-2 h-2 rounded-full bg-emerald-600"></span>
-          <span class="font-label-tabular-sm text-primary font-semibold">8 Capas Oficiales Conectadas</span>
-          <span class="text-outline text-[11px]">(Catastro, ICGC, INE, Pla d'Usos, TMB)</span>
+        <!-- Control Global de Isócronas Peatonales -->
+        <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface border border-sandstone-border shadow-xs" id="control-isocrona-header">
+          <div class="flex items-center gap-1.5 pr-2 border-r border-sandstone-border/60">
+            <span class="material-symbols-outlined text-[18px] text-primary">directions_walk</span>
+            <div class="flex flex-col">
+              <span class="font-label-caps text-outline uppercase text-[9px] font-bold leading-none">_cuenca_isócrona</span>
+              <span class="font-label-tabular-sm text-primary font-bold text-[10px] leading-tight mt-0.5" id="lbl-isocrona-radio">5 min (~300 m)</span>
+            </div>
+          </div>
+          <div class="flex items-center gap-1 bg-stone-surface/60 p-0.5 rounded-md border border-sandstone-border/50">
+            <button class="px-2.5 py-1 text-center font-label-tabular-sm text-[11px] rounded bg-primary text-on-primary font-semibold transition-all shadow-xs cursor-pointer" id="iso-5" onclick="window.cambiarIsocrona(5)" type="button" title="Cuenca inmediata a pie (5 min / 300m)">5 min</button>
+            <button class="px-2.5 py-1 text-center font-label-tabular-sm text-[11px] rounded bg-surface border border-sandstone-border text-charcoal-text hover:bg-stone-surface font-medium transition-all cursor-pointer" id="iso-10" onclick="window.cambiarIsocrona(10)" type="button" title="Cuenca de barrio a pie (10 min / 650m)">10 min</button>
+            <button class="px-2.5 py-1 text-center font-label-tabular-sm text-[11px] rounded bg-surface border border-sandstone-border text-charcoal-text hover:bg-stone-surface font-medium transition-all cursor-pointer" id="iso-15" onclick="window.cambiarIsocrona(15)" type="button" title="Cuenca metropolitana a pie (15 min / 1.000m)">15 min</button>
+          </div>
         </div>
-        <button class="h-9 px-space-sm rounded bg-surface border border-sandstone-border hover:bg-stone-surface/60 hover:text-on-surface text-charcoal-text font-body-sm text-body-sm flex items-center gap-1.5 transition-colors" id="btn-ajustes-informe" type="button">
-          <span class="material-symbols-outlined text-[16px] text-outline">tune</span>
-          <span class="hidden sm:inline">Ajustes</span>
-        </button>
         <div class="h-6 w-px bg-sandstone-border"></div>
         <!-- Institutional Header Badge (Sin marcas privadas) -->
         <div class="flex items-center gap-space-sm pl-1">
@@ -766,19 +772,6 @@
                 <span class="font-bold text-emerald-800" id="val-pla-dusos-tensionado">Zona Tensionada MIVAU</span>
               </div>
             </div>
-
-            <!-- Asset Snapshot Metadata Card -->
-            <div class="mt-space-xs p-space-sm rounded-lg bg-stone-surface/40 border border-sandstone-border/60 flex flex-col gap-space-xs">
-              <div class="flex items-center justify-between">
-                <span class="font-label-caps text-outline uppercase text-[10px] font-semibold">_filtro_isócrona</span>
-                <span class="font-label-tabular-sm text-primary font-semibold">TMB 5-10 min</span>
-              </div>
-              <div class="grid grid-cols-3 gap-1">
-                <button class="py-1 text-center font-label-tabular-sm text-label-tabular-sm rounded bg-primary text-on-primary font-medium transition-colors shadow-sm cursor-pointer" id="iso-5" onclick="window.cambiarIsocrona(5)" type="button">5 min</button>
-                <button class="py-1 text-center font-label-tabular-sm text-label-tabular-sm rounded bg-surface border border-sandstone-border text-charcoal-text hover:bg-stone-surface font-medium transition-colors cursor-pointer" id="iso-10" onclick="window.cambiarIsocrona(10)" type="button">10 min</button>
-                <button class="py-1 text-center font-label-tabular-sm text-label-tabular-sm rounded bg-surface border border-sandstone-border text-charcoal-text hover:bg-stone-surface font-medium transition-colors cursor-pointer" id="iso-15" onclick="window.cambiarIsocrona(15)" type="button">15 min</button>
-              </div>
-            </div>
           </aside>
 
           <!-- 2. MAIN COCKPIT & TABULAR UNDERWRITING PANE -->
@@ -896,7 +889,7 @@
                   <span class="material-symbols-outlined text-[16px] text-primary">map</span>
                   <span class="font-label-caps text-primary uppercase text-[10px] font-bold">_visor_cartográfico_icgc_&amp;_osm</span>
                   <span class="px-1.5 py-0.2 rounded bg-stone-surface font-label-tabular-sm text-primary font-semibold text-[10px]">Leaflet v1.9.4</span>
-                  <span class="font-label-tabular-sm text-outline text-[10px] hidden sm:inline">EPSG:25831 / WGS84 • Isócronas 5-10-15 min</span>
+                  <span class="font-label-tabular-sm text-outline text-[10px] hidden sm:inline" id="lbl-mapa-isocrona-info">EPSG:25831 / WGS84 • Isócrona activa: 5 min (~300 m)</span>
                 </div>
                 <div class="flex items-center gap-2">
                   <button type="button" id="btn-toggle-map" onclick="window.toggleVisorMapa()" class="text-xs text-outline hover:text-primary flex items-center gap-0.5 cursor-pointer font-medium px-2 py-0.5 rounded hover:bg-stone-surface transition-colors">
@@ -1608,13 +1601,15 @@
                 var b = document.getElementById('iso-' + m);
                 if (!b) return;
                 if (m === minutos) {
-                  b.classList.remove('bg-surface', 'text-charcoal-text');
-                  b.classList.add('bg-primary', 'text-on-primary');
+                  b.className = 'px-2.5 py-1 text-center font-label-tabular-sm text-[11px] rounded bg-primary text-on-primary font-semibold transition-all shadow-xs cursor-pointer';
                 } else {
-                  b.classList.remove('bg-primary', 'text-on-primary');
-                  b.classList.add('bg-surface', 'text-charcoal-text');
+                  b.className = 'px-2.5 py-1 text-center font-label-tabular-sm text-[11px] rounded bg-surface border border-sandstone-border text-charcoal-text hover:bg-stone-surface font-medium transition-all cursor-pointer';
                 }
               });
+              var lbl = document.getElementById('lbl-isocrona-radio');
+              if (lbl) {
+                lbl.textContent = minutos === 5 ? '5 min (~300 m)' : (minutos === 10 ? '10 min (~650 m)' : '15 min (~1.000 m)');
+              }
               window.mostrarToast('Isócrona fijada a ' + minutos + ' min a pie');
             };
 
