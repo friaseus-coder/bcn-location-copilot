@@ -831,12 +831,13 @@
             <!-- 4. KPI METRIC CARDS ROW (LIMPIO: LOCATION SCORE & RENTA INCASÒL) -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-space-sm">
               <!-- KPI 1: Location Score -->
-              <div class="bg-surface-container-lowest p-space-md rounded-xl border border-sandstone-border shadow-[0_1px_3px_rgba(27,28,26,0.03)] flex flex-col justify-between">
+              <div class="bg-surface-container-lowest p-space-md rounded-xl border border-sandstone-border shadow-[0_1px_3px_rgba(27,28,26,0.03)] flex flex-col justify-between hover:border-primary/40 transition-colors">
                 <div class="flex items-center justify-between pb-1">
-                  <div class="flex items-center gap-1.5">
+                  <div class="flex items-center gap-2">
                     <span class="font-label-caps text-outline uppercase text-[10px] font-semibold">_location_score</span>
-                    <button type="button" onclick="window.abrirModalInfo('score')" class="p-0.5 rounded text-outline hover:text-primary hover:bg-stone-surface transition-colors cursor-pointer" title="Ver desglose de puntuación y fórmula">
-                      <span class="material-symbols-outlined text-[15px]">info</span>
+                    <button type="button" onclick="window.abrirModalInfo('score')" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-stone-surface/80 hover:bg-stone-surface text-primary border border-sandstone-border font-label-caps text-[9px] font-bold tracking-wide transition-all shadow-2xs hover:shadow-xs cursor-pointer" title="Ver de dónde sale la puntuación, metodología y fórmula">
+                      <span class="material-symbols-outlined text-[13px] text-primary">info</span>
+                      <span>¿De dónde salen los datos?</span>
                     </button>
                   </div>
                   <span class="material-symbols-outlined text-primary text-[18px]">verified</span>
@@ -849,17 +850,21 @@
                 </div>
                 <div class="flex items-center justify-between pt-1">
                   <span class="font-body-sm text-body-sm text-on-surface-variant text-[11px]">Idoneidad integral calculada</span>
-                  <span class="font-label-tabular-sm text-label-tabular-sm text-primary font-semibold">+4.2 pts vs distrito</span>
+                  <button type="button" onclick="window.abrirModalInfo('score')" class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-200/80 font-label-tabular-sm text-[11px] font-semibold transition-colors cursor-pointer" title="Haga clic para ver el cálculo del Location Score">
+                    <span>+4.2 pts vs distrito</span>
+                    <span class="material-symbols-outlined text-[13px] text-emerald-800">help</span>
+                  </button>
                 </div>
               </div>
 
               <!-- KPI 2: Renta Estimada Incasòl -->
-              <div class="bg-surface-container-lowest p-space-md rounded-xl border border-sandstone-border shadow-[0_1px_3px_rgba(27,28,26,0.03)] flex flex-col justify-between">
+              <div class="bg-surface-container-lowest p-space-md rounded-xl border border-sandstone-border shadow-[0_1px_3px_rgba(27,28,26,0.03)] flex flex-col justify-between hover:border-primary/40 transition-colors">
                 <div class="flex items-center justify-between pb-1">
-                  <div class="flex items-center gap-1.5">
+                  <div class="flex items-center gap-2">
                     <span class="font-label-caps text-outline uppercase text-[10px] font-semibold">_renta_estimada (incasòl)</span>
-                    <button type="button" onclick="window.abrirModalInfo('renta')" class="p-0.5 rounded text-outline hover:text-primary hover:bg-stone-surface transition-colors cursor-pointer" title="Ver registro oficial INCASÒL y cálculo">
-                      <span class="material-symbols-outlined text-[15px]">info</span>
+                    <button type="button" onclick="window.abrirModalInfo('renta')" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-stone-surface/80 hover:bg-stone-surface text-primary border border-sandstone-border font-label-caps text-[9px] font-bold tracking-wide transition-all shadow-2xs hover:shadow-xs cursor-pointer" title="Ver registro público oficial INCASÒL y desglose del cálculo">
+                      <span class="material-symbols-outlined text-[13px] text-primary">info</span>
+                      <span>¿De dónde salen los datos?</span>
                     </button>
                   </div>
                   <span class="material-symbols-outlined text-terracotta-accent text-[18px]">real_estate_agent</span>
@@ -870,7 +875,10 @@
                 </div>
                 <div class="flex items-center justify-between pt-1">
                   <span class="font-body-sm text-body-sm text-on-surface-variant text-[11px]">35,00 €/m²/mes</span>
-                  <span class="font-label-tabular-sm text-label-tabular-sm text-secondary font-semibold">BBDD Fianzas BCN</span>
+                  <button type="button" onclick="window.abrirModalInfo('renta')" class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-stone-surface hover:bg-stone-surface/80 text-secondary border border-sandstone-border font-label-tabular-sm text-[11px] font-semibold transition-colors cursor-pointer" title="Haga clic para ver el cálculo oficial de rentas INCASÒL">
+                    <span>BBDD Fianzas BCN</span>
+                    <span class="material-symbols-outlined text-[13px] text-secondary">help</span>
+                  </button>
                 </div>
               </div>
 
