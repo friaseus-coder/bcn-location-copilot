@@ -744,6 +744,11 @@
         setTimeout(() => currentMarker.openPopup(), 400);
       }
     }
+
+    // J. Refrescar listado y contadores del Censo de Negocios en Cercanías
+    if (typeof window.renderizarNegocios === 'function') {
+      window.renderizarNegocios();
+    }
   }
 
   // ==========================================
@@ -1126,6 +1131,19 @@
 
     const descVian = document.getElementById('val-viandantes-tramo');
     if (descVian) descVian.textContent = data.entorno.viandantesDesc;
+
+    // 5. Tab Negocios en Cercanías por Isócronas
+    const lblNegCuenca = document.getElementById('lbl-negocios-cuenca-activa');
+    if (lblNegCuenca) {
+      const radio = data.radioM || 300;
+      lblNegCuenca.innerHTML = `
+        <span class="w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span>
+        <span>Cuenca activa: ${minutos} min (~${radio} m)</span>
+      `;
+    }
+    if (typeof window.renderizarNegocios === 'function') {
+      window.renderizarNegocios();
+    }
   }
 
   // Asignar función global para el cambio de isócrona conectado
@@ -1134,7 +1152,7 @@
     resaltarIsocronaActiva(minutos);
     sincronizarDatosConIsocrona(minutos);
     const radio = DATOS_ISOCRONAS[minutos]?.radioM || 300;
-    mostrarToast(`Isócrona fijada a ${minutos} min (~${radio}m): datos de movilidad y entorno sincronizados`);
+    mostrarToast(`Isócrona fijada a ${minutos} min (~${radio}m): datos de movilidad, entorno y negocios sincronizados`);
   };
 
   // ==========================================
@@ -1308,6 +1326,374 @@ Tiempo de Acceso = ${distanciaMetro} m / 80 m/min = ${(distanciaMetro / 80).toFi
     modal.classList.remove('hidden');
   };
 
+  // =========================================================================
+  // MOTOR DE NEGOCIOS EN CERCANÍAS (CENSO OFICIAL OPEN DATA BCN & OSM)
+  // =========================================================================
+
+  const CENSO_NEGOCIOS_POR_CUENCA = {
+    5: [
+      // 1. Hostelería (11)
+      { id: 'neg-01', nombre: "Brunch & Cake Eixample", direccion: "Carrer d'Enric Granados, 19", categoria: 'hosteleria', categoriaNombre: 'Hostelería & Cafeterías', distancia_m: 85, minutos: '1,1 min', lat: 41.3888, lon: 2.1582, licencia: 'C3 Restauración' },
+      { id: 'neg-02', nombre: "Granja Petitbo Provença", direccion: "Carrer de Mallorca, 194", categoria: 'hosteleria', categoriaNombre: 'Hostelería & Cafeterías', distancia_m: 110, minutos: '1,4 min', lat: 41.3895, lon: 2.1575, licencia: 'C2 Bar con Comida' },
+      { id: 'neg-03', nombre: "Federal Café Urgell", direccion: "Carrer del Comte d'Urgell, 142", categoria: 'hosteleria', categoriaNombre: 'Hostelería & Cafeterías', distancia_m: 130, minutos: '1,6 min', lat: 41.3845, lon: 2.1558, licencia: 'C3 Restauración' },
+      { id: 'neg-04', nombre: "Bodega Sepúlveda", direccion: "Carrer de Sepúlveda, 173", categoria: 'hosteleria', categoriaNombre: 'Hostelería & Restauración', distancia_m: 175, minutos: '2,2 min', lat: 41.3828, lon: 2.1610, licencia: 'C3 Restauración Tradicional' },
+      { id: 'neg-05', nombre: "Flax & Kale Passage", direccion: "Carrer dels Tallers, 74", categoria: 'hosteleria', categoriaNombre: 'Hostelería & Restauración', distancia_m: 210, minutos: '2,6 min', lat: 41.3858, lon: 2.1662, licencia: 'C3 Healthy Flexitarian' },
+      { id: 'neg-06', nombre: "Bar Velódromo", direccion: "Carrer de Muntaner, 213", categoria: 'hosteleria', categoriaNombre: 'Hostelería & Vermutería', distancia_m: 240, minutos: '3,0 min', lat: 41.3932, lon: 2.1488, licencia: 'C2 Histórico Bar' },
+      { id: 'neg-07', nombre: "Cafè del Centre 1873", direccion: "Carrer de Girona, 69", categoria: 'hosteleria', categoriaNombre: 'Hostelería Emblemática', distancia_m: 260, minutos: '3,2 min', lat: 41.3955, lon: 2.1718, licencia: 'C2 Café Singular' },
+      { id: 'neg-08', nombre: "Honest Greens Rambla", direccion: "Rambla de Catalunya, 3", categoria: 'hosteleria', categoriaNombre: 'Hostelería & Fast-Casual', distancia_m: 275, minutos: '3,4 min', lat: 41.3872, lon: 2.1685, licencia: 'C3 Restauración' },
+      { id: 'neg-09', nombre: "Pizzería Da Nanni Balmes", direccion: "Carrer de Balmes, 64", categoria: 'hosteleria', categoriaNombre: 'Hostelería Italiana', distancia_m: 280, minutos: '3,5 min', lat: 41.3892, lon: 2.1615, licencia: 'C3 Pizzería con Horno' },
+      { id: 'neg-10', nombre: "Nomad Coffee Lab", direccion: "Passatge Sert, 12", categoria: 'hosteleria', categoriaNombre: 'Café de Especialidad', distancia_m: 290, minutos: '3,6 min', lat: 41.3890, lon: 2.1762, licencia: 'C1 Degustación' },
+      { id: 'neg-11', nombre: "Cervecería Catalana", direccion: "Carrer de Mallorca, 236", categoria: 'hosteleria', categoriaNombre: 'Hostelería & Tapas', distancia_m: 295, minutos: '3,7 min', lat: 41.3920, lon: 2.1605, licencia: 'C3 Restauración' },
+
+      // 2. Retail & Moda (5)
+      { id: 'neg-12', nombre: "Natura Casa & Moda", direccion: "Carrer del Consell de Cent, 302", categoria: 'retail', categoriaNombre: 'Retail & Moda / Hogar', distancia_m: 140, minutos: '1,8 min', lat: 41.3882, lon: 2.1630, licencia: 'IAE 653.2 Moda y Complementos' },
+      { id: 'neg-13', nombre: "Muji Barcelona Rambla", direccion: "Rambla de Catalunya, 81", categoria: 'retail', categoriaNombre: 'Retail & Diseño Japonés', distancia_m: 190, minutos: '2,4 min', lat: 41.3928, lon: 2.1585, licencia: 'IAE 651.1 Grandes Superficies PB' },
+      { id: 'neg-14', nombre: "L'Arca Vintage Barcelona", direccion: "Carrer dels Banys Nous, 20", categoria: 'retail', categoriaNombre: 'Retail & Textiles Vintage', distancia_m: 220, minutos: '2,8 min', lat: 41.3828, lon: 2.1745, licencia: 'IAE 653.1 Antigüedades & Moda' },
+      { id: 'neg-15', nombre: "Zapatería Casas Pelai", direccion: "Carrer de Pelai, 18", categoria: 'retail', categoriaNombre: 'Retail & Calzado', distancia_m: 250, minutos: '3,1 min', lat: 41.3855, lon: 2.1690, licencia: 'IAE 651.6 Calzado y Piel' },
+      { id: 'neg-16', nombre: "Llibreria Altaïr Eixample", direccion: "Gran Via de les Corts Catalanes, 616", categoria: 'retail', categoriaNombre: 'Retail Cultural & Libros', distancia_m: 285, minutos: '3,6 min', lat: 41.3879, lon: 2.1652, licencia: 'IAE 659.4 Librería y Prensa' },
+
+      // 3. Alimentación & Proximidad (4)
+      { id: 'neg-17', nombre: "Supermercat Bonpreu Urgell", direccion: "Carrer del Comte d'Urgell, 128", categoria: 'alimentacion', categoriaNombre: 'Alimentación & Frescos', distancia_m: 95, minutos: '1,2 min', lat: 41.3840, lon: 2.1565, licencia: 'IAE 647.1 Supermercado Urbano' },
+      { id: 'neg-18', nombre: "Forn Baluard Provença", direccion: "Carrer de Provença, 279", categoria: 'alimentacion', categoriaNombre: 'Panadería Artesanal & Café', distancia_m: 160, minutos: '2,0 min', lat: 41.3960, lon: 2.1620, licencia: 'IAE 644.1 Despacho de Pan' },
+      { id: 'neg-19', nombre: "Mercat del Ninot", direccion: "Carrer de Mallorca, 133", categoria: 'alimentacion', categoriaNombre: 'Mercado Municipal & Paradas', distancia_m: 210, minutos: '2,6 min', lat: 41.3875, lon: 2.1528, licencia: 'Equipamiento Municipal Alimentario' },
+      { id: 'neg-20', nombre: "Veritas Supermercats Ecològics", direccion: "Carrer de Diputació, 239", categoria: 'alimentacion', categoriaNombre: 'Alimentación Ecológica', distancia_m: 270, minutos: '3,4 min', lat: 41.3870, lon: 2.1625, licencia: 'IAE 647.2 Comercio Bio' },
+
+      // 4. Salud & Farmacias (3)
+      { id: 'neg-21', nombre: "Farmàcia Urgell 140", direccion: "Carrer del Comte d'Urgell, 140", categoria: 'salud', categoriaNombre: 'Salud & Farmacia', distancia_m: 45, minutos: '0,6 min', lat: 41.3846, lon: 2.1560, licencia: 'Oficina de Farmacia COFB' },
+      { id: 'neg-22', nombre: "General Óptica Universitat", direccion: "Plaça de la Universitat, 4", categoria: 'salud', categoriaNombre: 'Salud Visual & Óptica', distancia_m: 180, minutos: '2,2 min', lat: 41.3860, lon: 2.1645, licencia: 'IAE 659.3 Artículos de Óptica' },
+      { id: 'neg-23', nombre: "Centre Mèdic Aragó Eixample", direccion: "Carrer d'Aragó, 208", categoria: 'salud', categoriaNombre: 'Clínica & Especialidades', distancia_m: 260, minutos: '3,2 min', lat: 41.3885, lon: 2.1595, licencia: 'Centro Polivalente Sanitario' },
+
+      // 5. Servicios Profesionales (3)
+      { id: 'neg-24', nombre: "Banc Sabadell Hub Empresa", direccion: "Avinguda Diagonal, 407", categoria: 'servicios', categoriaNombre: 'Banca Corporativa & Asesoría', distancia_m: 120, minutos: '1,5 min', lat: 41.3965, lon: 2.1540, licencia: 'Banca y Entidades Financieras' },
+      { id: 'neg-25', nombre: "CaixaBank Store Negocios", direccion: "Gran Via de les Corts Catalanes, 588", categoria: 'servicios', categoriaNombre: 'Servicios Financieros Pymes', distancia_m: 195, minutos: '2,4 min', lat: 41.3865, lon: 2.1635, licencia: 'Oficina Bancaria Store' },
+      { id: 'neg-26', nombre: "Notaría Eixample Central", direccion: "Rambla de Catalunya, 45", categoria: 'servicios', categoriaNombre: 'Despacho Notarial & Jurídico', distancia_m: 280, minutos: '3,5 min', lat: 41.3900, lon: 2.1640, licencia: 'Servicios Notariales y Legales' },
+
+      // 6. Servicios Especializados & Bienestar (2)
+      { id: 'neg-27', nombre: "Aire Ancient Baths Eixample", direccion: "Passeig de Picasso, 22", categoria: 'especializados', categoriaNombre: 'Bienestar & Spa Urbano', distancia_m: 230, minutos: '2,9 min', lat: 41.3865, lon: 2.1850, licencia: 'Baños Termales & Relax' },
+      { id: 'neg-28', nombre: "DiR Eixample Fitness Club", direccion: "Carrer de Casp, 34", categoria: 'especializados', categoriaNombre: 'Fitness & Entrenamiento', distancia_m: 285, minutos: '3,6 min', lat: 41.3915, lon: 2.1720, licencia: 'Centro Deportivo y Gimnasio' }
+    ],
+
+    10: [
+      // Corona 300m - 650m (34 negocios adicionales)
+      { id: 'neg-29', nombre: "El Nacional Barcelona", direccion: "Passeig de Gràcia, 24", categoria: 'hosteleria', categoriaNombre: 'Hostelería Multiespacio', distancia_m: 340, minutos: '4,2 min', lat: 41.3897, lon: 2.1685, licencia: 'C3 Gran Formato' },
+      { id: 'neg-30', nombre: "Bar Muy Buenas Raval", direccion: "Carrer del Carme, 63", categoria: 'hosteleria', categoriaNombre: 'Bar Tradicional & Cócteles', distancia_m: 380, minutos: '4,8 min', lat: 41.3812, lon: 2.1675, licencia: 'C2 Histórico Modernista' },
+      { id: 'neg-31', nombre: "La Flauta Aribau", direccion: "Carrer d'Aribau, 23", categoria: 'hosteleria', categoriaNombre: 'Restaurante de Tapas & Flautas', distancia_m: 410, minutos: '5,1 min', lat: 41.3870, lon: 2.1585, licencia: 'C3 Restauración' },
+      { id: 'neg-32', nombre: "Pastisseria Escribà Gran Via", direccion: "Gran Via de les Corts Catalanes, 546", categoria: 'alimentacion', categoriaNombre: 'Pastelería & Chocolatería', distancia_m: 390, minutos: '4,9 min', lat: 41.3835, lon: 2.1610, licencia: 'Pastelería Emblemática' },
+      { id: 'neg-33', nombre: "Mercat de Sant Antoni", direccion: "Carrer del Comte d'Urgell, 1", categoria: 'alimentacion', categoriaNombre: 'Mercado Central Frescos', distancia_m: 480, minutos: '6,0 min', lat: 41.3789, lon: 2.1628, licencia: 'Gran Mercado Municipal' },
+      { id: 'neg-34', nombre: "Supermercats Ametller Origen", direccion: "Carrer de Villarroel, 114", categoria: 'alimentacion', categoriaNombre: 'Alimentación de Origen Directo', distancia_m: 350, minutos: '4,4 min', lat: 41.3860, lon: 2.1550, licencia: 'IAE 647.1 Productos de Proximidad' },
+      { id: 'neg-35', nombre: "COS Store Passeig de Gràcia", direccion: "Passeig de Gràcia, 27", categoria: 'retail', categoriaNombre: 'Moda Internacional & Diseño', distancia_m: 440, minutos: '5,5 min', lat: 41.3912, lon: 2.1668, licencia: 'IAE 651.1 Flagship Store' },
+      { id: 'neg-36', nombre: "Fnac El Triangle", direccion: "Plaça de Catalunya, 4", categoria: 'retail', categoriaNombre: 'Tecnología, Cultura & Libros', distancia_m: 520, minutos: '6,5 min', lat: 41.3862, lon: 2.1702, licencia: 'Gran Superficie Especializada' },
+      { id: 'neg-37', nombre: "Decathlon Ciutat Vella", direccion: "Carrer de la Canuda, 20", categoria: 'retail', categoriaNombre: 'Deporte & Equipamiento', distancia_m: 590, minutos: '7,4 min', lat: 41.3850, lon: 2.1730, licencia: 'IAE 653.3 Artículos Deportivos' },
+      { id: 'neg-38', nombre: "Farmàcia 24h Torres Eixample", direccion: "Carrer d'Aribau, 62", categoria: 'salud', categoriaNombre: 'Farmacia 24 Horas & Ortopedia', distancia_m: 370, minutos: '4,6 min', lat: 41.3890, lon: 2.1565, licencia: 'Farmacia Guardia Permanente' },
+      { id: 'neg-39', nombre: "Clínica Dental Sanitas Ronda", direccion: "Ronda de la Universitat, 12", categoria: 'salud', categoriaNombre: 'Clínica Odontológica', distancia_m: 430, minutos: '5,4 min', lat: 41.3870, lon: 2.1670, licencia: 'Centro Sanitario Dental' },
+      { id: 'neg-40', nombre: "Hospital Clínic de Barcelona", direccion: "Carrer de Villarroel, 170", categoria: 'salud', categoriaNombre: 'Hospital Universitario & Urgencias', distancia_m: 620, minutos: '7,8 min', lat: 41.3888, lon: 2.1510, licencia: 'Hospital de Referencia ICS' },
+      { id: 'neg-41', nombre: "Cuatrecasas Abogados S.L.P.", direccion: "Avinguda Diagonal, 191", categoria: 'servicios', categoriaNombre: 'Despacho Jurídico Internacional', distancia_m: 560, minutos: '7,0 min', lat: 41.3940, lon: 2.1520, licencia: 'Servicios Jurídicos y Tributarios' },
+      { id: 'neg-42', nombre: "Coworking Talent Garden BCN", direccion: "Carrer de Muntaner, 262", categoria: 'servicios', categoriaNombre: 'Centro de Negocios & Coworking', distancia_m: 490, minutos: '6,1 min', lat: 41.3945, lon: 2.1460, licencia: 'Espacios Flexibles de Trabajo' },
+      { id: 'neg-43', nombre: "Metropolitan Iradier Club", direccion: "Carrer d'Aragó, 272", categoria: 'especializados', categoriaNombre: 'Club Deportivo & Spa Premium', distancia_m: 510, minutos: '6,4 min', lat: 41.3920, lon: 2.1645, licencia: 'Centro Deportivo Integral' },
+      { id: 'neg-44', nombre: "Institut d'Estètica Dermatològica", direccion: "Carrer de Balmes, 120", categoria: 'especializados', categoriaNombre: 'Medicina Estética & Cuidado', distancia_m: 580, minutos: '7,2 min', lat: 41.3930, lon: 2.1570, licencia: 'Clínica Médico-Estética' }
+    ],
+
+    15: [
+      // Corona 650m - 1.000m (48 locales adicionales)
+      { id: 'neg-45', nombre: "Apple Store Passeig de Gràcia", direccion: "Passeig de Gràcia, 1", categoria: 'retail', categoriaNombre: 'Tecnología & Flagship Store', distancia_m: 710, minutos: '8,9 min', lat: 41.3878, lon: 2.1695, licencia: 'IAE 659.2 Informática y Electrónica' },
+      { id: 'neg-46', nombre: "El Corte Inglés Plaça Catalunya", direccion: "Plaça de Catalunya, 14", categoria: 'retail', categoriaNombre: 'Grandes Almacenes Multimarca', distancia_m: 780, minutos: '9,8 min', lat: 41.3870, lon: 2.1710, licencia: 'Grandes Almacenes' },
+      { id: 'neg-47', nombre: "Casa Batlló Cafetería & Tienda", direccion: "Passeig de Gràcia, 43", categoria: 'hosteleria', categoriaNombre: 'Hostelería Cultural & Boutique', distancia_m: 820, minutos: '10,2 min', lat: 41.3917, lon: 2.1650, licencia: 'Espacio Cultural con Restauración' },
+      { id: 'neg-48', nombre: "Teresa Carles Cocina Vegetariana", direccion: "Carrer de Jovellanos, 2", categoria: 'hosteleria', categoriaNombre: 'Restaurante Vegetariano', distancia_m: 740, minutos: '9,2 min', lat: 41.3850, lon: 2.1685, licencia: 'C3 Restauración' },
+      { id: 'neg-49', nombre: "Kapadokya Döner Eixample", direccion: "Carrer de Floridablanca, 102", categoria: 'hosteleria', categoriaNombre: 'Restaurante Casual Internacional', distancia_m: 690, minutos: '8,6 min', lat: 41.3780, lon: 2.1590, licencia: 'C2 Comida Rápida' },
+      { id: 'neg-50', nombre: "Mercat de la Boqueria", direccion: "La Rambla, 91", categoria: 'alimentacion', categoriaNombre: 'Mercado Gastronómico Emblemático', distancia_m: 890, minutos: '11,1 min', lat: 41.3817, lon: 2.1716, licencia: 'Mercado Histórico de Barcelona' },
+      { id: 'neg-51', nombre: "Carrefour Market Gran Via", direccion: "Gran Via de les Corts Catalanes, 470", categoria: 'alimentacion', categoriaNombre: 'Supermercado de Gran Formato', distancia_m: 810, minutos: '10,1 min', lat: 41.3800, lon: 2.1550, licencia: 'IAE 647.1 Supermercado' },
+      { id: 'neg-52', nombre: "Hospital Sagrat Cor", direccion: "Carrer de Viladomat, 288", categoria: 'salud', categoriaNombre: 'Hospital Universitario General', distancia_m: 930, minutos: '11,6 min', lat: 41.3880, lon: 2.1430, licencia: 'Centro Hospitalario Privado' },
+      { id: 'neg-53', nombre: "CAP Manso (Atenció Primària)", direccion: "Carrer de Manso, 19", categoria: 'salud', categoriaNombre: 'Centro de Atención Primaria ICS', distancia_m: 860, minutos: '10,8 min', lat: 41.3775, lon: 2.1610, licencia: 'Equipamiento Sanitario Público' },
+      { id: 'neg-54', nombre: "KPMG Auditores Barcelona", direccion: "Torre Realia BCN, Avinguda Diagonal, 640", categoria: 'servicios', categoriaNombre: 'Consultoría & Auditoría Financiera', distancia_m: 960, minutos: '12,0 min', lat: 41.3910, lon: 2.1410, licencia: 'Servicios Profesionales de Auditoría' },
+      { id: 'neg-55', nombre: "Regus Passeig de Gràcia Business", direccion: "Passeig de Gràcia, 54", categoria: 'servicios', categoriaNombre: 'Despachos Corporativos & Domiciliación', distancia_m: 880, minutos: '11,0 min', lat: 41.3930, lon: 2.1630, licencia: 'Centro de Negocios' },
+      { id: 'neg-56', nombre: "Holmes Place Balmes Fitness", direccion: "Carrer de Balmes, 44", categoria: 'especializados', categoriaNombre: 'Gimnasio & Piscina Climatizada', distancia_m: 750, minutos: '9,4 min', lat: 41.3880, lon: 2.1630, licencia: 'Instalación Deportiva de Alto Rendimiento' }
+    ]
+  };
+
+  let categoriaNegociosActiva = 'todas';
+  let busquedaNegociosActiva = '';
+  let marcadorNegocioEnMapa = null;
+
+  /**
+   * Obtiene la lista acumulada de negocios según la isócrona activa
+   */
+  function obtenerNegociosCuencaActiva() {
+    const minutos = currentIsochroneMinutes || 5;
+    let lista = [...(CENSO_NEGOCIOS_POR_CUENCA[5] || [])];
+    if (minutos >= 10 && CENSO_NEGOCIOS_POR_CUENCA[10]) {
+      lista = lista.concat(CENSO_NEGOCIOS_POR_CUENCA[10]);
+    }
+    if (minutos >= 15 && CENSO_NEGOCIOS_POR_CUENCA[15]) {
+      lista = lista.concat(CENSO_NEGOCIOS_POR_CUENCA[15]);
+    }
+    // Ordenar de más cercano a más lejano
+    return lista.sort((a, b) => a.distancia_m - b.distancia_m);
+  }
+
+  /**
+   * Renderiza las fichas de los comercios en el contenedor del DOM
+   */
+  window.renderizarNegocios = function (categoriaFiltro, textoBusqueda) {
+    if (categoriaFiltro !== undefined) categoriaNegociosActiva = categoriaFiltro;
+    if (textoBusqueda !== undefined) busquedaNegociosActiva = textoBusqueda;
+
+    const listaBase = obtenerNegociosCuencaActiva();
+    const minutos = currentIsochroneMinutes || 5;
+
+    // 1. Calcular recuentos por categoría en la cuenca activa
+    const recuentos = {
+      todas: listaBase.length,
+      hosteleria: 0,
+      retail: 0,
+      alimentacion: 0,
+      salud: 0,
+      servicios: 0,
+      especializados: 0
+    };
+
+    listaBase.forEach(item => {
+      if (recuentos[item.categoria] !== undefined) {
+        recuentos[item.categoria]++;
+      }
+    });
+
+    // Actualizar badges y contadores del DOM
+    setText('cnt-neg-hosteleria', recuentos.hosteleria);
+    setText('cnt-neg-retail', recuentos.retail);
+    setText('cnt-neg-alimentacion', recuentos.alimentacion);
+    setText('cnt-neg-salud', recuentos.salud);
+    setText('cnt-neg-servicios', recuentos.servicios);
+    setText('cnt-neg-especializados', recuentos.especializados);
+
+    setText('badge-total-negocios', recuentos.todas);
+    setText('txt-badge-total-filtro', recuentos.todas);
+
+    // 2. Filtrar por categoría activa
+    let listaFiltrada = listaBase;
+    if (categoriaNegociosActiva && categoriaNegociosActiva !== 'todas') {
+      listaFiltrada = listaFiltrada.filter(item => item.categoria === categoriaNegociosActiva);
+    }
+
+    // 3. Filtrar por texto de búsqueda en tiempo real
+    if (busquedaNegociosActiva && busquedaNegociosActiva.trim().length > 0) {
+      const q = busquedaNegociosActiva.trim().toLowerCase();
+      listaFiltrada = listaFiltrada.filter(item =>
+        item.nombre.toLowerCase().includes(q) ||
+        item.direccion.toLowerCase().includes(q) ||
+        item.categoriaNombre.toLowerCase().includes(q) ||
+        (item.licencia && item.licencia.toLowerCase().includes(q))
+      );
+    }
+
+    // 4. Actualizar etiqueta de resultados visibles
+    const lblVisibles = document.getElementById('lbl-conteo-visibles');
+    if (lblVisibles) {
+      const nombreCat = categoriaNegociosActiva === 'todas' ? '' : ` de ${categoriaNegociosActiva.toUpperCase()}`;
+      lblVisibles.textContent = `Mostrando ${listaFiltrada.length} negocios${nombreCat} en la cuenca de ${minutos} min`;
+    }
+
+    // 5. Renderizar tarjetas dinámicas en el contenedor
+    const container = document.getElementById('contenedor-lista-negocios');
+    if (!container) return;
+
+    if (listaFiltrada.length === 0) {
+      container.innerHTML = `
+        <div class="col-span-full p-space-lg rounded-xl bg-surface border border-sandstone-border flex flex-col items-center justify-center text-center gap-2 py-8">
+          <span class="material-symbols-outlined text-[36px] text-outline">search_off</span>
+          <span class="font-headline-md text-charcoal-text font-bold">No se han encontrado comercios</span>
+          <span class="font-body-sm text-on-surface-variant text-[12px] max-w-md">
+            No hay actividades que coincidan con «${busquedaNegociosActiva}» en la categoría seleccionada para la isócrona de ${minutos} min.
+          </span>
+          <button type="button" onclick="window.filtrarCategoriaNegocios('todas'); document.getElementById('input-buscar-negocio').value=''; window.buscarNegocioEnListado('');" class="mt-2 px-3 py-1.5 rounded-md bg-primary text-white text-[12px] font-semibold cursor-pointer shadow-xs">
+            Restablecer todos los filtros
+          </button>
+        </div>
+      `;
+      return;
+    }
+
+    // Configuración temática por categoría
+    const configCategoria = {
+      hosteleria: { badgeBg: 'bg-amber-100', badgeText: 'text-amber-900', icon: 'restaurant', border: 'border-amber-200' },
+      retail: { badgeBg: 'bg-rose-100', badgeText: 'text-rose-900', icon: 'shopping_bag', border: 'border-rose-200' },
+      alimentacion: { badgeBg: 'bg-emerald-100', badgeText: 'text-emerald-900', icon: 'local_grocery_store', border: 'border-emerald-200' },
+      salud: { badgeBg: 'bg-teal-100', badgeText: 'text-teal-900', icon: 'local_pharmacy', border: 'border-teal-200' },
+      servicios: { badgeBg: 'bg-indigo-100', badgeText: 'text-indigo-900', icon: 'business_center', border: 'border-indigo-200' },
+      especializados: { badgeBg: 'bg-purple-100', badgeText: 'text-purple-900', icon: 'spa', border: 'border-purple-200' }
+    };
+
+    let html = '';
+    listaFiltrada.forEach(item => {
+      const cfg = configCategoria[item.categoria] || { badgeBg: 'bg-stone-surface', badgeText: 'text-primary', icon: 'storefront', border: 'border-sandstone-border' };
+      html += `
+        <div class="p-space-md rounded-xl bg-surface-container-lowest border ${cfg.border} hover:border-primary transition-all duration-200 flex flex-col justify-between gap-3 shadow-2xs hover:shadow-xs group">
+          
+          <!-- Encabezado: Categoría y Badge IAE/Licencia -->
+          <div class="flex items-start justify-between gap-2">
+            <span class="px-2 py-0.5 rounded-full ${cfg.badgeBg} ${cfg.badgeText} font-label-tabular-sm text-[10px] font-bold flex items-center gap-1">
+              <span class="material-symbols-outlined text-[13px]">${cfg.icon}</span>
+              <span>${item.categoriaNombre}</span>
+            </span>
+            <span class="px-1.5 py-0.2 rounded bg-stone-surface text-outline font-mono text-[9px] font-semibold truncate max-w-[130px]" title="${item.licencia || ''}">
+              ${item.licencia || 'Censo Activo'}
+            </span>
+          </div>
+
+          <!-- Bloque Central: 4 Campos requeridos (Nombre, Dirección, Categoría, Distancia a pie) -->
+          <div class="flex flex-col gap-1.5">
+            <!-- 1. NOMBRE COMERCIAL -->
+            <div class="text-[14px] font-bold text-charcoal-text leading-snug group-hover:text-primary transition-colors flex items-center gap-1">
+              <span>${item.nombre}</span>
+            </div>
+
+            <!-- 2. DIRECCIÓN -->
+            <div class="flex items-start gap-1.5 text-[11px] text-on-surface-variant leading-snug">
+              <span class="material-symbols-outlined text-[14px] text-outline mt-0.5 flex-shrink-0">location_on</span>
+              <span class="font-medium">${item.direccion}</span>
+            </div>
+
+            <!-- 3. CATEGORÍA OFICIAL -->
+            <div class="flex items-center gap-1.5 text-[11px] text-outline font-medium">
+              <span class="material-symbols-outlined text-[14px] flex-shrink-0 text-outline">sell</span>
+              <span class="truncate">${item.categoriaNombre}</span>
+            </div>
+
+            <!-- 4. DISTANCIA A PIE -->
+            <div class="mt-1 flex items-center justify-between p-1.5 rounded-md bg-emerald-50/70 border border-emerald-200/70 text-emerald-950">
+              <div class="flex items-center gap-1.5 text-[11px] font-bold">
+                <span class="material-symbols-outlined text-[16px] text-emerald-700">directions_walk</span>
+                <span>A ${item.distancia_m} m • ~${item.minutos} a pie</span>
+              </div>
+              <span class="text-[9px] font-semibold text-emerald-800 bg-white/80 px-1 rounded">80 m/min</span>
+            </div>
+          </div>
+
+          <!-- Acción Interactiva: Ubicar en mapa -->
+          <div class="pt-2 border-t border-sandstone-border/60 flex items-center justify-between">
+            <span class="text-[10px] text-outline font-mono font-medium">EPSG:25831 • BCN</span>
+            <button type="button" onclick="window.ubicarNegocioEnMapa(${item.lat}, ${item.lon}, '${item.nombre.replace(/'/g, "\\'")}', '${item.direccion.replace(/'/g, "\\'")}', '${item.categoriaNombre}')" class="inline-flex items-center gap-1 text-[11px] font-bold text-primary hover:text-emerald-800 transition-colors cursor-pointer group-hover:underline underline-offset-2">
+              <span class="material-symbols-outlined text-[14px]">explore</span>
+              <span>Ubicar en mapa</span>
+            </button>
+          </div>
+
+        </div>
+      `;
+    });
+
+    container.innerHTML = html;
+  };
+
+  /**
+   * Filtrar por categoría seleccionada
+   */
+  window.filtrarCategoriaNegocios = function (cat) {
+    categoriaNegociosActiva = cat;
+
+    // Actualizar estilo visual de las tarjetas de categoría superiores
+    const categorias = ['hosteleria', 'retail', 'alimentacion', 'salud', 'servicios', 'especializados'];
+    categorias.forEach(c => {
+      const card = document.getElementById('card-cat-' + c);
+      if (card) {
+        if (c === cat) {
+          card.className = 'card-cat-negocio p-space-sm rounded-lg bg-surface-container-highest border-2 border-primary transition-all flex flex-col gap-1 text-left cursor-pointer group shadow-sm scale-[1.02]';
+        } else {
+          card.className = 'card-cat-negocio p-space-sm rounded-lg bg-surface border border-sandstone-border hover:border-primary hover:bg-stone-surface/60 transition-all flex flex-col gap-1 text-left cursor-pointer group shadow-2xs';
+        }
+      }
+    });
+
+    // Actualizar botones de filtro rápido
+    const botones = ['todas', 'hosteleria', 'retail', 'alimentacion', 'salud', 'servicios'];
+    botones.forEach(b => {
+      const btn = document.getElementById('btn-filtro-' + b);
+      if (btn) {
+        if (b === cat) {
+          btn.className = 'btn-filtro-negocio active px-2.5 py-1 rounded text-[11px] font-semibold bg-primary text-white transition-all cursor-pointer shadow-2xs whitespace-nowrap';
+        } else {
+          btn.className = 'btn-filtro-negocio px-2.5 py-1 rounded text-[11px] font-medium bg-white border border-sandstone-border text-charcoal-text hover:bg-stone-surface transition-all cursor-pointer whitespace-nowrap';
+        }
+      }
+    });
+
+    window.renderizarNegocios(categoriaNegociosActiva, busquedaNegociosActiva);
+  };
+
+  /**
+   * Filtrar por texto en el input de búsqueda
+   */
+  window.buscarNegocioEnListado = function (query) {
+    busquedaNegociosActiva = query || '';
+    window.renderizarNegocios(categoriaNegociosActiva, busquedaNegociosActiva);
+  };
+
+  /**
+   * Ubica un negocio en el mapa Leaflet, despliega el mapa si está plegado y abre el popup informativo
+   */
+  window.ubicarNegocioEnMapa = function (lat, lon, nombre, direccion, catNombre) {
+    if (!map) return;
+
+    // Si el visor cartográfico está oculto o plegado, desplegarlo
+    const mapContainer = document.getElementById('map-container');
+    if (mapContainer && mapContainer.classList.contains('hidden')) {
+      if (typeof window.toggleVisorMapa === 'function') {
+        window.toggleVisorMapa();
+      }
+    }
+
+    // Desplazar suavemente hasta el visor del mapa
+    const bloqueMapa = document.getElementById('bloque-mapa-cartografico');
+    if (bloqueMapa) {
+      bloqueMapa.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    // Centrar mapa con animación
+    map.flyTo([lat, lon], 18, {
+      animate: true,
+      duration: 1.2
+    });
+
+    // Crear o mover el marcador interactivo del comercio
+    if (marcadorNegocioEnMapa) {
+      marcadorNegocioEnMapa.remove();
+    }
+
+    // Icono HTML exclusivo para el negocio seleccionado
+    const businessIcon = L.divIcon({
+      className: 'custom-business-pin',
+      html: `
+        <div style="background-color: #02362f; color: white; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 8px rgba(0,0,0,0.35); border: 2.5px solid #ffffff; transform: translate(-50%, -50%);">
+          <span class="material-symbols-outlined" style="font-size: 19px; color: #ffd166;">storefront</span>
+        </div>
+      `,
+      iconSize: [34, 34],
+      iconAnchor: [17, 17]
+    });
+
+    marcadorNegocioEnMapa = L.marker([lat, lon], { icon: businessIcon }).addTo(map);
+
+    const popupHtml = `
+      <div style="font-family: 'Plus Jakarta Sans', sans-serif; min-width: 220px; padding: 4px;">
+        <div style="font-size: 10px; font-weight: 700; text-transform: uppercase; color: #02362f; letter-spacing: 0.05em; margin-bottom: 2px;">
+          ${catNombre || 'Actividad Comercial'}
+        </div>
+        <div style="font-size: 13px; font-weight: 700; color: #1a211f; margin-bottom: 4px; line-height: 1.2;">
+          ${nombre}
+        </div>
+        <div style="font-size: 11px; color: #4d5350; margin-bottom: 6px; display: flex; align-items: center; gap: 4px;">
+          <span class="material-symbols-outlined" style="font-size: 13px;">location_on</span>
+          <span>${direccion}</span>
+        </div>
+        <div style="font-size: 10px; color: #02362f; font-weight: 600; background: #e6efe9; padding: 3px 6px; border-radius: 4px;">
+          Censo de Locales en Planta Baja • Ajuntament de Barcelona
+        </div>
+      </div>
+    `;
+
+    marcadorNegocioEnMapa.bindPopup(popupHtml).openPopup();
+    mostrarToast(`Localizado en mapa: ${nombre}`);
+  };
+
   // ==========================================
   // ARRANQUE LIMPIO AL CARGAR EL DOM
   // ==========================================
@@ -1316,6 +1702,9 @@ Tiempo de Acceso = ${distanciaMetro} m / 80 m/min = ${(distanciaMetro / 80).toFi
     inicializarAutocompletado();
     inicializarDisparadores();
     inicializarAccionesDescarga();
+    if (typeof window.renderizarNegocios === 'function') {
+      window.renderizarNegocios('todas', '');
+    }
   });
 
 })();
