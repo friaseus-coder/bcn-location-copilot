@@ -626,6 +626,30 @@
                 </div>
               </div>
 
+              <!-- Renta Oficial INCASÒL (Integrada en la Ficha Técnica) -->
+              <div class="p-2.5 rounded-lg bg-surface border border-sandstone-border flex flex-col gap-1 shadow-xs hover:border-primary/40 transition-colors" id="box-renta-sidebar">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-1.5">
+                    <span class="font-label-caps text-outline uppercase text-[10px] font-semibold">_renta_estimada (incasòl)</span>
+                    <button type="button" onclick="window.abrirModalInfo('renta')" class="p-0.5 rounded text-outline hover:text-primary hover:bg-stone-surface transition-colors cursor-pointer" title="Ver registro oficial INCASÒL y desglose del cálculo">
+                      <span class="material-symbols-outlined text-[14px]">info</span>
+                    </button>
+                  </div>
+                  <span class="material-symbols-outlined text-terracotta-accent text-[16px]">real_estate_agent</span>
+                </div>
+                <div class="flex items-baseline justify-between">
+                  <div class="text-[17px] font-bold text-primary font-label-tabular" id="kpi-renta">3.850 €/m</div>
+                  <span class="text-[10.5px] text-on-surface-variant font-mono font-medium" id="disp-renta-m2">35,00 €/m²/mes</span>
+                </div>
+                <div class="flex items-center justify-between pt-0.5 border-t border-sandstone-border/40 text-[9.5px]">
+                  <span class="text-outline">Rango: 3.600 € - 4.100 €</span>
+                  <button type="button" onclick="window.abrirModalInfo('renta')" class="text-secondary hover:text-primary font-bold inline-flex items-center gap-0.5 cursor-pointer" title="Haga clic para ver el cálculo oficial de rentas INCASÒL">
+                    <span>BBDD Fianzas BCN</span>
+                    <span class="material-symbols-outlined text-[11px]">help</span>
+                  </button>
+                </div>
+              </div>
+
               <!-- Cuota IBI Municipal Estimada -->
               <div class="p-2.5 rounded-lg bg-surface border border-sandstone-border flex items-center justify-between shadow-xs">
                 <div class="flex flex-col gap-0.5">
@@ -828,66 +852,13 @@
               </div>
             </div>
 
-            <!-- 4. KPI METRIC CARDS ROW (LIMPIO: LOCATION SCORE & RENTA INCASÒL) -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-space-sm">
-              <!-- KPI 1: Location Score -->
-              <div class="bg-surface-container-lowest p-space-md rounded-xl border border-sandstone-border shadow-[0_1px_3px_rgba(27,28,26,0.03)] flex flex-col justify-between hover:border-primary/40 transition-colors">
-                <div class="flex items-center justify-between pb-1">
-                  <div class="flex items-center gap-2">
-                    <span class="font-label-caps text-outline uppercase text-[10px] font-semibold">_location_score</span>
-                    <button type="button" onclick="window.abrirModalInfo('score')" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-stone-surface/80 hover:bg-stone-surface text-primary border border-sandstone-border font-label-caps text-[9px] font-bold tracking-wide transition-all shadow-2xs hover:shadow-xs cursor-pointer" title="Ver de dónde sale la puntuación, metodología y fórmula">
-                      <span class="material-symbols-outlined text-[13px] text-primary">info</span>
-                      <span>¿De dónde salen los datos?</span>
-                    </button>
-                  </div>
-                  <span class="material-symbols-outlined text-primary text-[18px]">verified</span>
-                </div>
-                <div class="my-1">
-                  <div class="font-headline-xl text-headline-xl font-bold text-primary tracking-tight" id="kpi-score">86 / 100</div>
-                  <div class="w-full bg-stone-surface h-1.5 rounded-full mt-2 overflow-hidden">
-                    <div class="bg-primary h-full rounded-full" id="kpi-score-bar" style="width: 86%;"></div>
-                  </div>
-                </div>
-                <div class="flex items-center justify-between pt-1">
-                  <span class="font-body-sm text-body-sm text-on-surface-variant text-[11px]">Idoneidad integral calculada</span>
-                  <button type="button" onclick="window.abrirModalInfo('score')" class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-200/80 font-label-tabular-sm text-[11px] font-semibold transition-colors cursor-pointer" title="Haga clic para ver el cálculo del Location Score">
-                    <span>+4.2 pts vs distrito</span>
-                    <span class="material-symbols-outlined text-[13px] text-emerald-800">help</span>
-                  </button>
-                </div>
-              </div>
-
-              <!-- KPI 2: Renta Estimada Incasòl -->
-              <div class="bg-surface-container-lowest p-space-md rounded-xl border border-sandstone-border shadow-[0_1px_3px_rgba(27,28,26,0.03)] flex flex-col justify-between hover:border-primary/40 transition-colors">
-                <div class="flex items-center justify-between pb-1">
-                  <div class="flex items-center gap-2">
-                    <span class="font-label-caps text-outline uppercase text-[10px] font-semibold">_renta_estimada (incasòl)</span>
-                    <button type="button" onclick="window.abrirModalInfo('renta')" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-stone-surface/80 hover:bg-stone-surface text-primary border border-sandstone-border font-label-caps text-[9px] font-bold tracking-wide transition-all shadow-2xs hover:shadow-xs cursor-pointer" title="Ver registro público oficial INCASÒL y desglose del cálculo">
-                      <span class="material-symbols-outlined text-[13px] text-primary">info</span>
-                      <span>¿De dónde salen los datos?</span>
-                    </button>
-                  </div>
-                  <span class="material-symbols-outlined text-terracotta-accent text-[18px]">real_estate_agent</span>
-                </div>
-                <div class="my-1">
-                  <div class="font-headline-xl text-headline-xl font-bold text-primary tracking-tight" id="kpi-renta">3.850 €/m</div>
-                  <span class="font-label-tabular-sm text-label-tabular-sm text-outline">Rango: 3.600 € - 4.100 €</span>
-                </div>
-                <div class="flex items-center justify-between pt-1">
-                  <span class="font-body-sm text-body-sm text-on-surface-variant text-[11px]">35,00 €/m²/mes</span>
-                  <button type="button" onclick="window.abrirModalInfo('renta')" class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-stone-surface hover:bg-stone-surface/80 text-secondary border border-sandstone-border font-label-tabular-sm text-[11px] font-semibold transition-colors cursor-pointer" title="Haga clic para ver el cálculo oficial de rentas INCASÒL">
-                    <span>BBDD Fianzas BCN</span>
-                    <span class="material-symbols-outlined text-[13px] text-secondary">help</span>
-                  </button>
-                </div>
-              </div>
-
-              <!-- IDs de compatibilidad interna ocultos -->
-              <div class="hidden">
-                <span id="kpi-gross-yield">7.22 %</span>
-                <span id="kpi-niy">5.68 %</span>
-                <span id="kpi-noi-sub">NOI: 21.312 €/año</span>
-              </div>
+            <!-- Identificadores técnicos preservados de forma invisible para compatibilidad -->
+            <div class="hidden">
+              <span id="kpi-score">86 / 100</span>
+              <div id="kpi-score-bar" style="width: 86%;"></div>
+              <span id="kpi-gross-yield">7.22 %</span>
+              <span id="kpi-niy">5.68 %</span>
+              <span id="kpi-noi-sub">NOI: 21.312 €/año</span>
             </div>
 
             <!-- 4.1 VISOR CARTOGRÁFICO INTERACTIVO (LEAFLET.JS & ISÓCRONAS) -->
