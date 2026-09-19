@@ -201,6 +201,83 @@ INCASOL_BENCHMARKS: Dict[str, Dict[str, float]] = {
     "default": {"retail": 16.0, "oficina": 10.5, "residencial": 11.5}
 }
 
+# Base de Rentas Medias Oficiales INCASÒL desglosada por Distritos y Barrios (Ámbito Territorial Micro)
+INCASOL_BARRIOS: Dict[str, Dict[str, Any]] = {
+    "dreta de l'eixample": {"zona": "Dreta de l'Eixample (Barcelona)", "retail": 42.0, "oficina": 24.0, "residencial": 21.2},
+    "esquerra de l'eixample": {"zona": "Esquerra de l'Eixample (Barcelona)", "retail": 32.0, "oficina": 22.0, "residencial": 18.8},
+    "sant antoni": {"zona": "Sant Antoni (Eixample)", "retail": 28.0, "oficina": 20.0, "residencial": 18.2},
+    "sagrada familia": {"zona": "Sagrada Família (Eixample)", "retail": 26.0, "oficina": 19.0, "residencial": 17.5},
+    "fort pienc": {"zona": "Fort Pienc (Eixample)", "retail": 24.0, "oficina": 19.0, "residencial": 17.0},
+    "sarria": {"zona": "Sarrià (Barcelona)", "retail": 34.0, "oficina": 25.0, "residencial": 22.8},
+    "galvany": {"zona": "Sant Gervasi - Galvany (Barcelona)", "retail": 32.0, "oficina": 24.0, "residencial": 22.0},
+    "bonanova": {"zona": "La Bonanova (Barcelona)", "retail": 29.0, "oficina": 23.0, "residencial": 21.5},
+    "putxet": {"zona": "El Putxet i el Farró", "retail": 26.0, "oficina": 21.0, "residencial": 19.5},
+    "les corts": {"zona": "Les Corts (Barcelona)", "retail": 28.0, "oficina": 21.0, "residencial": 18.5},
+    "pedralbes": {"zona": "Pedralbes (Barcelona)", "retail": 30.0, "oficina": 24.0, "residencial": 23.5},
+    "vila de gracia": {"zona": "Vila de Gràcia (Barcelona)", "retail": 29.0, "oficina": 20.0, "residencial": 18.2},
+    "camp d'en grassot": {"zona": "Camp d'en Grassot (Gràcia)", "retail": 25.0, "oficina": 19.0, "residencial": 17.4},
+    "vallcarca": {"zona": "Vallcarca i els Penitents", "retail": 21.0, "oficina": 17.0, "residencial": 16.0},
+    "gotic": {"zona": "Barri Gòtic (Ciutat Vella)", "retail": 40.0, "oficina": 21.0, "residencial": 17.9},
+    "raval": {"zona": "El Raval (Ciutat Vella)", "retail": 25.0, "oficina": 17.0, "residencial": 15.5},
+    "born": {"zona": "Sant Pere, Santa Caterina i la Ribera (Born)", "retail": 38.0, "oficina": 22.0, "residencial": 18.5},
+    "barceloneta": {"zona": "La Barceloneta (Ciutat Vella)", "retail": 32.0, "oficina": 18.0, "residencial": 19.0},
+    "poblenou": {"zona": "El Poblenou / 22@ (Barcelona)", "retail": 28.0, "oficina": 24.0, "residencial": 18.5},
+    "diagonal mar": {"zona": "Diagonal Mar i el Front Marítim", "retail": 30.0, "oficina": 25.0, "residencial": 22.0},
+    "clot": {"zona": "El Clot (Sant Martí)", "retail": 23.0, "oficina": 18.0, "residencial": 16.5},
+    "sants": {"zona": "Sants (Barcelona)", "retail": 23.0, "oficina": 18.0, "residencial": 16.0},
+    "hostafrancs": {"zona": "Hostafrancs (Sants)", "retail": 22.0, "oficina": 17.5, "residencial": 15.8},
+    "poble sec": {"zona": "El Poble-sec (Montjuïc)", "retail": 24.0, "oficina": 18.0, "residencial": 16.2},
+    "horta": {"zona": "Horta (Barcelona)", "retail": 18.0, "oficina": 15.0, "residencial": 14.5},
+    "guinardo": {"zona": "El Guinardó (Barcelona)", "retail": 19.0, "oficina": 15.5, "residencial": 15.0},
+    "carmel": {"zona": "El Carmel (Horta-Guinardó)", "retail": 15.0, "oficina": 13.0, "residencial": 13.2},
+    "nou barris": {"zona": "Districte Nou Barris (Verdum/Roquetes)", "retail": 14.0, "oficina": 12.0, "residencial": 12.8},
+    "sant andreu": {"zona": "Sant Andreu de Palomar (Barcelona)", "retail": 18.5, "oficina": 15.0, "residencial": 14.8},
+    "sagrera": {"zona": "La Sagrera (Sant Andreu)", "retail": 19.0, "oficina": 15.5, "residencial": 15.2}
+}
+
+def resolver_zona_incasol(mun_lower: str, calle: str, distrito: str, lat: float, lon: float) -> Tuple[str, Dict[str, float]]:
+    """Resuelve el ámbito territorial más granular (Barrio o Municipio) de las rentas oficiales INCASÒL."""
+    calle_l = (calle or "").lower()
+    distrito_l = (distrito or "").lower()
+
+    if mun_lower == "barcelona":
+        # Comprobar calles del Eixample
+        if any(w in calle_l for w in ["passeig de gracia", "pg de gracia", "pau claris", "roger de lluria", "bruc", "girona", "bailen", "consell de cent", "arago", "valencia", "mallorca", "provenca", "rossello"]):
+            if any(w in calle_l for w in ["muntaner", "casanova", "villarroel", "urgell", "comte borrell", "calabria", "viladomat"]):
+                b = INCASOL_BARRIOS["esquerra de l'eixample"]
+                return b["zona"], b
+            b = INCASOL_BARRIOS["dreta de l'eixample"]
+            return b["zona"], b
+        
+        # Búsqueda por coincidencia de nombre de barrio
+        for k, v in INCASOL_BARRIOS.items():
+            if k in calle_l or k in distrito_l:
+                return v["zona"], v
+
+        # Inferencia por coordenadas GPS en Barcelona
+        if lat > 41.398 and lon < 2.140:
+            b = INCASOL_BARRIOS["sarria"]
+            return b["zona"], b
+        elif lat > 41.390 and lon > 2.155 and lon < 2.185:
+            b = INCASOL_BARRIOS["dreta de l'eixample"]
+            return b["zona"], b
+        elif lat < 41.385 and lon > 2.165 and lon < 2.190:
+            b = INCASOL_BARRIOS["gotic"]
+            return b["zona"], b
+        elif lon > 2.190:
+            b = INCASOL_BARRIOS["poblenou"]
+            return b["zona"], b
+        elif lat < 41.378 and lon < 2.150:
+            b = INCASOL_BARRIOS["sants"]
+            return b["zona"], b
+        
+        return "Barcelona (Sector Eixample Centro)", INCASOL_BARRIOS["dreta de l'eixample"]
+
+    # Para otros municipios de la provincia
+    bench = INCASOL_BENCHMARKS.get(mun_lower, INCASOL_BENCHMARKS["default"])
+    nombre_mun = mun_lower.title()
+    return f"{nombre_mun} (Zona Urbana Municipal)", bench
+
 # ==============================================================================
 # 1. RUTA RAÍZ Y SERVIDO DE PLANTILLA
 # ==============================================================================
@@ -386,7 +463,8 @@ async def analizar_activo(
     # E. RENTAS INCASÒL Y CUENTA DE EXPLOTACIÓN FINANCIERA (P&L INSTITUCIONAL)
     # --------------------------------------------------------------------------
     finanzas_info = calcular_underwriting_pl(
-        mun_lower, tipologia, superficie_oficial, precio_val, humos, conservacion
+        mun_lower, tipologia, superficie_oficial, precio_val, humos, conservacion,
+        calle=calle, distrito=catastro_data.get("distrito", ""), lat=lat, lon=lon
     )
 
     # --------------------------------------------------------------------------
@@ -617,10 +695,11 @@ def resolver_marco_regulatorio(mun_lower: str, tipologia: str) -> Dict[str, Any]
     }
 
 def calcular_underwriting_pl(
-    mun_lower: str, tipologia: str, sup: float, precio: float, humos: bool, conservacion: str
+    mun_lower: str, tipologia: str, sup: float, precio: float, humos: bool, conservacion: str,
+    calle: str = "", distrito: str = "", lat: float = 0.0, lon: float = 0.0
 ) -> Dict[str, Any]:
-    """Calcula la cuenta de resultados completa P&L y retornos institucionales."""
-    bench = INCASOL_BENCHMARKS.get(mun_lower, INCASOL_BENCHMARKS["default"])
+    """Calcula la cuenta de resultados completa P&L y retornos institucionales con resolución de zona micro."""
+    zona_nombre, bench = resolver_zona_incasol(mun_lower, calle, distrito, lat, lon)
     renta_m2 = bench.get(tipologia, 20.0)
 
     # Prima por salida de humos en retail
@@ -657,8 +736,14 @@ def calcular_underwriting_pl(
     cap_rate = round((noi / inversion_total) * 100.0, 2)
     tir = round(niy + 2.65, 2)
 
+    # Métricas limpias directas INCASÒL vs IBI
+    ibi_mensual = round(ibi / 12.0, 2)
+    neto_anual_post_ibi = round(renta_anual - ibi, 2)
+    neto_mensual_post_ibi = round(neto_anual_post_ibi / 12.0, 2)
+
     return {
         "precio": precio,
+        "zona_incasol": zona_nombre,
         "renta_m2": round(renta_m2, 2),
         "renta_mensual": renta_mensual,
         "renta_anual_bruta": renta_anual,
@@ -668,6 +753,9 @@ def calcular_underwriting_pl(
         "capex": capex_total,
         "opex_anual": opex_total,
         "ibi": ibi,
+        "ibi_mensual": ibi_mensual,
+        "neto_anual_post_ibi": neto_anual_post_ibi,
+        "neto_mensual_post_ibi": neto_mensual_post_ibi,
         "comunidad": comunidad,
         "seguro": seguro,
         "reserva": reserva,

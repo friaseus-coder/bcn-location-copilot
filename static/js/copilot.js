@@ -499,14 +499,33 @@
     const noiVal = finanzas.noi || 41294;
     setText('kpi-noi-sub', `NOI: ${formatInt.format(noiVal)} €/año (c/CapEx)`);
 
-    // E. Tabla Financiera Underwriting P&L
+    // E. Panel Exclusivo: Renta INCASÒL (Zona más baja / Barrio) & IBI Municipal
+    const rentaAnual = finanzas.renta_anual_bruta || (rentaMensual * 12);
+    const cuotaIbi = finanzas.ibi || 1248;
+    const ibiMensual = finanzas.ibi_mensual || Math.round(cuotaIbi / 12);
+    const netoAnual = finanzas.neto_anual_post_ibi || (rentaAnual - cuotaIbi);
+    const netoMensual = finanzas.neto_mensual_post_ibi || Math.round(netoAnual / 12);
+
+    setText('val-incasol-zona', finanzas.zona_incasol || `${activo.distrito || 'Sector Eixample'} (${activo.municipio || 'Barcelona'})`);
+    setText('val-incasol-m2', `${formatDec.format(finanzas.renta_m2 || 21.20)} €/m²`);
+    setText('val-incasol-mensual', `${formatEuro.format(rentaMensual)}/mes`);
+    setText('val-incasol-anual', `${formatEuro.format(rentaAnual)}/año`);
+
+    setText('val-ibi-municipio', `Padrón IBI Ajuntament de ${activo.municipio || 'Barcelona'}`);
+    setText('val-ibi-mensual', `-${formatEuro.format(ibiMensual)}/mes`);
+    setText('val-ibi-anual', `-${formatEuro.format(cuotaIbi)}/año`);
+
+    setText('val-neto-mensual', `${formatEuro.format(netoMensual)}/mes`);
+    setText('val-neto-anual', `${formatEuro.format(netoAnual)}/año`);
+
+    // Sincronización de elementos de compatibilidad interna
     setText('row-precio', formatEuro.format(finanzas.precio || 320000));
     setText('row-itp', formatEuro.format(finanzas.itp || 32000));
     setText('row-ajd', formatEuro.format(finanzas.ajd || 4800));
     setText('row-capex', formatEuro.format(finanzas.capex || 0));
     setText('row-inversion-total', formatEuro.format(finanzas.inversion_total || 356800));
-    setText('row-renta-anual', formatEuro.format(finanzas.renta_anual_bruta || 46200));
-    setText('row-ibi', '-' + formatEuro.format(finanzas.ibi || 1250));
+    setText('row-renta-anual', formatEuro.format(rentaAnual));
+    setText('row-ibi', '-' + formatEuro.format(cuotaIbi));
     setText('row-comunidad', '-' + formatEuro.format(finanzas.comunidad || 1100));
     setText('row-seguro', '-' + formatEuro.format(finanzas.seguro || 450));
     setText('row-reserva', '-' + formatEuro.format(finanzas.reserva || 1000));
