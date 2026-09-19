@@ -413,15 +413,25 @@
     const metro = data.metro || {};
     const regulacion = data.regulacion || {};
 
-    // A. Metros cuadrados, año Catastro y Ficha Técnica Lateral
+    // A. Metros cuadrados, año Catastro, Cuota IBI y Ficha Lateral
     const supM2 = activo.superficie ? Math.round(activo.superficie) : 110;
-    const precioTotal = finanzas.precio || 320000;
-    const precioM2 = Math.round(precioTotal / supM2);
+    const anoConstruccion = activo.ano_construccion || 1928;
+    const tipoFinca = activo.tipo_finca || (anoConstruccion < 1960 ? 'Finca Clásica' : 'Edificación Moderna');
+    const cuotaIbi = finanzas.ibi || 1248;
+    const ibiMensual = finanzas.ibi_mensual || Math.round(cuotaIbi / 12);
 
     setText('disp-superficie', `${supM2} m²`);
+    setText('disp-ano', `${anoConstruccion}`);
+    setText('disp-tipo-finca', tipoFinca);
+    setText('disp-ibi', formatEuro.format(cuotaIbi) + '/año');
+    setText('disp-ibi-mes', formatEuro.format(ibiMensual) + '/mes');
+    setText('disp-conservacion', 'Buen Estado (Habitable)');
+    
+    // Compatibilidad interna
+    const precioTotal = finanzas.precio || 320000;
+    const precioM2 = Math.round(precioTotal / supM2);
     setText('disp-precio', formatEuro.format(precioTotal));
     setText('disp-precio-m2', `${formatInt.format(precioM2)} €/m²`);
-    setText('disp-conservacion', activo.ano_construccion ? `${activo.ano_construccion} (${activo.tipo_finca || 'Consolidado'})` : '1928 (Finca Clásica)');
     
     if (activo.tipologia) {
       const tipoNombres = { 'retail': 'Local Comercial (Retail)', 'residencial': 'Vivienda Residencial', 'oficina': 'Oficina / Terciario' };

@@ -604,18 +604,38 @@
                 </div>
               </div>
 
-              <!-- Superficie y Valor Estimado -->
+              <!-- Datos Oficiales Clave: Superficie, Año Construcción y Cuota IBI -->
               <div class="grid grid-cols-2 gap-space-sm">
+                <!-- Superficie Catastro -->
                 <div class="p-2.5 rounded-lg bg-surface border border-sandstone-border flex flex-col gap-0.5 shadow-xs">
                   <span class="font-label-caps text-outline uppercase text-[10px] font-semibold">Sup. Construida</span>
                   <div class="text-[17px] font-bold text-primary font-label-tabular" id="disp-superficie">110 m²</div>
                   <span class="text-[10px] text-on-surface-variant/80 font-medium">Sede Catastro OVC</span>
                 </div>
+                <!-- Año Construcción -->
                 <div class="p-2.5 rounded-lg bg-surface border border-sandstone-border flex flex-col gap-0.5 shadow-xs">
-                  <span class="font-label-caps text-outline uppercase text-[10px] font-semibold">Valor Estimado</span>
-                  <div class="text-[17px] font-bold text-charcoal-text font-label-tabular" id="disp-precio">320.000 €</div>
-                  <span class="text-[10px] text-on-surface-variant/80 font-medium" id="disp-precio-m2">2.909 €/m²</span>
+                  <span class="font-label-caps text-outline uppercase text-[10px] font-semibold">Año Construcción</span>
+                  <div class="text-[17px] font-bold text-charcoal-text font-label-tabular" id="disp-ano">1928</div>
+                  <span class="text-[10px] text-on-surface-variant/80 font-medium" id="disp-tipo-finca">Finca Clásica</span>
                 </div>
+              </div>
+
+              <!-- Cuota IBI Municipal Estimada -->
+              <div class="p-2.5 rounded-lg bg-surface border border-sandstone-border flex items-center justify-between shadow-xs">
+                <div class="flex flex-col gap-0.5">
+                  <span class="font-label-caps text-outline uppercase text-[10px] font-semibold">Cuota Estimada IBI</span>
+                  <div class="text-[16px] font-bold text-emerald-800 font-label-tabular" id="disp-ibi">1.248 €/año</div>
+                </div>
+                <div class="flex flex-col items-end gap-0.5">
+                  <span class="text-[11px] font-bold text-emerald-900 font-mono" id="disp-ibi-mes">104 €/mes</span>
+                  <span class="text-[9.5px] text-outline font-medium">Gravamen Municipal</span>
+                </div>
+              </div>
+
+              <!-- Identificadores ocultos de compatibilidad -->
+              <div class="hidden">
+                <span id="disp-precio">320.000 €</span>
+                <span id="disp-precio-m2">2.909 €/m²</span>
               </div>
 
               <!-- Características Físicas y Cumplimiento Legal -->
@@ -635,10 +655,10 @@
                   </span>
                 </div>
 
-                <!-- Conservación & Antigüedad -->
+                <!-- Estado de Conservación -->
                 <div class="p-2 rounded bg-surface border border-sandstone-border flex items-center justify-between text-body-sm shadow-xs">
-                  <span class="text-outline text-[11px] font-medium">Año y Conservación</span>
-                  <span class="font-semibold text-charcoal-text text-[12px]" id="disp-conservacion">1928 (Finca Clásica)</span>
+                  <span class="text-outline text-[11px] font-medium">Estado Conservación</span>
+                  <span class="font-semibold text-charcoal-text text-[12px]" id="disp-conservacion">Buen Estado (Habitable)</span>
                 </div>
               </div>
 
