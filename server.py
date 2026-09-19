@@ -1156,8 +1156,11 @@ async def generar_informe_impresion(
     return HTMLResponse(content=html_content)
 
 # ==============================================================================
-# EJECUCIÓN DIRECTA
+# EJECUCIÓN DIRECTA (SOPORTE PARA LOCAL, DOCKER Y RENDER.COM)
 # ==============================================================================
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("server:app", host="127.0.0.1", port=8000, reload=True)
+    # Render.com inyecta dinámicamente la variable de entorno PORT
+    port = int(os.environ.get("PORT", 8000))
+    host = "0.0.0.0" if os.environ.get("PORT") else "127.0.0.1"
+    uvicorn.run("server:app", host=host, port=port, reload=False)

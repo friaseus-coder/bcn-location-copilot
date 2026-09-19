@@ -83,6 +83,24 @@ Acceder a la aplicación en: [http://localhost:7860](http://localhost:7860)
 
 ---
 
+## ☁️ Despliegue en Render.com (Web Service Gratuito)
+
+Para desplegar el backend o la aplicación completa con CI/CD automático desde GitHub en Render:
+
+1. Inicia sesión en [Render.com](https://dashboard.render.com/) y crea un **New Web Service**.
+2. Conecta tu repositorio de GitHub: `friaseus-coder/bcn-location-copilot`.
+3. Configura los parámetros del servicio:
+   - **Name**: `bcn-location-copilot`
+   - **Environment**: `Python 3`
+   - **Region**: Frankfurt (EU Central) u otra cercana
+   - **Branch**: `main`
+   - **Build Command**: `pip install -r requirements.txt`
+   - **Start Command**: `uvicorn server:app --host 0.0.0.0 --port $PORT`
+   - **Instance Type**: `Free`
+4. Pulsa en **Deploy Web Service**. Render detectará dinámicamente el puerto `$PORT` y CORS aceptará todas las peticiones entrantes.
+
+---
+
 ## 📄 Documentación de Referencia
 
 - [BUSINESS_CONTEXT.md](BUSINESS_CONTEXT.md): Tesis de inversión institucional, fórmulas financieras y marco regulatorio (MIVAU, PEUAT, Pla d'Usos).

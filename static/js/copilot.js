@@ -16,6 +16,11 @@
   // ==========================================
   // ESTADO GLOBAL Y VARIABLES DE MÓDULO
   // ==========================================
+  // URL base dinámica: local si ejecutas en localhost, o la URL de Render en producción
+  const API_BASE_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+    ? '' 
+    : (window.RENDER_API_URL || (window.location.hostname.endsWith('onrender.com') || window.location.hostname.endsWith('hf.space') ? '' : 'https://bcn-location-copilot.onrender.com'));
+
   let map = null;
   let assetLayerGroup = null;
   let isochroneLayerGroup = null;
@@ -197,7 +202,7 @@
     if (!sugerenciasContainer) return;
 
     try {
-      const url = `/api/autocompletar?texto=${encodeURIComponent(texto)}&municipio=${encodeURIComponent(municipio)}`;
+      const url = `${API_BASE_URL}/api/autocompletar?texto=${encodeURIComponent(texto)}&municipio=${encodeURIComponent(municipio)}`;
       const response = await fetch(url);
       
       if (!response.ok) {
@@ -411,7 +416,7 @@
         conservacion: conservacion
       });
 
-      const response = await fetch(`/api/analizar?${params.toString()}`);
+      const response = await fetch(`${API_BASE_URL}/api/analizar?${params.toString()}`);
       
       if (!response.ok) {
         throw new Error(`Error en servidor: ${response.status} ${response.statusText}`);
@@ -747,7 +752,7 @@
         });
 
         // Forzar descarga directa desde endpoint FastAPI
-        window.location.href = `/api/descargar-excel?${query.toString()}`;
+        window.location.href = `${API_BASE_URL}/api/descargar-excel?${query.toString()}`;
       });
     }
 
