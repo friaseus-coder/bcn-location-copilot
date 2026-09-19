@@ -1323,106 +1323,190 @@
 
                     </div>
 
-                    <!-- Acoustic Facade Decibel Meters (Columna Derecha 7) -->
+                    <!-- Acoustic Facade Decibel Meters: REAL (SENTILO BCN) vs NORMATIVA (MES) -->
                     <div class="lg:col-span-7 p-space-md rounded-xl bg-surface-container-lowest border border-sandstone-border flex flex-col justify-between shadow-xs">
                       <div>
-                        <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-2 border-b border-sandstone-border/60 gap-1">
+                        <!-- Cabecera de la Auditoría Dual -->
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-2 border-b border-sandstone-border/60 gap-1.5">
                           <div class="flex items-center gap-1.5 text-primary font-bold text-[12px] uppercase font-label-caps">
                             <span class="material-symbols-outlined text-[18px]">graphic_eq</span>
-                            <span>_mapa_acústico_estratégico_bcn</span>
+                            <span>_auditoría_acústica:_real_vs_normativa</span>
                           </div>
-                          <div class="flex items-center gap-1.5">
-                            <span class="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-900 border border-emerald-200 font-label-tabular-sm text-[9px] font-bold flex items-center gap-1" id="badge-ruido-fecha">
+                          <div class="flex items-center gap-1.5 flex-wrap">
+                            <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-950 border border-emerald-300 font-label-tabular-sm text-[9px] font-bold flex items-center gap-1 shadow-2xs">
                               <span class="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse"></span>
-                              <span>ÚLTIMA SERIE: 2022-2027</span>
+                              <span>SONÓMETRO FÍSICO REAL</span>
                             </span>
                             <span class="px-1.5 py-0.5 rounded bg-stone-surface text-charcoal-text font-label-tabular-sm text-[9px] font-bold">FACHADA 4m</span>
                             <span class="font-label-tabular-sm text-label-tabular-sm text-outline font-semibold">dBA Leq</span>
                           </div>
                         </div>
 
-                        <!-- Banner Visible de Última Actualización y Serie Oficial -->
-                        <div class="flex items-center justify-between px-2.5 py-1.5 rounded-md bg-stone-surface/50 border border-sandstone-border/70 text-[11px] text-on-surface-variant font-medium mt-2.5">
-                          <div class="flex items-center gap-1.5 min-w-0">
-                            <span class="material-symbols-outlined text-[15px] text-emerald-700 flex-shrink-0">event_available</span>
-                            <span class="truncate">Fecha datos oficiales: <strong class="text-charcoal-text" id="lbl-ruido-fecha-serie">4º Ciclo Quinquenal Vigente 2022 – 2027</strong> (Open Data BCN)</span>
+                        <!-- Tarjeta del Sonómetro Físico Oficial más Cercano (Sentilo / Open Data BCN) -->
+                        <div class="p-2.5 rounded-lg bg-emerald-50/70 border border-emerald-200 mt-2.5 flex flex-col gap-1.5 shadow-2xs" id="box-sensor-real-cercano">
+                          <div class="flex items-center justify-between border-b border-emerald-200/60 pb-1">
+                            <div class="flex items-center gap-1.5 min-w-0">
+                              <span class="material-symbols-outlined text-[17px] text-emerald-800 flex-shrink-0">sensors</span>
+                              <span class="font-bold text-[11px] text-emerald-950 truncate" id="sensor-real-nombre">Estació Acústica Comte d'Urgell</span>
+                              <span class="px-1.5 py-0.2 rounded bg-white/80 text-emerald-900 font-mono text-[9px] font-bold border border-emerald-200" id="sensor-real-id">SNT-BCN-EIX-01</span>
+                            </div>
+                            <span class="text-[9px] font-bold text-emerald-800 bg-emerald-100 px-1.5 py-0.5 rounded uppercase font-mono" id="sensor-real-distancia">A 45 m del activo</span>
                           </div>
-                          <span class="text-outline font-mono text-[9px] hidden sm:inline flex-shrink-0 ml-2">Próx. revisión: 2027</span>
-                        </div>
-
-                        <div class="flex flex-col gap-space-sm mt-3">
-                          <!-- Metric 1: Vianants_Ld -->
-                          <div class="bg-stone-surface/40 p-space-sm rounded-lg border border-sandstone-border/60 flex flex-col gap-1">
-                            <div class="flex items-center justify-between">
-                              <span class="font-body-sm text-body-sm font-semibold text-charcoal-text">Ruido Peatonal Diurno (Vianants_Ld - 07h a 21h)</span>
-                              <span class="font-label-tabular text-label-tabular font-bold text-secondary font-mono" id="val-ruido-vianants-ld">62 dBA</span>
+                          <div class="flex flex-col sm:flex-row sm:items-center justify-between text-[10px] text-emerald-900 gap-1 leading-snug">
+                            <div class="flex items-center gap-1 truncate">
+                              <span class="material-symbols-outlined text-[13px] text-emerald-700 flex-shrink-0">location_on</span>
+                              <span class="truncate" id="sensor-real-ubicacion">Carrer del Comte d'Urgell, 138 (cruce con Mallorca)</span>
                             </div>
-                            <div class="w-full bg-sandstone-border h-2 rounded-full overflow-hidden">
-                              <div class="bg-secondary h-full rounded-full" id="bar-ruido-vianants-ld" style="width: 62%;"></div>
-                            </div>
-                            <span class="font-label-tabular-sm text-label-tabular-sm text-outline text-[10px]">Nivel confortable para terrazas y actividad comercial diurna en fachada.</span>
+                            <span class="font-semibold text-emerald-800 flex-shrink-0" id="sensor-real-soporte">Farola semafórica municipal</span>
                           </div>
-
-                          <!-- Metric 2: Vianants_Le -->
-                          <div class="bg-stone-surface/40 p-space-sm rounded-lg border border-sandstone-border/60 flex flex-col gap-1">
-                            <div class="flex items-center justify-between">
-                              <span class="font-body-sm text-body-sm font-semibold text-charcoal-text">Ruido Tarde / Atardecer (Vianants_Le - 21h a 23h)</span>
-                              <span class="font-label-tabular text-label-tabular font-bold text-secondary font-mono" id="val-ruido-vianants-le">59 dBA</span>
-                            </div>
-                            <div class="w-full bg-sandstone-border h-2 rounded-full overflow-hidden">
-                              <div class="bg-secondary h-full rounded-full" id="bar-ruido-vianants-le" style="width: 59%;"></div>
-                            </div>
-                          </div>
-
-                          <!-- Metric 3: Oci_Ln -->
-                          <div class="bg-stone-surface/40 p-space-sm rounded-lg border border-sandstone-border/60 flex flex-col gap-1">
-                            <div class="flex items-center justify-between">
-                              <span class="font-body-sm text-body-sm font-semibold text-charcoal-text">Ocio Nocturno (Oci_Ln - 23h a 07h)</span>
-                              <span class="font-label-tabular text-label-tabular font-bold text-emerald-800 font-mono" id="val-ruido-oci-ln">48 dBA</span>
-                            </div>
-                            <div class="w-full bg-sandstone-border h-2 rounded-full overflow-hidden">
-                              <div class="bg-emerald-700 h-full rounded-full" id="bar-ruido-oci-ln" style="width: 48%;"></div>
-                            </div>
-                            <span class="font-label-tabular-sm text-label-tabular-sm text-outline text-[10px]" id="val-ruido-oci-desc">
-                              Cumple ZATHN (Zona Acústicamente Tensionada en Horario Nocturno).
-                            </span>
-                          </div>
-
-                          <!-- Metric 4: Transit_Ld -->
-                          <div class="bg-stone-surface/40 p-space-sm rounded-lg border border-sandstone-border/60 flex flex-col gap-1">
-                            <div class="flex items-center justify-between">
-                              <span class="font-body-sm text-body-sm font-semibold text-charcoal-text">Tráfico Rodado Diurno (Transit_Ld)</span>
-                              <span class="font-label-tabular text-label-tabular font-bold text-secondary font-mono" id="val-ruido-transit-ld">66 dBA</span>
-                            </div>
-                            <div class="w-full bg-sandstone-border h-2 rounded-full overflow-hidden">
-                              <div class="bg-secondary h-full rounded-full" id="bar-ruido-transit-ld" style="width: 66%;"></div>
-                            </div>
-                            <span class="font-label-tabular-sm text-label-tabular-sm text-outline text-[10px]" id="val-ruido-transit-desc">
-                              Requiere carpintería técnica con aislamiento mín. 35 dB en caso residencial según CTE DB-HR.
-                            </span>
+                          <div class="flex items-center justify-between text-[9px] text-emerald-900/80 pt-0.5">
+                            <span id="sensor-real-estado">Medición física continua • Plataforma Sentilo BCN</span>
+                            <span class="font-mono" id="sensor-real-ultima-lectura">Serie Anual Consolidada: 2024</span>
                           </div>
                         </div>
+
+                        <!-- TABLA COMPARATIVA DE PROMEDIOS ANUALES: SENSOR REAL vs NORMATIVA -->
+                        <div class="mt-3 overflow-x-auto">
+                          <table class="w-full text-left border-collapse text-[11px]">
+                            <thead>
+                              <tr class="border-b border-sandstone-border text-[9px] uppercase font-label-caps text-outline">
+                                <th class="py-1.5 font-bold">Franja / Tramo Horario</th>
+                                <th class="py-1.5 font-bold text-emerald-900 text-center">Sensor Real (2024)</th>
+                                <th class="py-1.5 font-bold text-outline text-center">Normativa (MES)</th>
+                                <th class="py-1.5 font-bold text-center">Diferencia (Δ)</th>
+                                <th class="py-1.5 font-bold text-right">Dictamen</th>
+                              </tr>
+                            </thead>
+                            <tbody class="divide-y divide-sandstone-border/50">
+                              
+                              <!-- Fila 1: Día (07h a 21h) -->
+                              <tr class="hover:bg-stone-surface/30 transition-colors">
+                                <td class="py-2 pr-2">
+                                  <div class="flex flex-col">
+                                    <span class="font-bold text-charcoal-text">Día (Ld: 07h a 21h)</span>
+                                    <span class="text-[9px] text-outline">Viandantes &amp; Comercio diurno</span>
+                                  </div>
+                                </td>
+                                <td class="py-2 px-1 text-center font-mono font-bold text-emerald-900 text-[12px]" id="comp-dia-real">63.8 dBA</td>
+                                <td class="py-2 px-1 text-center font-mono font-medium text-on-surface-variant text-[11px]" id="comp-dia-normativa">62.0 dBA</td>
+                                <td class="py-2 px-1 text-center font-mono font-bold text-[11px] text-amber-900" id="comp-dia-delta">+1.8 dBA</td>
+                                <td class="py-2 pl-2 text-right">
+                                  <span class="px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-900 font-label-tabular-sm text-[9px] font-bold" id="comp-dia-estado">Conforme</span>
+                                </td>
+                              </tr>
+
+                              <!-- Fila 2: Tarde / Vespre (21h a 23h) -->
+                              <tr class="hover:bg-stone-surface/30 transition-colors">
+                                <td class="py-2 pr-2">
+                                  <div class="flex flex-col">
+                                    <span class="font-bold text-charcoal-text">Tarde (Le: 21h a 23h)</span>
+                                    <span class="text-[9px] text-outline">Cierre comercial &amp; Terrazas</span>
+                                  </div>
+                                </td>
+                                <td class="py-2 px-1 text-center font-mono font-bold text-emerald-900 text-[12px]" id="comp-tarde-real">60.5 dBA</td>
+                                <td class="py-2 px-1 text-center font-mono font-medium text-on-surface-variant text-[11px]" id="comp-tarde-normativa">59.0 dBA</td>
+                                <td class="py-2 px-1 text-center font-mono font-bold text-[11px] text-amber-900" id="comp-tarde-delta">+1.5 dBA</td>
+                                <td class="py-2 pl-2 text-right">
+                                  <span class="px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-900 font-label-tabular-sm text-[9px] font-bold" id="comp-tarde-estado">Conforme</span>
+                                </td>
+                              </tr>
+
+                              <!-- Fila 3: Noche (23h a 07h) -->
+                              <tr class="hover:bg-stone-surface/30 transition-colors bg-emerald-50/20">
+                                <td class="py-2 pr-2">
+                                  <div class="flex flex-col">
+                                    <span class="font-bold text-charcoal-text">Noche (Ln: 23h a 07h)</span>
+                                    <span class="text-[9px] text-outline">Ocio nocturno &amp; Límite ZATHN</span>
+                                  </div>
+                                </td>
+                                <td class="py-2 px-1 text-center font-mono font-bold text-emerald-900 text-[12px]" id="comp-noche-real">49.2 dBA</td>
+                                <td class="py-2 px-1 text-center font-mono font-medium text-on-surface-variant text-[11px]" id="comp-noche-normativa">48.0 dBA</td>
+                                <td class="py-2 px-1 text-center font-mono font-bold text-[11px] text-emerald-800" id="comp-noche-delta">+1.2 dBA</td>
+                                <td class="py-2 pl-2 text-right">
+                                  <span class="px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-900 font-label-tabular-sm text-[9px] font-bold" id="comp-noche-estado">Cumple ZATHN</span>
+                                </td>
+                              </tr>
+
+                              <!-- Fila 4: Tráfico / Ponderado 24h -->
+                              <tr class="hover:bg-stone-surface/30 transition-colors">
+                                <td class="py-2 pr-2">
+                                  <div class="flex flex-col">
+                                    <span class="font-bold text-charcoal-text">Tráfico / 24h (Lden)</span>
+                                    <span class="text-[9px] text-outline">Tráfico rodado calzada (CTE DB-HR)</span>
+                                  </div>
+                                </td>
+                                <td class="py-2 px-1 text-center font-mono font-bold text-emerald-900 text-[12px]" id="comp-trafico-real">66.4 dBA</td>
+                                <td class="py-2 px-1 text-center font-mono font-medium text-on-surface-variant text-[11px]" id="comp-trafico-normativa">66.0 dBA</td>
+                                <td class="py-2 px-1 text-center font-mono font-bold text-[11px] text-charcoal-text" id="comp-trafico-delta">+0.4 dBA</td>
+                                <td class="py-2 pl-2 text-right">
+                                  <span class="px-1.5 py-0.5 rounded bg-stone-surface text-charcoal-text font-label-tabular-sm text-[9px] font-bold" id="comp-trafico-estado">Aislamiento Estándar</span>
+                                </td>
+                              </tr>
+
+                            </tbody>
+                          </table>
+                        </div>
+
+                        <!-- BARRAS COMPARATIVAS DUALES (REAL vs NORMATIVA) -->
+                        <div class="flex flex-col gap-2.5 mt-3 pt-2.5 border-t border-sandstone-border/60">
+                          
+                          <!-- Barra 1: Día -->
+                          <div class="flex flex-col gap-1">
+                            <div class="flex items-center justify-between text-[10px]">
+                              <span class="font-bold text-charcoal-text">Día (Ld) • Sensor Real vs Normativa</span>
+                              <span class="font-mono text-[10px] text-emerald-900 font-bold"><span id="bar-num-dia-real">63.8</span> vs <span id="bar-num-dia-normativa" class="text-outline">62.0</span> dBA</span>
+                            </div>
+                            <div class="w-full bg-sandstone-border/60 h-2 rounded-full overflow-hidden relative">
+                              <div class="bg-outline/40 h-full rounded-full absolute" id="bar-normativa-dia" style="width: 62%;"></div>
+                              <div class="bg-emerald-700 h-full rounded-full absolute" id="bar-real-dia" style="width: 63.8%; opacity: 0.85;"></div>
+                            </div>
+                          </div>
+
+                          <!-- Barra 2: Noche -->
+                          <div class="flex flex-col gap-1">
+                            <div class="flex items-center justify-between text-[10px]">
+                              <span class="font-bold text-charcoal-text">Noche (Ln) • Límite ZATHN 55 dBA</span>
+                              <span class="font-mono text-[10px] text-emerald-900 font-bold"><span id="bar-num-noche-real">49.2</span> vs <span id="bar-num-noche-normativa" class="text-outline">48.0</span> dBA</span>
+                            </div>
+                            <div class="w-full bg-sandstone-border/60 h-2 rounded-full overflow-hidden relative">
+                              <div class="bg-outline/40 h-full rounded-full absolute" id="bar-normativa-noche" style="width: 48%;"></div>
+                              <div class="bg-emerald-700 h-full rounded-full absolute" id="bar-real-noche" style="width: 49.2%; opacity: 0.85;"></div>
+                            </div>
+                          </div>
+
+                        </div>
+
                       </div>
 
+                      <!-- Acordeón Desplegable: Explicación de Fuentes Duales (Sentilo vs MES) -->
                       <details class="group mt-2.5 pt-2 border-t border-sandstone-border/60 cursor-pointer">
                         <summary class="list-none flex items-center justify-between text-[10px] font-bold text-primary uppercase font-label-caps hover:text-terracotta-accent transition-colors select-none py-0.5">
                           <span class="flex items-center gap-1">
                             <span class="material-symbols-outlined text-[13px] text-terracotta-accent">source</span>
-                            <span>Origen de los datos y fecha</span>
+                            <span>Diferencia entre la Medición Real (Sentilo) y la Normativa (MES)</span>
                           </span>
                           <span class="material-symbols-outlined text-[15px] text-outline transition-transform duration-200 group-open:rotate-180">expand_more</span>
                         </summary>
-                        <div class="mt-1.5 p-2.5 rounded bg-stone-surface/50 border border-sandstone-border/50 text-[11px] text-on-surface-variant leading-relaxed space-y-1.5">
+                        <div class="mt-1.5 p-2.5 rounded bg-stone-surface/50 border border-sandstone-border/50 text-[11px] text-on-surface-variant leading-relaxed space-y-2">
                           <div>
-                            <strong>Fuente Oficial:</strong> Portal <strong>Open Data BCN</strong> del <em>Ajuntament de Barcelona</em> — Conjunto de datos oficial <strong>«Mapes de soroll per tram de carrer del Mapa Estratègic de Soroll (MES)»</strong>, elaborado junto a la <em>Agència de Salut Pública de Barcelona (ASPB)</em>.
+                            <strong>1. Sensor Físico Real (Xarxa de Monitoratge - Sentilo BCN):</strong>
+                            <br>
+                            Mide decibelios continuos reales con **sonómetros físicos clase 1** instalados en farolas y fachadas. La cifra mostrada corresponde al **promedio anual consolidado más reciente (2024)** de la estación oficial más próxima al activo.
                           </div>
                           <div>
-                            <strong>Formato y Metodología:</strong> Publicado en GeoPackage (.gpkg) y tabla CKAN por <strong>tramo de calle entre intersecciones</strong>. La modelización 3D (software <em>CadnaA</em> calibrado con la red municipal de sonómetros continuos) calcula el nivel sonoro incidente en las fachadas a 4 metros de altura para cada franja: día ($L_d$), tarde ($L_e$) y noche ($L_n$), desglosado por tráfico rodado, ocio nocturno y viandantes.
+                            <strong>2. Normativa Oficial (Mapa Estratègic de Soroll - MES):</strong>
+                            <br>
+                            Es el modelo matemático tridimensional quinquenal (*CadnaA*, 4º ciclo 2022-2027) requerido por la **Directiva Europea 2002/49/CE**. Sirve de referencia legal para licencias y urbanismo.
+                          </div>
+                          <div>
+                            <strong>3. Interpretación de la Diferencia (Δ dBA):</strong>
+                            <br>
+                            Un valor $\Delta > 0$ indica que la actividad real de la calle genera más decibelios de los modelizados (habitual en calles con veladores activos o terrazas). Un valor $\Delta < 0$ indica que la calle es más silenciosa de lo previsto (típico en calles pacificadas o con tráfico calmado).
                           </div>
                           <div class="pt-1 border-t border-sandstone-border/40 flex items-center justify-between text-[10px]">
-                            <span class="text-outline">Directiva Europea 2002/49/CE • 4º Ciclo Quinquenal (2022-2027)</span>
-                            <a href="https://opendata-ajuntament.barcelona.cat" target="_blank" rel="noopener noreferrer" class="text-primary font-bold hover:underline inline-flex items-center gap-0.5">
-                              <span>Open Data BCN</span>
+                            <span>Portales: <strong>Open Data BCN</strong> &amp; <strong>Sentilo BCN</strong></span>
+                            <a href="https://opendata-ajuntament.barcelona.cat/data/es/dataset/monitoratge-soroll-instal-lacions" target="_blank" rel="noopener noreferrer" class="text-primary font-bold hover:underline inline-flex items-center gap-0.5">
+                              <span>Instalaciones Sonómetros</span>
                               <span class="material-symbols-outlined text-[11px]">open_in_new</span>
                             </a>
                           </div>

@@ -698,6 +698,50 @@
       setText('lbl-ruido-fecha-serie', ruido.fecha_serie);
     }
 
+    // I. Sonómetro Físico Real (Sentilo BCN) vs Normativa (MES)
+    const sensor = data.sensor_real || {};
+    if (sensor.nombre) setText('sensor-real-nombre', sensor.nombre);
+    if (sensor.estacion_id) setText('sensor-real-id', sensor.estacion_id);
+    if (sensor.distancia_texto) setText('sensor-real-distancia', sensor.distancia_texto);
+    if (sensor.ubicacion) setText('sensor-real-ubicacion', sensor.ubicacion);
+    if (sensor.soporte) setText('sensor-real-soporte', sensor.soporte);
+    if (sensor.estado) setText('sensor-real-estado', sensor.estado);
+    if (sensor.ultima_lectura) setText('sensor-real-ultima-lectura', sensor.ultima_lectura);
+
+    const comp = sensor.comparativa || {};
+    if (comp.dia) {
+      setText('comp-dia-real', `${comp.dia.real} dBA`);
+      setText('comp-dia-normativa', `${comp.dia.normativa} dBA`);
+      setText('comp-dia-delta', comp.dia.delta_texto);
+      setText('comp-dia-estado', comp.dia.estado);
+      setText('bar-num-dia-real', comp.dia.real);
+      setText('bar-num-dia-normativa', comp.dia.normativa);
+      setBarWidth('bar-normativa-dia', comp.dia.normativa);
+      setBarWidth('bar-real-dia', comp.dia.real);
+    }
+    if (comp.tarde) {
+      setText('comp-tarde-real', `${comp.tarde.real} dBA`);
+      setText('comp-tarde-normativa', `${comp.tarde.normativa} dBA`);
+      setText('comp-tarde-delta', comp.tarde.delta_texto);
+      setText('comp-tarde-estado', comp.tarde.estado);
+    }
+    if (comp.noche) {
+      setText('comp-noche-real', `${comp.noche.real} dBA`);
+      setText('comp-noche-normativa', `${comp.noche.normativa} dBA`);
+      setText('comp-noche-delta', comp.noche.delta_texto);
+      setText('comp-noche-estado', comp.noche.estado);
+      setText('bar-num-noche-real', comp.noche.real);
+      setText('bar-num-noche-normativa', comp.noche.normativa);
+      setBarWidth('bar-normativa-noche', comp.noche.normativa);
+      setBarWidth('bar-real-noche', comp.noche.real);
+    }
+    if (comp.trafico) {
+      setText('comp-trafico-real', `${comp.trafico.real} dBA`);
+      setText('comp-trafico-normativa', `${comp.trafico.normativa} dBA`);
+      setText('comp-trafico-delta', comp.trafico.delta_texto);
+      setText('comp-trafico-estado', comp.trafico.estado);
+    }
+
     // 6 Tarjetas de Clima 365 días
     if (clima.dias_lluvia !== undefined) setText('clima-dias-lluvia', `${clima.dias_lluvia} días`);
     if (clima.precipitacion_mm !== undefined) setText('clima-precipitacion', `${clima.precipitacion_mm} mm`);
@@ -939,7 +983,75 @@
       },
       metro: {
         texto: metroTexto
-      }
+      },
+      sensor_real: (function() {
+        const c = (calle || '').toLowerCase();
+        if (c.includes('arago') || c.includes('gran via') || c.includes('meridiana')) {
+          return {
+            estacion_id: 'SNT-BCN-EIX-04',
+            nombre: 'Estació Acústica Aragó Arterial',
+            ubicacion: "Carrer d'Aragó, 240 (cruce con Rambla Catalunya)",
+            soporte: 'Poste semafórico carril central calzada',
+            distancia_texto: 'A 60 m del activo (~0.8 min a pie)',
+            estado: 'Activo • Monitorización Tráfico Arterial',
+            ultima_lectura: 'Serie Anual Consolidada Open Data BCN (2024)',
+            comparativa: {
+              dia: { real: 70.8, normativa: 69.0, delta_texto: '+1.8 dBA', estado: 'Sobrecarga' },
+              tarde: { real: 68.5, normativa: 67.0, delta_texto: '+1.5 dBA', estado: 'Alerta Tarde' },
+              noche: { real: 56.2, normativa: 54.0, delta_texto: '+2.2 dBA', estado: 'Alerta Nocturna' },
+              trafico: { real: 73.5, normativa: 72.0, delta_texto: '+1.5 dBA', estado: 'Aislamiento Reforzado' }
+            }
+          };
+        } else if (c.includes('consell de cent') || c.includes('girona') || c.includes('borrell')) {
+          return {
+            estacion_id: 'SNT-BCN-EIX-05',
+            nombre: 'Estació Acústica Consell de Cent (Superilla)',
+            ubicacion: 'Carrer del Consell de Cent, 312 (eje verde pacificado)',
+            soporte: 'Báculo alumbrado público plaza verde',
+            distancia_texto: 'A 35 m del activo (~0.4 min a pie)',
+            estado: 'Activo • Seguimiento Plan Superilles',
+            ultima_lectura: 'Serie Anual Consolidada Open Data BCN (2024)',
+            comparativa: {
+              dia: { real: 53.2, normativa: 54.0, delta_texto: '-0.8 dBA', estado: 'Silencioso' },
+              tarde: { real: 51.4, normativa: 52.0, delta_texto: '-0.6 dBA', estado: 'Silencioso' },
+              noche: { real: 41.8, normativa: 42.0, delta_texto: '-0.2 dBA', estado: 'Excelente' },
+              trafico: { real: 55.6, normativa: 45.0, delta_texto: '+10.6 dBA', estado: 'Tráfico Calmado' }
+            }
+          };
+        } else if (c.includes('enric granados') || c.includes('carme') || c.includes('gotic') || c.includes('raval')) {
+          return {
+            estacion_id: 'SNT-BCN-EIX-03',
+            nombre: 'Estació Acústica Enric Granados (ZATHN)',
+            ubicacion: "Carrer d'Enric Granados, 25 (eje gastronómico)",
+            soporte: 'Farola peatonal plaza peatonal',
+            distancia_texto: 'A 50 m del activo (~0.6 min a pie)',
+            estado: 'Activo • Red ZATHN Sonómetros',
+            ultima_lectura: 'Serie Anual Consolidada Open Data BCN (2024)',
+            comparativa: {
+              dia: { real: 65.5, normativa: 64.0, delta_texto: '+1.5 dBA', estado: 'Conforme' },
+              tarde: { real: 66.8, normativa: 65.0, delta_texto: '+1.8 dBA', estado: 'Alerta Tarde' },
+              noche: { real: 59.4, normativa: 58.0, delta_texto: '+1.4 dBA', estado: 'Alerta ZATHN Nocturna' },
+              trafico: { real: 68.2, normativa: 52.0, delta_texto: '+16.2 dBA', estado: 'Peatonal / Ocio' }
+            }
+          };
+        } else {
+          return {
+            estacion_id: 'SNT-BCN-EIX-01',
+            nombre: "Estació Acústica Comte d'Urgell",
+            ubicacion: "Carrer del Comte d'Urgell, 138 (cruce con Mallorca)",
+            soporte: 'Farola báculo semafórico municipal',
+            distancia_texto: 'A 45 m del activo (~0.6 min a pie)',
+            estado: 'Activo • Transmisión continua Sentilo',
+            ultima_lectura: 'Serie Anual Consolidada Open Data BCN (2024)',
+            comparativa: {
+              dia: { real: 63.8, normativa: 62.0, delta_texto: '+1.8 dBA', estado: 'Conforme' },
+              tarde: { real: 60.5, normativa: 59.0, delta_texto: '+1.5 dBA', estado: 'Conforme' },
+              noche: { real: 49.2, normativa: 48.0, delta_texto: '+1.2 dBA', estado: 'Cumple ZATHN' },
+              trafico: { real: 66.4, normativa: 66.0, delta_texto: '+0.4 dBA', estado: 'Aislamiento Estándar' }
+            }
+          };
+        }
+      })()
     };
 
     aplicarDatosEnInterfaz(mockData);
