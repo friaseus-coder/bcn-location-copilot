@@ -304,8 +304,22 @@
 
     if (selectMunicipio) {
       selectMunicipio.addEventListener('change', () => {
+        const sugerenciasContainer = document.getElementById('sugerencias-vias');
+        if (sugerenciasContainer) {
+          sugerenciasContainer.innerHTML = '';
+          sugerenciasContainer.classList.add('hidden');
+        }
+
+        const nuevoMun = selectMunicipio.value;
+        const badgeMun = document.getElementById('val-municipio-distrito-badge');
+        if (badgeMun) {
+          badgeMun.textContent = `${nuevoMun} • Prov. Barcelona`;
+        }
+
         const calleVal = inputCalle ? inputCalle.value.trim() : '';
-        if (calleVal) {
+        if (calleVal && calleVal.length >= 2) {
+          consultarSugerenciasICGC(calleVal, nuevoMun);
+        } else {
           ejecutarAnalisisCompleto();
         }
       });

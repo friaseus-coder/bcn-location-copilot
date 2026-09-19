@@ -210,59 +210,113 @@ async def home(request: Request):
     return templates.TemplateResponse(request=request, name="index.html")
 
 # ==============================================================================
-# 2. ENDPOINT PREDICTIVO `/api/autocompletar` (ICGC PELIAS)
 # ==============================================================================
+# 2. ENDPOINT PREDICTIVO `/api/autocompletar` (CATASTRO OVC + NOMINATIM RESTRINGIDO)
+# ==============================================================================
+TIPO_VIA_OVC = {
+    "CL": "Carrer", "CALLE": "Carrer", "AV": "Avinguda", "AVDA": "Avinguda",
+    "PG": "Passeig", "Pº": "Passeig", "RB": "Rambla", "PL": "Plaça", "PZA": "Plaça",
+    "TR": "Travessera", "TRAV": "Travessera", "PJ": "Passatge", "PTGE": "Passatge",
+    "RD": "Ronda", "RDA": "Ronda", "CT": "Carretera", "CTRA": "Carretera",
+    "CM": "Camí", "UR": "Urbanització", "URB": "Urbanització", "GL": "Glorieta"
+}
+
+def format_nombre_via(tv: str, nv: str) -> str:
+    tipo = TIPO_VIA_OVC.get(tv.upper().strip(), tv.strip().capitalize() or "Carrer")
+    palabras = nv.strip().split()
+    nombre_formateado = " ".join(
+        p.lower() if p.lower() in ["de", "del", "dels", "de la", "de les", "d'", "l'", "i", "a", "en", "el", "la", "les", "els"] and i > 0
+        else p.capitalize()
+        for i, p in enumerate(palabras)
+    )
+    return f"{tipo} {nombre_formateado}"
+
 @app.get("/api/autocompletar")
 async def autocompletar(texto: str = Query(..., min_length=2), municipio: str = Query("Barcelona")):
     """
-    Consulta asíncrona a ICGC Pelias para normalización de callejero oficial.
-    Filtra y devuelve sugerencias estructuradas en la provincia de Barcelona.
+    Normalización de callejero oficial restringido ESTRICTAMENTE a la población seleccionada.
+    1. Consulta prioritaria al Catastro OVC oficial por provincia y municipio.
+    2. Fallback secundario a Nominatim filtrando por municipio.
     """
     query_clean = texto.strip()
-    mun_lower = municipio.strip().lower()
-    geo_ref = MUNICIPALITIES_GEO.get(mun_lower, MUNICIPALITIES_GEO["barcelona"])
+    mun_clean = municipio.strip()
+    
+    # Normalización para Catastro OVC (mayúsculas sin tildes)
+    import unicodedata
+    norm_mun = unicodedata.normalize('NFD', mun_clean)
+    mun_ovc = ''.join(c for c in norm_mun if unicodedata.category(c) != 'Mn').upper()
 
-    icgc_url = "https://geocoder.icgc.cat/autocomplete"
-    params = {
-        "text": f"{query_clean}, {municipio}",
-        "focus.point.lat": geo_ref["lat"],
-        "focus.point.lon": geo_ref["lon"],
-        "boundary.country": "ESP"
-    }
+    sugerencias = []
 
+    # 1. CONSULTA A SEDE CATASTRAL (OVC) - Vías oficiales garantizadas del municipio
     try:
+        ovc_url = "http://ovc.catastro.meh.es/ovcservweb/ovcswlocalizacionrc/ovccallejero.asmx/ConsultaVia"
         async with httpx.AsyncClient(timeout=3.0) as client:
-            resp = await client.get(icgc_url, params=params)
-            if resp.status_code == 200:
-                data = resp.json()
-                features = data.get("features", [])
-                sugerencias = []
-                for f in features:
-                    props = f.get("properties", {})
-                    nombre = props.get("name") or props.get("label") or ""
-                    loc = props.get("locality") or props.get("county") or municipio
-                    postal = props.get("postalcode") or ""
-                    layer = props.get("layer") or "street"
-
-                    # Normalizar nombre sin repetir el municipio
-                    sugerencias.append({
-                        "nombre": nombre.split(",")[0].strip(),
-                        "etiqueta": props.get("label") or f"{nombre}, {loc}",
-                        "municipio": loc,
-                        "codigo_postal": postal,
-                        "tipo": "Vía Urbana" if layer in ["street", "address", "venue"] else layer.capitalize()
-                    })
-
+            resp = await client.get(ovc_url, params={
+                "Provincia": "BARCELONA",
+                "Municipio": mun_ovc,
+                "TipoVia": "",
+                "NombreVia": query_clean.upper()
+            })
+            if resp.status_code == 200 and "<calle>" in resp.text:
+                root = ET.fromstring(resp.text)
+                for c in root.findall(".//{http://www.catastro.meh.es/}calle"):
+                    tv = c.findtext("{http://www.catastro.meh.es/}dir/{http://www.catastro.meh.es/}tv") or ""
+                    nv = c.findtext("{http://www.catastro.meh.es/}dir/{http://www.catastro.meh.es/}nv") or ""
+                    if nv:
+                        nombre_completo = format_nombre_via(tv, nv)
+                        sugerencias.append({
+                            "nombre": nombre_completo,
+                            "tipo": TIPO_VIA_OVC.get(tv.upper().strip(), "Vía Urbana"),
+                            "etiqueta": f"{nombre_completo}, {mun_clean}",
+                            "municipio": mun_clean
+                        })
                 if sugerencias:
-                    return JSONResponse(content={"status": "success", "sugerencias": sugerencias})
-
-    except Exception as e:
-        # Silencio de error de red y fallback inteligente
+                    return JSONResponse(content={"status": "success", "municipio": mun_clean, "sugerencias": sugerencias[:10]})
+    except Exception:
         pass
 
-    # Fallback determinista local para respuesta en < 5ms
+    # 2. CONSULTA SECUNDARIA A NOMINATIM RESTRICTIVA POR CIUDAD
+    try:
+        nom_url = "https://nominatim.openstreetmap.org/search"
+        headers = {"User-Agent": "BCNLocationCopilot/3.0 (underwriting@bcncopilot.local)"}
+        async with httpx.AsyncClient(timeout=3.0) as client:
+            resp = await client.get(nom_url, params={
+                "street": query_clean,
+                "city": mun_clean,
+                "county": "Barcelona",
+                "country": "Spain",
+                "format": "json",
+                "addressdetails": "1"
+            }, headers=headers)
+            if resp.status_code == 200:
+                items = resp.json()
+                for item in items:
+                    addr = item.get("address", {})
+                    road = addr.get("road") or addr.get("pedestrian") or addr.get("street")
+                    loc = addr.get("city") or addr.get("town") or addr.get("village") or addr.get("municipality") or ""
+                    # Filtro estricto: la localidad devuelta debe coincidir con el municipio seleccionado
+                    if road and (mun_clean.lower() in loc.lower() or loc.lower() in mun_clean.lower() or mun_clean.lower() in item.get("display_name", "").lower()):
+                        sugerencias.append({
+                            "nombre": road,
+                            "tipo": "Vía Urbana",
+                            "etiqueta": f"{road}, {mun_clean}",
+                            "municipio": mun_clean
+                        })
+                if sugerencias:
+                    # Eliminar duplicados
+                    seen = set()
+                    unique_sug = []
+                    for s in sugerencias:
+                        if s["nombre"] not in seen:
+                            seen.add(s["nombre"])
+                            unique_sug.append(s)
+                    return JSONResponse(content={"status": "success", "municipio": mun_clean, "sugerencias": unique_sug[:10]})
+    except Exception:
+        pass
+
+    # 3. FALLBACK RESILIENTE ETIQUETADO EXCLUSIVAMENTE CON EL MUNICIPIO SELECCIONADO
     fallback_vias = [
-        f"{query_clean}",
         f"Carrer de {query_clean}",
         f"Avinguda de {query_clean}",
         f"Passeig de {query_clean}",
@@ -270,7 +324,8 @@ async def autocompletar(texto: str = Query(..., min_length=2), municipio: str = 
     ]
     return JSONResponse(content={
         "status": "success",
-        "sugerencias": [{"nombre": v, "etiqueta": f"{v}, {municipio}", "municipio": municipio, "tipo": "Vía Urbana"} for v in fallback_vias]
+        "municipio": mun_clean,
+        "sugerencias": [{"nombre": v, "etiqueta": f"{v}, {mun_clean}", "municipio": mun_clean, "tipo": "Vía Urbana"} for v in fallback_vias]
     })
 
 # ==============================================================================
