@@ -30,6 +30,7 @@
   let debounceTimer = null;
   let ultimoAnalisisTimestamp = 0;
   let currentCoords = { lat: 41.3888, lon: 2.1590 };
+  let municipioActivo = 'Barcelona';
 
   // Formateadores numéricos institucional es-ES
   const formatEuro = new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 });
@@ -176,6 +177,55 @@
   }
 
   // ==========================================
+  // 1.5. CONSULTA DINÁMICA DE PLANTAS E INMUEBLES REALES EN CATASTRO OVC
+  // ==========================================
+  /**
+   * Consulta la Sede Electrónica del Catastro (OVC) y actualiza el <select id="input-piso">
+   * con las plantas y puertas reales existentes en la finca física especificada.
+   */
+  async function actualizarDesplegablePlantasCatastro(municipio, calle, numero, pisoPreseleccionado) {
+    const selectPiso = document.getElementById('input-piso');
+    if (!selectPiso) return;
+
+    const mun = (municipio || document.getElementById('select-municipio')?.value || 'Barcelona').trim();
+    const c = (calle || document.getElementById('input-calle')?.value || 'Balmes').trim();
+    const n = (numero || document.getElementById('input-numero')?.value || '1').trim();
+
+    const valorPrevio = pisoPreseleccionado || selectPiso.value;
+
+    try {
+      const url = `${API_BASE_URL}/api/catastro/inmuebles?municipio=${encodeURIComponent(mun)}&calle=${encodeURIComponent(c)}&numero=${encodeURIComponent(n)}`;
+      const resp = await fetch(url);
+      if (!resp.ok) return;
+      const data = await resp.json();
+
+      const plantas = data.plantas || [];
+      if (plantas.length === 0) return;
+
+      selectPiso.innerHTML = '';
+      let valorSeleccionado = false;
+
+      plantas.forEach((p, idx) => {
+        const opt = document.createElement('option');
+        opt.value = p.value;
+        opt.textContent = p.label;
+        if (p.value === valorPrevio || (!valorPrevio && idx === 0)) {
+          opt.selected = true;
+          valorSeleccionado = true;
+        }
+        selectPiso.appendChild(opt);
+      });
+
+      if (!valorSeleccionado && selectPiso.options.length > 0) {
+        selectPiso.selectedIndex = 0;
+      }
+    } catch (err) {
+      console.warn('Error consultando plantas en Catastro OVC:', err);
+    }
+  }
+  window.actualizarDesplegablePlantasCatastro = actualizarDesplegablePlantasCatastro;
+
+  // ==========================================
   // 2. AUTOCOMPLETADO ASÍNCRONO DE VÍAS (ICGC)
   // ==========================================
   function inicializarAutocompletado() {
@@ -269,9 +319,15 @@
         row.addEventListener('click', function () {
           const inputCalle = document.getElementById('input-calle');
           const inputNumero = document.getElementById('input-numero');
+          const selectMunicipio = document.getElementById('select-municipio');
           
           if (inputCalle) inputCalle.value = nombreVia;
           sugerenciasContainer.classList.add('hidden');
+
+          // Actualizar inmediatamente el desplegable con las plantas catastrales reales de la finca
+          const mun = selectMunicipio ? selectMunicipio.value : 'Barcelona';
+          const num = inputNumero ? inputNumero.value.trim() : '1';
+          actualizarDesplegablePlantasCatastro(mun, nombreVia, num);
 
           // Trasladar automáticamente el foco al número de policía (no disparar análisis hasta pulsar Analizar)
           if (inputNumero) {
@@ -312,6 +368,29 @@
       });
     });
 
+    // Al cambiar de número o desenfocar calle, refrescar las plantas reales desde Catastro
+    if (inputNumero) {
+      inputNumero.addEventListener('change', () => {
+        const mun = selectMunicipio ? selectMunicipio.value : 'Barcelona';
+        const calleVal = inputCalle ? inputCalle.value.trim() : '';
+        const numVal = inputNumero.value.trim();
+        if (calleVal) {
+          actualizarDesplegablePlantasCatastro(mun, calleVal, numVal);
+        }
+      });
+    }
+
+    if (inputCalle) {
+      inputCalle.addEventListener('blur', () => {
+        const mun = selectMunicipio ? selectMunicipio.value : 'Barcelona';
+        const calleVal = inputCalle.value.trim();
+        const numVal = inputNumero ? inputNumero.value.trim() : '1';
+        if (calleVal.length >= 3) {
+          actualizarDesplegablePlantasCatastro(mun, calleVal, numVal);
+        }
+      });
+    }
+
     // Al cambiar de municipio, actualizar el contexto territorial pero NO ejecutar análisis
     if (selectMunicipio) {
       selectMunicipio.addEventListener('change', () => {
@@ -322,14 +401,28 @@
         }
 
         const nuevoMun = selectMunicipio.value;
+        municipioActivo = nuevoMun;
+
         const badgeMun = document.getElementById('val-municipio-distrito-badge');
         if (badgeMun) {
           badgeMun.textContent = `${nuevoMun} • Prov. Barcelona`;
         }
 
         const calleVal = inputCalle ? inputCalle.value.trim() : '';
+        const numVal = inputNumero ? inputNumero.value.trim() : '1';
+
+        // Actualizar plantas para la calle en el nuevo municipio
         if (calleVal && calleVal.length >= 2) {
           consultarSugerenciasICGC(calleVal, nuevoMun);
+          actualizarDesplegablePlantasCatastro(nuevoMun, calleVal, numVal);
+        }
+
+        // Si el nuevo municipio es distinto de Barcelona, actualizar de inmediato los estados a "No hay datos"
+        if (typeof window.renderizarNegocios === 'function') {
+          window.renderizarNegocios();
+        }
+        if (typeof window.renderizarServicios === 'function') {
+          window.renderizarServicios();
         }
       });
     }
@@ -359,6 +452,7 @@
   // ==========================================
   async function ejecutarAnalisisCompleto() {
     const municipio = document.getElementById('select-municipio')?.value || 'Barcelona';
+    municipioActivo = municipio;
     const calle = document.getElementById('input-calle')?.value.trim() || 'Carrer de Balmes';
     const numero = document.getElementById('input-numero')?.value.trim() || '12';
     const piso = document.getElementById('input-piso')?.value.trim() || '';
@@ -444,6 +538,7 @@
     ultimoDatosAnalisis = data;
 
     const activo = data.activo || {};
+    municipioActivo = (activo.municipio || document.getElementById('select-municipio')?.value || 'Barcelona').trim();
     const finanzas = data.finanzas || {};
     const entorno = data.entorno || {};
     const ocr = entorno.ocr || {};
@@ -699,47 +794,90 @@
     }
 
     // I. Sonómetro Físico Real (Sentilo BCN) vs Normativa (MES)
-    const sensor = data.sensor_real || {};
-    if (sensor.nombre) setText('sensor-real-nombre', sensor.nombre);
-    if (sensor.estacion_id) setText('sensor-real-id', sensor.estacion_id);
-    if (sensor.distancia_texto) setText('sensor-real-distancia', sensor.distancia_texto);
-    if (sensor.ubicacion) setText('sensor-real-ubicacion', sensor.ubicacion);
-    if (sensor.soporte) setText('sensor-real-soporte', sensor.soporte);
-    if (sensor.estado) setText('sensor-real-estado', sensor.estado);
-    if (sensor.ultima_lectura) setText('sensor-real-ultima-lectura', sensor.ultima_lectura);
+    const sensor = data.sensor_real || data.acustica?.sensor_real || {};
+    if (municipioActivo.toLowerCase() !== 'barcelona' || sensor.tiene_sensor_sentilo === false) {
+      setText('sensor-real-nombre', `No hay datos de estación física Sentilo para ${municipioActivo}`);
+      setText('sensor-real-id', `SIN SENSOR EN MUNICIPIO`);
+      setText('sensor-real-distancia', `Sin sensor Sentilo en este municipio`);
+      setText('sensor-real-ubicacion', `Red Sentilo circunscrita a Barcelona ciudad`);
+      setText('sensor-real-soporte', `No hay sonómetros físicos desplegados`);
+      setText('sensor-real-estado', `No disponible fuera de Barcelona`);
+      setText('sensor-real-ultima-lectura', `No hay datos`);
 
-    const comp = sensor.comparativa || {};
-    if (comp.dia) {
-      setText('comp-dia-real', `${comp.dia.real} dBA`);
-      setText('comp-dia-normativa', `${comp.dia.normativa} dBA`);
-      setText('comp-dia-delta', comp.dia.delta_texto);
-      setText('comp-dia-estado', comp.dia.estado);
-      setText('bar-num-dia-real', comp.dia.real);
-      setText('bar-num-dia-normativa', comp.dia.normativa);
-      setBarWidth('bar-normativa-dia', comp.dia.normativa);
-      setBarWidth('bar-real-dia', comp.dia.real);
-    }
-    if (comp.tarde) {
-      setText('comp-tarde-real', `${comp.tarde.real} dBA`);
-      setText('comp-tarde-normativa', `${comp.tarde.normativa} dBA`);
-      setText('comp-tarde-delta', comp.tarde.delta_texto);
-      setText('comp-tarde-estado', comp.tarde.estado);
-    }
-    if (comp.noche) {
-      setText('comp-noche-real', `${comp.noche.real} dBA`);
-      setText('comp-noche-normativa', `${comp.noche.normativa} dBA`);
-      setText('comp-noche-delta', comp.noche.delta_texto);
-      setText('comp-noche-estado', comp.noche.estado);
-      setText('bar-num-noche-real', comp.noche.real);
-      setText('bar-num-noche-normativa', comp.noche.normativa);
-      setBarWidth('bar-normativa-noche', comp.noche.normativa);
-      setBarWidth('bar-real-noche', comp.noche.real);
-    }
-    if (comp.trafico) {
-      setText('comp-trafico-real', `${comp.trafico.real} dBA`);
-      setText('comp-trafico-normativa', `${comp.trafico.normativa} dBA`);
-      setText('comp-trafico-delta', comp.trafico.delta_texto);
-      setText('comp-trafico-estado', comp.trafico.estado);
+      setText('comp-dia-real', 'No hay datos');
+      setText('comp-dia-normativa', '-- dBA');
+      setText('comp-dia-delta', 'Sin sensor');
+      setText('comp-dia-estado', 'No hay datos');
+      setText('bar-num-dia-real', '-');
+      setBarWidth('bar-real-dia', 0);
+
+      setText('comp-tarde-real', 'No hay datos');
+      setText('comp-tarde-normativa', '-- dBA');
+      setText('comp-tarde-delta', 'Sin sensor');
+      setText('comp-tarde-estado', 'No hay datos');
+
+      setText('comp-noche-real', 'No hay datos');
+      setText('comp-noche-normativa', '-- dBA');
+      setText('comp-noche-delta', 'Sin sensor');
+      setText('comp-noche-estado', 'No hay datos');
+      setText('bar-num-noche-real', '-');
+      setBarWidth('bar-real-noche', 0);
+
+      setText('comp-trafico-real', 'No hay datos');
+      setText('comp-trafico-normativa', '-- dBA');
+      setText('comp-trafico-delta', 'Sin sensor');
+      setText('comp-trafico-estado', 'No hay datos');
+
+      // Pla d'Usos BCN
+      setText('val-pla-dusos-titulo', `No hay datos de Plan Especial de Usos BCN (${municipioActivo})`);
+      setText('val-pla-dusos-desc', `Este inmueble se ubica en el término municipal de ${municipioActivo}. El Plan Especial de Usos y PEUAT rigen exclusivamente en Barcelona ciudad.`);
+      setText('val-pla-dusos-badge', `SIN PLAN BCN`);
+      if (document.getElementById('badge-regulacion')) {
+        const truncEl = document.getElementById('badge-regulacion').querySelector('.truncate');
+        if (truncEl) truncEl.textContent = `Normativa Urbanística ${municipioActivo} (Sin Pla d'Usos BCN)`;
+      }
+    } else {
+      if (sensor.nombre) setText('sensor-real-nombre', sensor.nombre);
+      if (sensor.estacion_id) setText('sensor-real-id', sensor.estacion_id);
+      if (sensor.distancia_texto) setText('sensor-real-distancia', sensor.distancia_texto);
+      if (sensor.ubicacion) setText('sensor-real-ubicacion', sensor.ubicacion);
+      if (sensor.soporte) setText('sensor-real-soporte', sensor.soporte);
+      if (sensor.estado) setText('sensor-real-estado', sensor.estado);
+      if (sensor.ultima_lectura) setText('sensor-real-ultima-lectura', sensor.ultima_lectura);
+
+      const comp = sensor.comparativa || {};
+      if (comp.dia) {
+        setText('comp-dia-real', `${comp.dia.real} dBA`);
+        setText('comp-dia-normativa', `${comp.dia.normativa} dBA`);
+        setText('comp-dia-delta', comp.dia.delta_texto);
+        setText('comp-dia-estado', comp.dia.estado);
+        setText('bar-num-dia-real', comp.dia.real);
+        setText('bar-num-dia-normativa', comp.dia.normativa);
+        setBarWidth('bar-normativa-dia', comp.dia.normativa);
+        setBarWidth('bar-real-dia', comp.dia.real);
+      }
+      if (comp.tarde) {
+        setText('comp-tarde-real', `${comp.tarde.real} dBA`);
+        setText('comp-tarde-normativa', `${comp.tarde.normativa} dBA`);
+        setText('comp-tarde-delta', comp.tarde.delta_texto);
+        setText('comp-tarde-estado', comp.tarde.estado);
+      }
+      if (comp.noche) {
+        setText('comp-noche-real', `${comp.noche.real} dBA`);
+        setText('comp-noche-normativa', `${comp.noche.normativa} dBA`);
+        setText('comp-noche-delta', comp.noche.delta_texto);
+        setText('comp-noche-estado', comp.noche.estado);
+        setText('bar-num-noche-real', comp.noche.real);
+        setText('bar-num-noche-normativa', comp.noche.normativa);
+        setBarWidth('bar-normativa-noche', comp.noche.normativa);
+        setBarWidth('bar-real-noche', comp.noche.real);
+      }
+      if (comp.trafico) {
+        setText('comp-trafico-real', `${comp.trafico.real} dBA`);
+        setText('comp-trafico-normativa', `${comp.trafico.normativa} dBA`);
+        setText('comp-trafico-delta', comp.trafico.delta_texto);
+        setText('comp-trafico-estado', comp.trafico.estado);
+      }
     }
 
     // 6 Tarjetas de Clima 365 días
@@ -792,9 +930,12 @@
       }
     }
 
-    // J. Refrescar listado y contadores del Censo de Negocios en Cercanías
+    // J. Refrescar listado y contadores del Censo de Negocios y Servicios en Cercanías
     if (typeof window.renderizarNegocios === 'function') {
       window.renderizarNegocios();
+    }
+    if (typeof window.renderizarServicios === 'function') {
+      window.renderizarServicios();
     }
   }
 
@@ -1617,8 +1758,47 @@ Tiempo de Acceso = ${distanciaMetro} m / 80 m/min = ${(distanciaMetro / 80).toFi
     if (categoriaFiltro !== undefined) categoriaNegociosActiva = categoriaFiltro;
     if (textoBusqueda !== undefined) busquedaNegociosActiva = textoBusqueda;
 
-    const listaBase = obtenerNegociosCuencaActiva();
     const minutos = currentIsochroneMinutes || 5;
+
+    // 0. VERIFICACIÓN DE DISPONIBILIDAD DE DATOS POR MUNICIPIO
+    // Si la ubicación es fuera de Barcelona o no hay datos censales abiertos
+    if (municipioActivo.toLowerCase() !== 'barcelona') {
+      setText('cnt-neg-hosteleria', 0);
+      setText('cnt-neg-retail', 0);
+      setText('cnt-neg-alimentacion', 0);
+      setText('cnt-neg-salud', 0);
+      setText('cnt-neg-servicios', 0);
+      setText('cnt-neg-especializados', 0);
+      setText('badge-total-negocios', 0);
+      setText('txt-badge-total-filtro', 0);
+
+      const lblVisibles = document.getElementById('lbl-conteo-visibles');
+      if (lblVisibles) {
+        lblVisibles.textContent = `No hay datos censados para ${municipioActivo} (Isócrona ${minutos} min)`;
+      }
+
+      const container = document.getElementById('contenedor-lista-negocios');
+      if (container) {
+        container.innerHTML = `
+          <div class="col-span-full p-space-xl rounded-xl bg-surface border border-sandstone-border flex flex-col items-center justify-center text-center gap-3 py-12 shadow-2xs">
+            <div class="w-14 h-14 rounded-full bg-stone-surface flex items-center justify-center text-outline mb-1">
+              <span class="material-symbols-outlined text-[32px]">storefront</span>
+            </div>
+            <span class="font-headline-md text-charcoal-text font-bold text-[16px]">No hay datos de actividades comerciales censadas en ${municipioActivo}</span>
+            <span class="font-body-sm text-on-surface-variant text-[12px] max-w-md leading-relaxed">
+              El censo digitalizado de locales comerciales en planta baja (Open Data BCN) está limitado al término municipal de Barcelona. No constan registros de comercios en ${municipioActivo} en esta plataforma abierta.
+            </span>
+            <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-stone-surface/80 border border-sandstone-border text-[11px] font-mono font-medium text-outline mt-1">
+              <span class="material-symbols-outlined text-[14px]">info</span>
+              <span>Sin censo comercial disponible para ${municipioActivo}</span>
+            </div>
+          </div>
+        `;
+      }
+      return;
+    }
+
+    const listaBase = obtenerNegociosCuencaActiva();
 
     // 1. Calcular recuentos por categoría en la cuenca activa
     const recuentos = {
@@ -1980,8 +2160,47 @@ Tiempo de Acceso = ${distanciaMetro} m / 80 m/min = ${(distanciaMetro / 80).toFi
     if (categoriaFiltro !== undefined) categoriaServiciosActiva = categoriaFiltro;
     if (textoBusqueda !== undefined) busquedaServiciosActiva = textoBusqueda;
 
-    const listaBase = obtenerServiciosCuencaActiva();
     const minutos = currentIsochroneMinutes || 5;
+
+    // 0. VERIFICACIÓN DE DISPONIBILIDAD DE DATOS POR MUNICIPIO
+    // Si la ubicación es fuera de Barcelona o no hay datos dotacionales abiertos
+    if (municipioActivo.toLowerCase() !== 'barcelona') {
+      setText('cnt-serv-educacion', 0);
+      setText('cnt-serv-salud', 0);
+      setText('cnt-serv-parking', 0);
+      setText('cnt-serv-zonas_verdes', 0);
+      setText('cnt-serv-culto', 0);
+      setText('cnt-serv-civicos', 0);
+      setText('badge-total-servicios', 0);
+      setText('txt-badge-total-filtro-servicios', 0);
+
+      const lblVisibles = document.getElementById('lbl-conteo-visibles-servicios');
+      if (lblVisibles) {
+        lblVisibles.textContent = `No hay datos censados para ${municipioActivo} (Isócrona ${minutos} min)`;
+      }
+
+      const container = document.getElementById('contenedor-lista-servicios');
+      if (container) {
+        container.innerHTML = `
+          <div class="col-span-full p-space-xl rounded-xl bg-surface border border-sandstone-border flex flex-col items-center justify-center text-center gap-3 py-12 shadow-2xs">
+            <div class="w-14 h-14 rounded-full bg-stone-surface flex items-center justify-center text-outline mb-1">
+              <span class="material-symbols-outlined text-[32px]">account_balance</span>
+            </div>
+            <span class="font-headline-md text-charcoal-text font-bold text-[16px]">No hay datos de equipamientos ni servicios públicos en ${municipioActivo}</span>
+            <span class="font-body-sm text-on-surface-variant text-[12px] max-w-md leading-relaxed">
+              La Guia d'Equipaments de la red abierta institucional (educación, salud, aparcamientos públicos, zonas verdes, centros cívicos y culto) abarca exclusivamente el término de Barcelona ciudad. No constan registros para ${municipioActivo} en esta base abierta.
+            </span>
+            <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-stone-surface/80 border border-sandstone-border text-[11px] font-mono font-medium text-outline mt-1">
+              <span class="material-symbols-outlined text-[14px]">info</span>
+              <span>Sin censo dotacional disponible para ${municipioActivo}</span>
+            </div>
+          </div>
+        `;
+      }
+      return;
+    }
+
+    const listaBase = obtenerServiciosCuencaActiva();
 
     // 1. Calcular recuentos por categoría de servicio
     const recuentos = {
@@ -2256,6 +2475,14 @@ Tiempo de Acceso = ${distanciaMetro} m / 80 m/min = ${(distanciaMetro / 80).toFi
     inicializarAutocompletado();
     inicializarDisparadores();
     inicializarAccionesDescarga();
+
+    // Sincronizar desplegable inicial con Catastro OVC
+    const munIni = document.getElementById('select-municipio')?.value || 'Barcelona';
+    const calleIni = document.getElementById('input-calle')?.value || 'Carrer de Balmes';
+    const numIni = document.getElementById('input-numero')?.value || '12';
+    const pisoIni = document.getElementById('input-piso')?.value || 'Bajos / Local';
+    actualizarDesplegablePlantasCatastro(munIni, calleIni, numIni, pisoIni);
+
     if (typeof window.renderizarNegocios === 'function') {
       window.renderizarNegocios('todas', '');
     }

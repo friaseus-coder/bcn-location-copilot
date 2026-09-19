@@ -427,6 +427,227 @@ async def autocompletar(texto: str = Query(..., min_length=2), municipio: str = 
     })
 
 # ==============================================================================
+# 2.5. ENDPOINT DE CONSULTA DE INMUEBLES Y PLANTAS EN CATASTRO OVC
+# ==============================================================================
+@app.get("/api/catastro/inmuebles")
+async def obtener_inmuebles_catastro(
+    municipio: str = Query("Barcelona"),
+    calle: str = Query("Carrer de Balmes"),
+    numero: str = Query("12")
+):
+    """
+    Consulta en tiempo real la Sede Electrónica del Catastro (OVC Web Services)
+    mediante ConsultaVia y Consulta_DNPLOC para obtener las plantas y puertas reales
+    existentes en la finca física especificada.
+    """
+    mun_clean = (municipio or "Barcelona").strip()
+    mun_norm = mun_clean.upper()
+    calle_clean = (calle or "").strip()
+    num_clean = re.sub(r'\D', '', str(numero)) if numero else "1"
+
+    # Limpiar prefijos habituales de la vía
+    nombre_base = re.sub(
+        r'^(carrer\s+(del?s?|d\')?|calle\s+|c/|pla[cç]a\s+(del?s?|d\')?|pz\.?\s*|avinguda\s+(del?s?|d\')?|avda\.?\s*|passeig\s+(del?s?|d\')?|pg\.?\s*|rambla\s+(del?s?|d\')?)\s*',
+        '',
+        calle_clean,
+        flags=re.IGNORECASE
+    ).strip()
+
+    tv = ""
+    nv = nombre_base.upper()
+
+    # 1. ConsultaVia para determinar el tipo de vía (tv) y nombre catastral oficial (nv)
+    try:
+        url_via = "http://ovc.catastro.meh.es/ovcservweb/ovcswlocalizacionrc/ovccallejero.asmx/ConsultaVia"
+        params_via = {
+            "Provincia": "BARCELONA",
+            "Municipio": mun_norm,
+            "TipoVia": "",
+            "NombreVia": nv
+        }
+        async with httpx.AsyncClient(timeout=3.0) as client:
+            resp_via = await client.get(url_via, params=params_via)
+            if resp_via.status_code == 200:
+                root_via = ET.fromstring(resp_via.text)
+                ns = {"c": "http://www.catastro.meh.es/"}
+                primer_calle = root_via.find(".//c:calle", ns)
+                if primer_calle is not None:
+                    tv_c = primer_calle.findtext("c:dir/c:tv", "", ns).strip()
+                    nv_c = primer_calle.findtext("c:dir/c:nv", "", ns).strip()
+                    if tv_c:
+                        tv = tv_c
+                    if nv_c:
+                        nv = nv_c
+    except Exception:
+        pass
+
+    # Si ConsultaVia no devolvió tipo de vía, inferir por el nombre original
+    if not tv:
+        if re.search(r'pla[cç]a|plaza', calle_clean, re.I):
+            tv = "PZ"
+        elif re.search(r'avinguda|avenida', calle_clean, re.I):
+            tv = "AV"
+        elif re.search(r'passeig|paseo', calle_clean, re.I):
+            tv = "PS"
+        elif re.search(r'rambla', calle_clean, re.I):
+            tv = "RB"
+        else:
+            tv = "CL"
+
+    # 2. Consulta_DNPLOC en Catastro OVC para recuperar los inmuebles de la finca
+    url_dnp = "http://ovc.catastro.meh.es/ovcservweb/ovcswlocalizacionrc/ovccallejero.asmx/Consulta_DNPLOC"
+    params_dnp = {
+        "Provincia": "BARCELONA",
+        "Municipio": mun_norm,
+        "Sigla": tv,
+        "Calle": nv,
+        "Numero": num_clean,
+        "Bloque": "",
+        "Escalera": "",
+        "Planta": "",
+        "Puerta": ""
+    }
+
+    inmuebles_raw = []
+    rc_finca = ""
+    try:
+        async with httpx.AsyncClient(timeout=4.0) as client:
+            resp_dnp = await client.get(url_dnp, params=params_dnp)
+            if resp_dnp.status_code == 200 and "rcdnp" in resp_dnp.text:
+                root_dnp = ET.fromstring(resp_dnp.text)
+                ns = {"c": "http://www.catastro.meh.es/"}
+                for rcdnp in root_dnp.findall(".//c:rcdnp", ns):
+                    pc1 = rcdnp.findtext("c:rc/c:pc1", "", ns).strip()
+                    pc2 = rcdnp.findtext("c:rc/c:pc2", "", ns).strip()
+                    car = rcdnp.findtext("c:rc/c:car", "", ns).strip()
+                    cc1 = rcdnp.findtext("c:rc/c:cc1", "", ns).strip()
+                    cc2 = rcdnp.findtext("c:rc/c:cc2", "", ns).strip()
+                    rc = f"{pc1}{pc2}{car}{cc1}{cc2}"
+                    if not rc_finca and len(pc1 + pc2) >= 14:
+                        rc_finca = f"{pc1}{pc2}"
+
+                    pt = rcdnp.findtext(".//c:loint/c:pt", "", ns).strip()
+                    pu = rcdnp.findtext(".//c:loint/c:pu", "", ns).strip()
+                    es = rcdnp.findtext(".//c:loint/c:es", "", ns).strip()
+
+                    inmuebles_raw.append({
+                        "rc": rc,
+                        "planta_raw": pt,
+                        "puerta": pu,
+                        "escalera": es
+                    })
+    except Exception:
+        pass
+
+    # Mapa canónico de etiquetas de plantas
+    MAPA_PLANTAS = {
+        "00": ("Planta Baja (Local)", "Bajos / Local", 10),
+        "0": ("Planta Baja (Local)", "Bajos / Local", 10),
+        "BJ": ("Planta Baja (Local)", "Bajos / Local", 10),
+        "PB": ("Planta Baja (Local)", "Bajos / Local", 10),
+        "BA": ("Planta Baja (Local)", "Bajos / Local", 10),
+        "EN": ("Entresuelo", "Entresuelo", 20),
+        "ES": ("Entresuelo", "Entresuelo", 20),
+        "PR": ("Principal", "Principal", 30),
+        "01": ("Planta 1ª", "Planta 1ª", 40),
+        "1": ("Planta 1ª", "Planta 1ª", 40),
+        "02": ("Planta 2ª", "Planta 2ª", 50),
+        "2": ("Planta 2ª", "Planta 2ª", 50),
+        "03": ("Planta 3ª", "Planta 3ª", 60),
+        "3": ("Planta 3ª", "Planta 3ª", 60),
+        "04": ("Planta 4ª", "Planta 4ª", 70),
+        "4": ("Planta 4ª", "Planta 4ª", 70),
+        "05": ("Planta 5ª", "Planta 5ª", 80),
+        "5": ("Planta 5ª", "Planta 5ª", 80),
+        "06": ("Planta 6ª", "Planta 6ª", 90),
+        "6": ("Planta 6ª", "Planta 6ª", 90),
+        "07": ("Planta 7ª", "Planta 7ª", 100),
+        "7": ("Planta 7ª", "Planta 7ª", 100),
+        "08": ("Planta 8ª", "Planta 8ª", 110),
+        "8": ("Planta 8ª", "Planta 8ª", 110),
+        "09": ("Planta 9ª", "Planta 9ª", 120),
+        "9": ("Planta 9ª", "Planta 9ª", 120),
+        "AT": ("Ático", "Ático", 200),
+        "AC": ("Ático", "Ático", 200),
+        "SO": ("Sobreático", "Sobreático", 210),
+        "SA": ("Sobreático", "Sobreático", 210),
+        "SS": ("Sótano", "Sótano", 5),
+        "-1": ("Sótano -1", "Sótano", 4),
+        "-2": ("Sótano -2", "Sótano", 3),
+    }
+
+    plantas_dict = {}
+    inmuebles_formateados = []
+
+    for inm in inmuebles_raw:
+        pt = inm["planta_raw"].upper()
+        if not pt or pt in ["UE", "CO"]:
+            continue  # Omitir unidades comunes o de suelo genérico
+
+        if pt in MAPA_PLANTAS:
+            label, val, orden = MAPA_PLANTAS[pt]
+        else:
+            try:
+                num_pt = int(pt)
+                label = f"Planta {num_pt}ª"
+                val = f"Planta {num_pt}ª"
+                orden = 40 + num_pt * 10
+            except ValueError:
+                label = f"Planta {pt}"
+                val = f"Planta {pt}"
+                orden = 150
+
+        if val not in plantas_dict:
+            plantas_dict[val] = {"label": label, "value": val, "orden": orden}
+
+        pu_label = f" Puerta {inm['puerta']}" if inm["puerta"] else ""
+        es_label = f" Esc. {inm['escalera']}" if inm["escalera"] else ""
+        inmuebles_formateados.append({
+            "rc": inm["rc"],
+            "planta": label,
+            "puerta": inm["puerta"],
+            "etiqueta": f"{label}{es_label}{pu_label}".strip()
+        })
+
+    # Si se encontraron plantas reales en Catastro, ordenarlas
+    if plantas_dict:
+        plantas_ordenadas = sorted(plantas_dict.values(), key=lambda x: x["orden"])
+        # Limpiar campo temporal orden
+        lista_plantas = [{"label": p["label"], "value": p["value"]} for p in plantas_ordenadas]
+        # Añadir opción de Edificio Entero
+        lista_plantas.append({"label": "Edificio Entero", "value": "Edificio Entero"})
+        return JSONResponse(content={
+            "status": "success",
+            "encontrado_en_catastro": True,
+            "total_inmuebles": len(inmuebles_raw),
+            "ref_catastral_finca": rc_finca,
+            "plantas": lista_plantas,
+            "inmuebles": inmuebles_formateados,
+            "municipio": mun_clean,
+            "calle": calle_clean,
+            "numero": num_clean
+        })
+
+    # Fallback si Catastro no devuelve inmuebles (finca no encontrada o desconexión)
+    fallback_plantas = [
+        {"label": "Planta Baja (Local)", "value": "Bajos / Local"},
+        {"label": "Planta 1ª", "value": "Planta 1ª"},
+        {"label": "Edificio Entero", "value": "Edificio Entero"}
+    ]
+    return JSONResponse(content={
+        "status": "success",
+        "encontrado_en_catastro": False,
+        "total_inmuebles": 0,
+        "ref_catastral_finca": "",
+        "plantas": fallback_plantas,
+        "inmuebles": [],
+        "mensaje": "No hay datos de unidades específicas en Catastro para esta finca.",
+        "municipio": mun_clean,
+        "calle": calle_clean,
+        "numero": num_clean
+    })
+
+# ==============================================================================
 # 3. ENDPOINT MAESTRO `/api/analizar` (PIPELINE EN CASCADA COMPLETO)
 # ==============================================================================
 @app.get("/api/analizar")
@@ -540,7 +761,10 @@ async def analizar_activo(
         "acustica": acustica_info,
         "clima": clima_info,
         "metro": movilidad_info,
-        "movilidad": movilidad_info
+        "movilidad": movilidad_info,
+        "es_barcelona": mun_lower == "barcelona",
+        "tiene_negocios": mun_lower == "barcelona",
+        "tiene_servicios": mun_lower == "barcelona"
     })
 
 # ==============================================================================
@@ -1485,54 +1709,72 @@ def resolver_acustica_y_viandantes(
     diff_ln = round(estacion_cercana["anual_ln"] - ruido_ln, 1)
     diff_traffic = round(estacion_cercana["anual_lden"] - transit_ld, 1)
 
-    sensor_real_data = {
-        "estacion_id": estacion_cercana["id"],
-        "nombre": estacion_cercana["nombre"],
-        "ubicacion": estacion_cercana["ubicacion"],
-        "soporte": estacion_cercana["soporte"],
-        "distrito": estacion_cercana["distrito"],
-        "distancia_m": distancia_m,
-        "distancia_texto": f"A {distancia_m} m del activo (~{minutos_a_pie} min a pie)",
-        "estado": estacion_cercana["estado"],
-        "ultima_lectura": estacion_cercana["ultima_lectura"],
-        "fuente_oficial": "Xarxa de Monitoratge del Soroll Ambiental de Barcelona (Sentilo BCN & Open Data BCN)",
-        "mediciones_anuales": {
-            "ld_dia": estacion_cercana["anual_ld"],
-            "le_tarde": estacion_cercana["anual_le"],
-            "ln_noche": estacion_cercana["anual_ln"],
-            "lden_total": estacion_cercana["anual_lden"]
-        },
-        "comparativa": {
-            "dia": {
-                "real": estacion_cercana["anual_ld"],
-                "normativa": ruido_ld,
-                "delta": diff_ld,
-                "delta_texto": f"{'+' if diff_ld > 0 else ''}{diff_ld} dBA",
-                "estado": "Silencioso" if diff_ld < 0 else ("Conforme" if diff_ld <= 2.0 else "Sobrecarga")
+    if mun_lower != "barcelona":
+        sensor_real_data = {
+            "tiene_sensor_sentilo": False,
+            "estacion_id": "NO_APLICA",
+            "nombre": f"Sin estación física Sentilo en {mun_lower.title()}",
+            "ubicacion": f"Término Municipal de {mun_lower.title()}",
+            "soporte": "No hay red de sensores acústicos desplegada en este municipio",
+            "distrito": mun_lower.title(),
+            "distancia_m": 0,
+            "distancia_texto": f"Sin sensor Sentilo en {mun_lower.title()} (Exclusivo BCN)",
+            "estado": "No disponible en este municipio",
+            "ultima_lectura": "No hay datos",
+            "fuente_oficial": "Red Sentilo BCN exclusiva del término municipal de Barcelona",
+            "mediciones_anuales": None,
+            "comparativa": None
+        }
+    else:
+        sensor_real_data = {
+            "tiene_sensor_sentilo": True,
+            "estacion_id": estacion_cercana["id"],
+            "nombre": estacion_cercana["nombre"],
+            "ubicacion": estacion_cercana["ubicacion"],
+            "soporte": estacion_cercana["soporte"],
+            "distrito": estacion_cercana["distrito"],
+            "distancia_m": distancia_m,
+            "distancia_texto": f"A {distancia_m} m del activo (~{minutos_a_pie} min a pie)",
+            "estado": estacion_cercana["estado"],
+            "ultima_lectura": estacion_cercana["ultima_lectura"],
+            "fuente_oficial": "Xarxa de Monitoratge del Soroll Ambiental de Barcelona (Sentilo BCN & Open Data BCN)",
+            "mediciones_anuales": {
+                "ld_dia": estacion_cercana["anual_ld"],
+                "le_tarde": estacion_cercana["anual_le"],
+                "ln_noche": estacion_cercana["anual_ln"],
+                "lden_total": estacion_cercana["anual_lden"]
             },
-            "tarde": {
-                "real": estacion_cercana["anual_le"],
-                "normativa": ruido_le,
-                "delta": diff_le,
-                "delta_texto": f"{'+' if diff_le > 0 else ''}{diff_le} dBA",
-                "estado": "Conforme" if estacion_cercana["anual_le"] < 65 else "Alerta Tarde"
-            },
-            "noche": {
-                "real": estacion_cercana["anual_ln"],
-                "normativa": ruido_ln,
-                "delta": diff_ln,
-                "delta_texto": f"{'+' if diff_ln > 0 else ''}{diff_ln} dBA",
-                "estado": "Cumple ZATHN" if estacion_cercana["anual_ln"] <= 55 else "Alerta ZATHN Nocturna"
-            },
-            "trafico": {
-                "real": estacion_cercana["anual_lden"],
-                "normativa": transit_ld,
-                "delta": diff_traffic,
-                "delta_texto": f"{'+' if diff_traffic > 0 else ''}{diff_traffic} dBA",
-                "estado": "Aislamiento Estándar" if estacion_cercana["anual_lden"] < 70 else "Aislamiento Reforzado"
+            "comparativa": {
+                "dia": {
+                    "real": estacion_cercana["anual_ld"],
+                    "normativa": ruido_ld,
+                    "delta": diff_ld,
+                    "delta_texto": f"{'+' if diff_ld > 0 else ''}{diff_ld} dBA",
+                    "estado": "Silencioso" if diff_ld < 0 else ("Conforme" if diff_ld <= 2.0 else "Sobrecarga")
+                },
+                "tarde": {
+                    "real": estacion_cercana["anual_le"],
+                    "normativa": ruido_le,
+                    "delta": diff_le,
+                    "delta_texto": f"{'+' if diff_le > 0 else ''}{diff_le} dBA",
+                    "estado": "Conforme" if estacion_cercana["anual_le"] < 65 else "Alerta Tarde"
+                },
+                "noche": {
+                    "real": estacion_cercana["anual_ln"],
+                    "normativa": ruido_ln,
+                    "delta": diff_ln,
+                    "delta_texto": f"{'+' if diff_ln > 0 else ''}{diff_ln} dBA",
+                    "estado": "Cumple ZATHN" if estacion_cercana["anual_ln"] <= 55 else "Alerta ZATHN Nocturna"
+                },
+                "trafico": {
+                    "real": estacion_cercana["anual_lden"],
+                    "normativa": transit_ld,
+                    "delta": diff_traffic,
+                    "delta_texto": f"{'+' if diff_traffic > 0 else ''}{diff_traffic} dBA",
+                    "estado": "Aislamiento Estándar" if estacion_cercana["anual_lden"] < 70 else "Aislamiento Reforzado"
+                }
             }
         }
-    }
 
     return {
         "viandantes_hora": viandantes_hora,
