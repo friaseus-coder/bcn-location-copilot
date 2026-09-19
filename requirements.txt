@@ -1,0 +1,7 @@
+fastapi
+uvicorn[standard]
+httpx
+openpyxl
+jinja2
+python-multipart
+pydantic

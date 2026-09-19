@@ -1,0 +1,1252 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <meta content="web_dashboard" name="shell-type"/>
+  <title>BARCELONA PROVINCE LOCATION INTELLIGENCE &amp; UNDERWRITING (v3.0)</title>
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com" rel="preconnect"/>
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+
+  <!-- Leaflet.js v1.9.4 CDN (CSS & JS) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+  <style>
+    @layer base {
+      html, body { margin: 0; padding: 0; }
+      body { overscroll-behavior: none; }
+      main > :first-child { margin-top: 0 !important; }
+      main > :last-child { margin-bottom: 0 !important; }
+    }
+    ::-webkit-scrollbar { display: none; }
+    #leaflet-map { z-index: 10; width: 100%; height: 100%; }
+    .leaflet-container { font-family: 'Plus Jakarta Sans', sans-serif; }
+  </style>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "tertiary": "#002019",
+            "surface-container-high": "#e9e8e4",
+            "sandstone-border": "#dedad2",
+            "on-surface": "#1b1c1a",
+            "on-primary-container": "#bdece1",
+            "badge-parkings-text": "#1b4468",
+            "badge-hotels-bg": "#ece8f1",
+            "on-primary-fixed": "#00201b",
+            "on-primary": "#ffffff",
+            "on-primary-fixed-variant": "#214e46",
+            "surface-variant": "#e3e2df",
+            "secondary-container": "#faebd7",
+            "on-tertiary-fixed-variant": "#264e44",
+            "error-container": "#ffdad6",
+            "badge-living-text": "#02362f",
+            "on-error": "#ffffff",
+            "inverse-surface": "#1a211f",
+            "terracotta-accent": "#c26d38",
+            "surface-container": "#efeeea",
+            "surface-dim": "#dbdad6",
+            "surface-container-highest": "#e3e2df",
+            "on-secondary-fixed": "#331200",
+            "on-secondary-container": "#763300",
+            "outline-variant": "#dedad2",
+            "surface": "#faf9f5",
+            "background": "#faf9f5",
+            "surface-bright": "#ffffff",
+            "primary-fixed-dim": "#a1d0c5",
+            "on-secondary": "#ffffff",
+            "limestone-canvas": "#f9f8f5",
+            "badge-hotels-text": "#473264",
+            "surface-tint": "#02362f",
+            "secondary-fixed": "#ffdbca",
+            "badge-working-bg": "#faebd7",
+            "surface-container-lowest": "#ffffff",
+            "tertiary-fixed-dim": "#a5cfc2",
+            "on-surface-variant": "#4d5350",
+            "tertiary-fixed": "#c0ecde",
+            "on-tertiary-container": "#002019",
+            "badge-working-text": "#8c4408",
+            "on-error-container": "#93000a",
+            "error": "#ba1a1a",
+            "inverse-on-surface": "#f2f1ed",
+            "charcoal-text": "#1a211f",
+            "badge-retail-bg": "#f9e8e5",
+            "on-tertiary": "#ffffff",
+            "badge-retail-text": "#993826",
+            "primary-container": "#02362f",
+            "surface-container-low": "#f5f4f0",
+            "tertiary-container": "#044339",
+            "stone-surface": "#eae7e1",
+            "outline": "#78807d",
+            "inverse-primary": "#a1d0c5",
+            "on-tertiary-fixed": "#00201a",
+            "primary-fixed": "#bdece1",
+            "badge-parkings-bg": "#e6edf5",
+            "forest-muted": "#0e433b",
+            "secondary-fixed-dim": "#ffb68e",
+            "on-background": "#1b1c1a",
+            "badge-living-bg": "#e6efe9",
+            "bronze-gold": "#c59849",
+            "secondary": "#b45309",
+            "on-secondary-fixed-variant": "#763300",
+            "primary": "#02362f"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "spacing": {
+            "margin": "1rem",
+            "space-xl": "1.5rem",
+            "space-2xl": "2.5rem",
+            "gutter": "0.75rem",
+            "space-2xs": "0.25rem",
+            "space-lg": "1rem",
+            "space-xs": "0.25rem",
+            "space-md": "0.75rem",
+            "space-sm": "0.375rem"
+          },
+          "fontFamily": {
+            "body-lg": ["Plus Jakarta Sans"],
+            "headline-sm": ["Outfit"],
+            "data-metric": ["Outfit"],
+            "headline-md": ["Outfit"],
+            "display-hero": ["Outfit"],
+            "label-md": ["Plus Jakarta Sans"],
+            "label-caps": ["Outfit"],
+            "taxonomy-header": ["Outfit"],
+            "body-md": ["Plus Jakarta Sans"],
+            "body-sm": ["Plus Jakarta Sans"],
+            "headline-lg": ["Outfit"],
+            "headline-xl": ["Outfit"],
+            "label-tabular": ["JetBrains Mono"],
+            "label-tabular-sm": ["JetBrains Mono"]
+          },
+          "fontSize": {
+            "body-lg": ["14px", {"lineHeight": "20px", "letterSpacing": "0em", "fontWeight": "400"}],
+            "body-md": ["13px", {"lineHeight": "18px", "letterSpacing": "0em", "fontWeight": "400"}],
+            "body-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0em", "fontWeight": "400"}],
+            "label-tabular-sm": ["11px", {"lineHeight": "14px", "letterSpacing": "0em", "fontWeight": "500"}],
+            "label-tabular": ["12px", {"lineHeight": "16px", "letterSpacing": "-0.01em", "fontWeight": "500"}],
+            "headline-sm": ["18px", {"lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+            "headline-md": ["16px", {"lineHeight": "22px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+            "headline-lg": ["22px", {"lineHeight": "28px", "letterSpacing": "-0.015em", "fontWeight": "600"}],
+            "headline-xl": ["26px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+            "label-caps": ["11px", {"lineHeight": "15px", "letterSpacing": "0.08em", "fontWeight": "600"}]
+          }
+        }
+      }
+    };
+  </script>
+</head>
+<body class="bg-background font-body-md text-body-md text-on-surface antialiased selection:bg-primary-fixed selection:text-primary">
+
+  <!-- LEFT NAVIGATION DRAWER (INSTITUTIONAL BRANDING) -->
+  <aside class="fixed left-0 top-0 h-full w-64 bg-surface-container-lowest border-r border-sandstone-border z-50 flex flex-col justify-between shadow-[0_1px_4px_rgba(27,28,26,0.03)]">
+    <div class="flex flex-col">
+      <!-- Institutional Header Crest -->
+      <div class="h-16 px-space-lg flex items-center gap-space-sm border-b border-sandstone-border bg-stone-surface/40">
+        <div class="w-8 h-8 rounded bg-primary flex items-center justify-center text-on-primary shadow-sm">
+          <span class="material-symbols-outlined text-[19px]">account_balance</span>
+        </div>
+        <div class="flex flex-col pl-2">
+          <div class="flex items-center gap-1.5">
+            <span class="font-headline-md text-[13px] font-bold tracking-tight text-primary leading-none">BCN COPILOT</span>
+            <span class="px-1.5 py-0.5 rounded bg-primary text-on-primary font-label-tabular-sm text-[9px] font-medium tracking-wide">v3.0</span>
+          </div>
+          <span class="font-label-caps text-[9px] text-outline uppercase tracking-wider mt-0.5 font-medium">Província de Barcelona</span>
+        </div>
+      </div>
+
+      <div class="px-space-md py-space-sm border-b border-sandstone-border/60 bg-surface">
+        <div class="flex items-center justify-between">
+          <span class="font-label-caps text-outline uppercase text-[10px] tracking-wider">_ámbito_territorial</span>
+          <span class="font-label-tabular-sm text-secondary font-semibold">311 Municipios</span>
+        </div>
+      </div>
+
+      <!-- Navigation Modules -->
+      <nav class="flex flex-col gap-1 p-space-md" data-active-classes="bg-primary text-on-primary font-semibold rounded-lg shadow-sm">
+        <div class="px-2 pt-2 pb-1 font-label-caps text-outline uppercase text-[10px] tracking-wider font-semibold">_módulos_de_análisis</div>
+        <a class="flex items-center gap-space-sm px-3 py-2 rounded-lg text-charcoal-text/80 hover:bg-stone-surface/60 hover:text-primary transition-colors text-body-sm font-medium" data-path="analisis-predial" href="#" onclick="window.cambiarTab('tab-catastro'); return false;">
+          <span class="material-symbols-outlined text-[17px] text-primary">apartment</span>
+          <span>_análisis_predial</span>
+        </a>
+        <a class="flex items-center gap-space-sm px-3 py-2 rounded-lg text-charcoal-text/80 hover:bg-stone-surface/60 hover:text-primary transition-colors text-body-sm font-medium" data-path="movilidad-e-isocronas" href="#" onclick="window.cambiarTab('tab-movilidad'); return false;">
+          <span class="material-symbols-outlined text-[17px] text-terracotta-accent">alt_route</span>
+          <span>_movilidad_e_isócronas</span>
+        </a>
+        <a class="flex items-center gap-space-sm px-3 py-2 rounded-lg text-charcoal-text/80 hover:bg-stone-surface/60 hover:text-primary transition-colors text-body-sm font-medium" data-path="viabilidad-financiera" href="#" onclick="window.cambiarTab('tab-finanzas'); return false;">
+          <span class="material-symbols-outlined text-[17px] text-primary">account_balance_wallet</span>
+          <span>_viabilidad_financiera</span>
+        </a>
+        <a class="flex items-center gap-space-sm px-3 py-2 rounded-lg text-charcoal-text/80 hover:bg-stone-surface/60 hover:text-primary transition-colors text-body-sm font-medium" data-path="regulacion-y-pla-dusos" href="#" onclick="window.cambiarTab('tab-entorno'); return false;">
+          <span class="material-symbols-outlined text-[17px] text-terracotta-accent">gavel</span>
+          <span>_regulación_pla_d'usos</span>
+        </a>
+
+        <div class="px-2 pt-space-md pb-1 font-label-caps text-outline uppercase text-[10px] tracking-wider font-semibold">_cartera_&amp;_informes</div>
+        <a class="flex items-center gap-space-sm px-3 py-2 rounded-lg text-charcoal-text/80 hover:bg-stone-surface/60 hover:text-primary transition-colors text-body-sm font-medium" data-path="pipeline-institucional" href="#" onclick="window.mostrarToast('Módulo Pipeline Institucional activo'); return false;">
+          <span class="material-symbols-outlined text-[17px] text-outline">folder_open</span>
+          <span>_pipeline_institucional</span>
+        </a>
+        <a class="flex items-center gap-space-sm px-3 py-2 rounded-lg text-charcoal-text/80 hover:bg-stone-surface/60 hover:text-primary transition-colors text-body-sm font-medium" data-path="informes-icgc-catastro" href="#" onclick="window.mostrarToast('Generando dossier cartográfico ICGC...'); return false;">
+          <span class="material-symbols-outlined text-[17px] text-outline">description</span>
+          <span>_informes_icgc_catastro</span>
+        </a>
+      </nav>
+    </div>
+
+    <!-- Infrastructure Status -->
+    <div class="p-space-md border-t border-sandstone-border bg-stone-surface/30 flex flex-col gap-2">
+      <div class="flex items-center justify-between text-on-surface-variant">
+        <span class="font-label-caps text-[10px] uppercase text-outline">_motor_catastral</span>
+        <div class="flex items-center gap-1.5">
+          <span class="inline-block w-2 h-2 rounded-full bg-emerald-600"></span>
+          <span class="font-label-tabular-sm text-primary font-semibold">Online 99.8%</span>
+        </div>
+      </div>
+      <div class="p-2 rounded bg-surface-container-lowest border border-sandstone-border flex items-center justify-between">
+        <div class="flex flex-col">
+          <span class="font-label-caps text-primary font-semibold text-[10px]" id="val-municipio-distrito-badge">Barcelona • Eixample</span>
+          <span class="font-label-tabular-sm text-outline text-[11px]">WGS84 EPSG:25831</span>
+        </div>
+        <span class="material-symbols-outlined text-outline text-[16px]">satellite_alt</span>
+      </div>
+    </div>
+  </aside>
+
+  <div class="pl-64">
+    <!-- TOP MULTIDATA PROVINCIAL HEADER -->
+    <header class="fixed top-0 left-64 right-0 h-16 bg-surface-container-lowest/95 backdrop-blur-md border-b border-sandstone-border z-40 px-space-lg flex items-center justify-between gap-space-md shadow-[0_1px_4px_rgba(27,28,26,0.03)]">
+      
+      <!-- 3. BARRA DE BÚSQUEDA MULTIDATO PROVINCIAL (ERGONÓMICA) -->
+      <div class="relative flex items-center gap-2 flex-1 max-w-3xl">
+        <!-- Municipio Selector -->
+        <div class="relative min-w-[150px] max-w-[190px]">
+          <select id="select-municipio" class="w-full h-9 pl-2.5 pr-7 rounded bg-surface border border-sandstone-border font-body-sm text-body-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary appearance-none cursor-pointer truncate">
+            <option value="Barcelona" selected>Barcelona</option>
+            <option value="L'Hospitalet de Llobregat">L'Hospitalet de Llobregat</option>
+            <option value="Badalona">Badalona</option>
+            <option value="Terrassa">Terrassa</option>
+            <option value="Sabadell">Sabadell</option>
+            <option value="Mataró">Mataró</option>
+            <option value="Santa Coloma de Gramenet">Santa Coloma de Gramenet</option>
+            <option value="Sant Cugat del Vallès">Sant Cugat del Vallès</option>
+            <option value="Cornellà de Llobregat">Cornellà de Llobregat</option>
+            <option value="Sant Boi de Llobregat">Sant Boi de Llobregat</option>
+            <option value="Rubí">Rubí</option>
+            <option value="Manresa">Manresa</option>
+            <option value="Vilanova i la Geltrú">Vilanova i la Geltrú</option>
+            <option value="Viladecans">Viladecans</option>
+            <option value="Castelldefels">Castelldefels</option>
+            <option value="El Prat de Llobregat">El Prat de Llobregat</option>
+            <option value="Granollers">Granollers</option>
+            <option value="Cerdanyola del Vallès">Cerdanyola del Vallès</option>
+            <option value="Mollet del Vallès">Mollet del Vallès</option>
+            <option value="Vic">Vic</option>
+            <option value="Esplugues de Llobregat">Esplugues de Llobregat</option>
+            <option value="Gavà">Gavà</option>
+            <option value="Sant Feliu de Llobregat">Sant Feliu de Llobregat</option>
+            <option value="Igualada">Igualada</option>
+            <option value="Ripollet">Ripollet</option>
+            <option value="Sant Adrià de Besòs">Sant Adrià de Besòs</option>
+            <option value="Montcada i Reixac">Montcada i Reixac</option>
+            <option value="Sant Joan Despí">Sant Joan Despí</option>
+            <option value="Barberà del Vallès">Barberà del Vallès</option>
+            <option value="Sitges">Sitges</option>
+            <option value="Premià de Mar">Premià de Mar</option>
+            <option value="Sant Pere de Ribes">Sant Pere de Ribes</option>
+            <option value="Martorell">Martorell</option>
+            <option value="Pineda de Mar">Pineda de Mar</option>
+            <option value="El Masnou">El Masnou</option>
+            <option value="Molins de Rei">Molins de Rei</option>
+            <option value="Castellar del Vallès">Castellar del Vallès</option>
+            <option value="Olesa de Montserrat">Olesa de Montserrat</option>
+            <option value="Vilassar de Mar">Vilassar de Mar</option>
+            <option value="Cardedeu">Cardedeu</option>
+            <option value="Berga">Berga</option>
+            <option value="Arenys de Mar">Arenys de Mar</option>
+            <option value="Pallejà">Pallejà</option>
+            <option value="Malgrat de Mar">Malgrat de Mar</option>
+            <option value="Sant Just Desvern">Sant Just Desvern</option>
+            <option value="Sant Celoni">Sant Celoni</option>
+            <option value="Calella">Calella</option>
+            <option value="Esparreguera">Esparreguera</option>
+            <option value="Sant Andreu de la Barca">Sant Andreu de la Barca</option>
+            <option value="Sant Quirze del Vallès">Sant Quirze del Vallès</option>
+            <option value="Caldes de Montbui">Caldes de Montbui</option>
+            <option value="Sant Sadurní d'Anoia">Sant Sadurní d'Anoia</option>
+            <option value="Torelló">Torelló</option>
+            <option value="Manlleu">Manlleu</option>
+          </select>
+          <span class="material-symbols-outlined absolute right-1.5 top-1/2 -translate-y-1/2 pointer-events-none text-outline text-[16px]">expand_more</span>
+        </div>
+
+        <!-- Input Calle (Nombre de la vía) -->
+        <div class="relative flex-1 min-w-[160px]">
+          <span class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-outline text-[16px]">location_searching</span>
+          <input class="w-full h-9 pl-8 pr-2 rounded bg-surface border border-sandstone-border font-body-sm text-body-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" id="input-calle" autocomplete="off" placeholder="Calle / Vía (ej. Balmes)" type="text" value="Carrer de Balmes"/>
+          <!-- Sugerencias Vías (Contenedor Flotante Oculto para API ICGC Pelias) -->
+          <div class="hidden absolute top-full left-0 right-0 mt-1 max-h-60 overflow-y-auto bg-surface-container-lowest border border-sandstone-border rounded-lg shadow-xl z-50 divide-y divide-sandstone-border/60" id="sugerencias-vias">
+          </div>
+        </div>
+
+        <!-- Input Número de policía (Ancho fijo ~80px) -->
+        <div class="w-[80px] flex-shrink-0">
+          <input class="w-full h-9 px-2 text-center rounded bg-surface border border-sandstone-border font-body-sm text-body-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" id="input-numero" max="9999" min="1" placeholder="Nº" type="number" value="12"/>
+        </div>
+
+        <!-- Input Planta, Piso y Puerta (Piso/Pta) -->
+        <div class="w-[105px] flex-shrink-0">
+          <input class="w-full h-9 px-2 text-center rounded bg-surface border border-sandstone-border font-body-sm text-body-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" id="input-piso" placeholder="(Piso/Pta)" type="text" value="Principal 1ª"/>
+        </div>
+
+        <!-- Input hidden fallback for legacy compatibility -->
+        <input type="hidden" id="input-direccion" value="Carrer de Balmes, 12, Barcelona"/>
+
+        <!-- Botón Primario Analizar -->
+        <button class="h-9 px-3.5 rounded bg-primary text-on-primary hover:bg-forest-muted font-body-sm text-body-sm font-semibold flex items-center gap-1.5 whitespace-nowrap shadow-sm transition-colors cursor-pointer" id="btn-analizar" type="button">
+          <span class="material-symbols-outlined text-[16px]">travel_explore</span>
+          <span>Analizar</span>
+        </button>
+      </div>
+
+      <!-- Header Right: Institutional Neutral Brand & Status -->
+      <div class="flex items-center gap-space-md">
+        <div class="hidden 2xl:flex items-center gap-1.5 px-3 py-1 rounded bg-stone-surface/60 border border-sandstone-border">
+          <span class="inline-block w-2 h-2 rounded-full bg-emerald-600"></span>
+          <span class="font-label-tabular-sm text-primary font-semibold">8 Capas Oficiales Conectadas</span>
+          <span class="text-outline text-[11px]">(Catastro, ICGC, INE, Pla d'Usos, TMB)</span>
+        </div>
+        <button class="h-9 px-space-sm rounded bg-surface border border-sandstone-border hover:bg-stone-surface/60 hover:text-on-surface text-charcoal-text font-body-sm text-body-sm flex items-center gap-1.5 transition-colors" id="btn-ajustes-informe" type="button">
+          <span class="material-symbols-outlined text-[16px] text-outline">tune</span>
+          <span class="hidden sm:inline">Ajustes</span>
+        </button>
+        <div class="h-6 w-px bg-sandstone-border"></div>
+        <!-- Institutional Header Badge (Sin marcas privadas) -->
+        <div class="flex items-center gap-space-sm pl-1">
+          <div class="flex flex-col items-end text-right">
+            <span class="font-label-caps text-primary font-bold text-[10px] leading-tight tracking-wide">BARCELONA PROVINCE LOCATION INTELLIGENCE &amp; UNDERWRITING (v3.0)</span>
+            <span class="font-label-tabular-sm text-secondary font-medium text-[9px] leading-tight">Public Open Data Core (Coste 0 €)</span>
+          </div>
+          <div class="w-8 h-8 rounded bg-primary text-on-primary flex items-center justify-center shadow-sm">
+            <span class="material-symbols-outlined text-[18px]">account_balance</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- MAIN BODY -->
+    <main class="relative pt-16 bg-background w-full min-h-screen">
+      <div class="flex flex-col w-full">
+        
+        <!-- Interactive Feedback Toast -->
+        <div class="fixed bottom-16 right-8 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none flex items-center gap-space-sm px-space-md py-space-sm rounded-lg bg-inverse-surface text-inverse-on-surface shadow-xl border border-stone-700" id="action-toast">
+          <span class="material-symbols-outlined text-tertiary-fixed text-[18px]">verified</span>
+          <span class="font-body-sm text-body-sm font-medium" id="toast-text">Modelo actualizado correctamente</span>
+        </div>
+
+        <div class="p-space-lg flex flex-col xl:flex-row gap-space-lg items-start">
+          
+          <!-- 1. LEFT COLLAPSIBLE UNDERWRITING CONTROL SIDEBAR (320px) -->
+          <aside class="w-full xl:w-[320px] flex-shrink-0 flex flex-col gap-space-md bg-surface-container-lowest rounded-xl p-space-md border border-sandstone-border shadow-[0_1px_3px_rgba(27,28,26,0.03)]">
+            <!-- Institutional Module Crest (Sanitizado) -->
+            <div class="flex items-center gap-space-sm pb-space-sm bg-stone-surface/40 p-space-sm rounded-lg border border-sandstone-border/60">
+              <div class="w-9 h-9 rounded bg-primary flex items-center justify-center flex-shrink-0 text-on-primary shadow-sm">
+                <span class="material-symbols-outlined text-[19px]">apartment</span>
+              </div>
+              <div class="flex flex-col min-w-0">
+                <div class="flex items-center gap-1.5">
+                  <span class="font-headline-md text-[14px] font-bold text-primary truncate leading-tight">Location Copilot</span>
+                  <span class="px-1.5 py-0.2 rounded bg-primary text-on-primary font-label-tabular-sm text-[9px] font-medium">Underwriting</span>
+                </div>
+                <span class="font-label-caps text-outline uppercase text-[9px] tracking-wider truncate font-medium">Open Data &amp; Legal Compliance</span>
+              </div>
+            </div>
+
+            <!-- Underwriting Inputs Form -->
+            <form class="flex flex-col gap-space-md" id="form-copilot" onsubmit="event.preventDefault(); window.recalcularModelo();">
+              <!-- Typology Selector Dropdown -->
+              <div class="flex flex-col gap-1">
+                <label class="font-label-caps text-charcoal-text uppercase flex items-center justify-between text-[11px] font-semibold" for="select-tipologia">
+                  <span>_tipología_de_activo</span>
+                  <span class="text-terracotta-accent font-label-tabular-sm">Cód. PUM-BCN</span>
+                </label>
+                <div class="relative">
+                  <select class="w-full h-8 pl-2 pr-7 rounded bg-surface border border-sandstone-border font-body-sm text-body-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary appearance-none cursor-pointer" id="select-tipologia">
+                    <option selected="" value="retail">Local Comercial (Retail)</option>
+                    <option value="oficina">Oficina / Terciario</option>
+                    <option value="residencial">Vivienda Residencial</option>
+                  </select>
+                  <span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-outline text-[16px]">expand_more</span>
+                </div>
+              </div>
+
+              <!-- Numerical Inputs: Area and Purchase Price -->
+              <div class="grid grid-cols-2 gap-space-sm">
+                <div class="flex flex-col gap-1">
+                  <label class="font-label-caps text-outline uppercase text-[10px] font-semibold" for="input-superficie">Sup. Útil (m²)</label>
+                  <div class="relative">
+                    <input class="w-full h-8 px-2 pr-6 rounded bg-surface border border-sandstone-border font-label-tabular text-label-tabular text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary text-right" id="input-superficie" max="10000" min="15" step="5" type="number" value="110"/>
+                    <span class="absolute right-2 top-1/2 -translate-y-1/2 font-label-tabular-sm text-label-tabular-sm text-outline pointer-events-none">m²</span>
+                  </div>
+                </div>
+                <div class="flex flex-col gap-1">
+                  <label class="font-label-caps text-outline uppercase text-[10px] font-semibold" for="input-precio">Precio Objetivo (€)</label>
+                  <div class="relative">
+                    <input class="w-full h-8 px-2 pr-5 rounded bg-surface border border-sandstone-border font-label-tabular text-label-tabular text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary text-right" id="input-precio" max="100000000" min="50000" step="5000" type="number" value="320000"/>
+                    <span class="absolute right-2 top-1/2 -translate-y-1/2 font-label-tabular-sm text-label-tabular-sm text-outline pointer-events-none">€</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Facade & Physical Parameters -->
+              <div class="flex flex-col gap-space-sm pt-space-xs">
+                <div class="flex flex-col gap-1">
+                  <label class="font-label-caps text-outline uppercase text-[10px] font-semibold" for="select-fachada">_configuración_fachada</label>
+                  <div class="relative">
+                    <select class="w-full h-8 pl-2 pr-7 rounded bg-surface border border-sandstone-border font-body-sm text-body-sm text-on-surface focus:outline-none focus:border-primary appearance-none cursor-pointer" id="select-fachada">
+                      <option selected="" value="chaflan">Chaflán Eixample (&gt;10m)</option>
+                      <option value="escaparate_amplio">Escaparate amplio (6 - 10m)</option>
+                      <option value="escaparate_std">Escaparate estándar (3 - 6m)</option>
+                      <option value="fachada_estrecha">Fachada estrecha (&lt;3m)</option>
+                    </select>
+                    <span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-outline text-[16px]">expand_more</span>
+                  </div>
+                </div>
+
+                <!-- Smoke Exhaust Checkbox -->
+                <label class="flex items-center gap-space-sm py-1.5 px-2 rounded bg-stone-surface/50 border border-sandstone-border/60 hover:bg-stone-surface cursor-pointer transition-colors">
+                  <input class="w-3.5 h-3.5 rounded text-primary focus:ring-0 focus:outline-none cursor-pointer accent-primary" id="check-humos" type="checkbox"/>
+                  <div class="flex items-center justify-between flex-1">
+                    <span class="font-body-sm text-body-sm text-charcoal-text font-medium">Salida de Humos Legal</span>
+                    <span class="font-label-tabular-sm text-label-tabular-sm text-outline text-[10px]">CTE DB-SI</span>
+                  </div>
+                </label>
+
+                <!-- Conservation Status -->
+                <div class="flex flex-col gap-1">
+                  <label class="font-label-caps text-outline uppercase text-[10px] font-semibold" for="select-conservacion">_estado_conservación</label>
+                  <div class="relative">
+                    <select class="w-full h-8 pl-2 pr-7 rounded bg-surface border border-sandstone-border font-body-sm text-body-sm text-on-surface focus:outline-none focus:border-primary appearance-none cursor-pointer" id="select-conservacion">
+                      <option value="listo">Listo para entrar / Buen estado</option>
+                      <option selected="" value="ligera">Requiere adecuación ligera</option>
+                      <option value="reforma">Para reforma integral</option>
+                    </select>
+                    <span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-outline text-[16px]">expand_more</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Action Button -->
+              <button class="w-full h-9 rounded bg-primary text-on-primary hover:bg-forest-muted font-headline-md text-[13px] font-semibold flex items-center justify-center gap-space-xs transition-all shadow-sm active:scale-[0.99] cursor-pointer" id="btn-recalcular" type="submit">
+                <span class="material-symbols-outlined text-[17px]">calculate</span>
+                <span>Recalcular Modelo</span>
+              </button>
+
+              <!-- Status Badge -->
+              <div class="flex items-center justify-center gap-1.5 p-1.5 rounded bg-badge-living-bg border border-emerald-900/10">
+                <span class="w-2 h-2 rounded-full bg-emerald-600 inline-block"></span>
+                <span class="font-label-tabular-sm text-primary font-semibold text-[10px]">Fuentes Oficiales Públicas | Coste 0 €</span>
+              </div>
+            </form>
+
+            <!-- Asset Snapshot Metadata Card -->
+            <div class="mt-space-xs p-space-sm rounded-lg bg-stone-surface/40 border border-sandstone-border/60 flex flex-col gap-space-xs">
+              <div class="flex items-center justify-between">
+                <span class="font-label-caps text-outline uppercase text-[10px] font-semibold">_filtro_isócrona</span>
+                <span class="font-label-tabular-sm text-primary font-semibold">TMB 5-10 min</span>
+              </div>
+              <div class="grid grid-cols-3 gap-1">
+                <button class="py-1 text-center font-label-tabular-sm text-label-tabular-sm rounded bg-primary text-on-primary font-medium transition-colors shadow-sm cursor-pointer" id="iso-5" onclick="window.cambiarIsocrona(5)" type="button">5 min</button>
+                <button class="py-1 text-center font-label-tabular-sm text-label-tabular-sm rounded bg-surface border border-sandstone-border text-charcoal-text hover:bg-stone-surface font-medium transition-colors cursor-pointer" id="iso-10" onclick="window.cambiarIsocrona(10)" type="button">10 min</button>
+                <button class="py-1 text-center font-label-tabular-sm text-label-tabular-sm rounded bg-surface border border-sandstone-border text-charcoal-text hover:bg-stone-surface font-medium transition-colors cursor-pointer" id="iso-15" onclick="window.cambiarIsocrona(15)" type="button">15 min</button>
+              </div>
+            </div>
+          </aside>
+
+          <!-- 2. MAIN COCKPIT & TABULAR UNDERWRITING PANE -->
+          <div class="flex-1 flex flex-col gap-space-md w-full min-w-0">
+            
+            <!-- 3. CRITICAL REGULATORY & MOBILITY BANNERS ROW -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-space-sm">
+              <!-- Banner 1: Pla d'Usos / Regulación (#badge-regulacion) -->
+              <div class="flex items-center gap-space-sm px-space-md py-2.5 rounded-lg bg-[#fbf3eb] border border-amber-200 text-amber-950 shadow-sm" id="badge-regulacion">
+                <div class="w-7 h-7 rounded bg-[#faebd7] flex items-center justify-center flex-shrink-0 text-secondary">
+                  <span class="material-symbols-outlined text-[18px]">gavel</span>
+                </div>
+                <div class="flex flex-col min-w-0">
+                  <span class="font-label-caps uppercase text-[10px] text-secondary font-bold tracking-wide">_pla_especial_d'usos_bcn</span>
+                  <span class="font-body-sm text-body-sm font-semibold truncate text-[#592a05]">Regulación Especial Eixample (Susp. C3/Hostelería)</span>
+                </div>
+              </div>
+
+              <!-- Banner 2: Parking Catchment Deficit (#badge-parking) -->
+              <div class="flex items-center gap-space-sm px-space-md py-2.5 rounded-lg bg-badge-parkings-bg border border-sky-200 text-primary shadow-sm" id="badge-parking">
+                <div class="w-7 h-7 rounded bg-white flex items-center justify-center flex-shrink-0 text-badge-parkings-text">
+                  <span class="material-symbols-outlined text-[18px]">local_parking</span>
+                </div>
+                <div class="flex flex-col min-w-0">
+                  <span class="font-label-caps uppercase text-[10px] text-badge-parkings-text font-bold tracking-wide">_déficit_parking_cuenca</span>
+                  <span class="font-body-sm text-body-sm font-semibold truncate text-[#11314d]">90 / 100 (Alta Presión Área Verde/Azul)</span>
+                </div>
+              </div>
+
+              <!-- Banner 3: Transit Metro Proximity (#badge-transporte) -->
+              <div class="flex items-center gap-space-sm px-space-md py-2.5 rounded-lg bg-surface-container-lowest border border-sandstone-border text-on-surface shadow-sm" id="badge-transporte">
+                <div class="w-7 h-7 rounded bg-stone-surface/70 flex items-center justify-center flex-shrink-0 text-primary">
+                  <span class="material-symbols-outlined text-[18px]">directions_subway</span>
+                </div>
+                <div class="flex flex-col min-w-0">
+                  <span class="font-label-caps uppercase text-[10px] text-outline font-bold tracking-wide">_hub_intermodal_tmb</span>
+                  <span class="font-body-sm text-body-sm font-semibold truncate text-charcoal-text">Metro Universitat (L1/L2) a 280 m (3 min a pie)</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 4. KPI METRIC CARDS ROW -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-space-sm">
+              <!-- KPI 1: Location Score -->
+              <div class="bg-surface-container-lowest p-space-md rounded-xl border border-sandstone-border shadow-[0_1px_3px_rgba(27,28,26,0.03)] flex flex-col justify-between">
+                <div class="flex items-center justify-between pb-1">
+                  <span class="font-label-caps text-outline uppercase text-[10px] font-semibold">_location_score</span>
+                  <span class="material-symbols-outlined text-primary text-[18px]">verified</span>
+                </div>
+                <div class="my-1">
+                  <div class="font-headline-xl text-headline-xl font-bold text-primary tracking-tight" id="kpi-score">86 / 100</div>
+                  <div class="w-full bg-stone-surface h-1.5 rounded-full mt-2 overflow-hidden">
+                    <div class="bg-primary h-full rounded-full" id="kpi-score-bar" style="width: 86%;"></div>
+                  </div>
+                </div>
+                <div class="flex items-center justify-between pt-1">
+                  <span class="font-body-sm text-body-sm text-on-surface-variant text-[11px]">Idoneidad integral calculada</span>
+                  <span class="font-label-tabular-sm text-label-tabular-sm text-primary font-semibold">+4.2 pts vs distrito</span>
+                </div>
+              </div>
+
+              <!-- KPI 2: Renta Estimada Incasòl -->
+              <div class="bg-surface-container-lowest p-space-md rounded-xl border border-sandstone-border shadow-[0_1px_3px_rgba(27,28,26,0.03)] flex flex-col justify-between">
+                <div class="flex items-center justify-between pb-1">
+                  <span class="font-label-caps text-outline uppercase text-[10px] font-semibold">_renta_estimada (incasòl)</span>
+                  <span class="material-symbols-outlined text-terracotta-accent text-[18px]">real_estate_agent</span>
+                </div>
+                <div class="my-1">
+                  <div class="font-headline-xl text-headline-xl font-bold text-primary tracking-tight" id="kpi-renta">3.850 €/m</div>
+                  <span class="font-label-tabular-sm text-label-tabular-sm text-outline">Rango: 3.600 € - 4.100 €</span>
+                </div>
+                <div class="flex items-center justify-between pt-1">
+                  <span class="font-body-sm text-body-sm text-on-surface-variant text-[11px]">35,00 €/m²/mes</span>
+                  <span class="font-label-tabular-sm text-label-tabular-sm text-secondary font-semibold">BBDD Fianzas BCN</span>
+                </div>
+              </div>
+
+              <!-- KPI 3: Gross Yield -->
+              <div class="bg-surface-container-lowest p-space-md rounded-xl border border-sandstone-border shadow-[0_1px_3px_rgba(27,28,26,0.03)] flex flex-col justify-between">
+                <div class="flex items-center justify-between pb-1">
+                  <span class="font-label-caps text-outline uppercase text-[10px] font-semibold">_gross_yield (bruto)</span>
+                  <span class="material-symbols-outlined text-primary text-[18px]">trending_up</span>
+                </div>
+                <div class="my-1">
+                  <div class="font-headline-xl text-headline-xl font-bold text-charcoal-text tracking-tight" id="kpi-gross-yield">7.22 %</div>
+                  <span class="font-label-tabular-sm text-label-tabular-sm text-outline">Renta anual: 46.200 €</span>
+                </div>
+                <div class="flex items-center justify-between pt-1">
+                  <span class="font-body-sm text-body-sm text-on-surface-variant text-[11px]">Sobre adquisición pura</span>
+                  <span class="font-label-tabular-sm text-label-tabular-sm text-primary font-semibold">TIR 10Y: 8.9%</span>
+                </div>
+              </div>
+
+              <!-- KPI 4: Net Initial Yield -->
+              <div class="bg-surface-container-lowest p-space-md rounded-xl border border-sandstone-border shadow-[0_1px_3px_rgba(27,28,26,0.03)] flex flex-col justify-between">
+                <div class="flex items-center justify-between pb-1">
+                  <span class="font-label-caps text-outline uppercase text-[10px] font-semibold">_net_initial_yield (niy)</span>
+                  <span class="material-symbols-outlined text-emerald-700 text-[18px]">monetization_on</span>
+                </div>
+                <div class="my-1">
+                  <div class="font-headline-xl text-headline-xl font-bold text-primary tracking-tight" id="kpi-niy">5.68 %</div>
+                  <span class="font-label-tabular-sm text-label-tabular-sm text-outline" id="kpi-noi-sub">NOI: 21.312 €/año (c/CapEx)</span>
+                </div>
+                <div class="flex items-center justify-between pt-1">
+                  <span class="font-body-sm text-body-sm text-on-surface-variant text-[11px]">Post-tasas, IBI e ITP</span>
+                  <span class="font-label-tabular-sm text-label-tabular-sm text-primary font-semibold">Spread +210 bps</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 5. CENTRAL TABBED ANALYSIS ENGINE (6 TABS) -->
+            <div class="bg-surface-container-lowest rounded-xl border border-sandstone-border shadow-[0_1px_3px_rgba(27,28,26,0.03)] overflow-hidden flex flex-col min-h-[560px]">
+              
+              <!-- Tab Navigation Bar -->
+              <div class="flex items-center overflow-x-auto bg-stone-surface/40 px-space-md pt-2 gap-1 border-b border-sandstone-border scrollbar-none">
+                <button class="tab-btn active px-3.5 py-2 rounded-t-md font-headline-md text-[13px] font-semibold flex items-center gap-1.5 transition-all bg-surface-container-lowest text-primary border-t-2 border-primary shadow-sm cursor-pointer" id="btn-tab-catastro" onclick="window.cambiarTab('tab-catastro')" type="button">
+                  <span class="material-symbols-outlined text-[16px]">map</span>
+                  <span>_catastro_y_registro</span>
+                </button>
+                <button class="tab-btn px-3.5 py-2 rounded-t-md font-headline-md text-[13px] font-medium flex items-center gap-1.5 transition-all text-on-surface-variant hover:text-primary hover:bg-stone-surface cursor-pointer" id="btn-tab-finanzas" onclick="window.cambiarTab('tab-finanzas')" type="button">
+                  <span class="material-symbols-outlined text-[16px]">account_balance_wallet</span>
+                  <span>_underwriting_&amp;_p&amp;l</span>
+                </button>
+                <button class="tab-btn px-3.5 py-2 rounded-t-md font-headline-md text-[13px] font-medium flex items-center gap-1.5 transition-all text-on-surface-variant hover:text-primary hover:bg-stone-surface cursor-pointer" id="btn-tab-movilidad" onclick="window.cambiarTab('tab-movilidad')" type="button">
+                  <span class="material-symbols-outlined text-[16px]">directions_car</span>
+                  <span>_movilidad_&amp;_parking</span>
+                </button>
+                <button class="tab-btn px-3.5 py-2 rounded-t-md font-headline-md text-[13px] font-medium flex items-center gap-1.5 transition-all text-on-surface-variant hover:text-primary hover:bg-stone-surface cursor-pointer" id="btn-tab-entorno" onclick="window.cambiarTab('tab-entorno')" type="button">
+                  <span class="material-symbols-outlined text-[16px]">storefront</span>
+                  <span>_diagnóstico_entorno</span>
+                </button>
+                <button class="tab-btn px-3.5 py-2 rounded-t-md font-headline-md text-[13px] font-medium flex items-center gap-1.5 transition-all text-on-surface-variant hover:text-primary hover:bg-stone-surface cursor-pointer" id="btn-tab-acustica" onclick="window.cambiarTab('tab-acustica')" type="button">
+                  <span class="material-symbols-outlined text-[16px]">graphic_eq</span>
+                  <span>_peatones_&amp;_acústica</span>
+                </button>
+                <button class="tab-btn px-3.5 py-2 rounded-t-md font-headline-md text-[13px] font-medium flex items-center gap-1.5 transition-all text-on-surface-variant hover:text-primary hover:bg-stone-surface cursor-pointer" id="btn-tab-clima" onclick="window.cambiarTab('tab-clima')" type="button">
+                  <span class="material-symbols-outlined text-[16px]">wb_sunny</span>
+                  <span>_clima_365_días</span>
+                </button>
+              </div>
+
+              <!-- TAB CONTENT CONTAINER -->
+              <div class="p-space-lg flex-1 bg-surface-container-lowest">
+                
+                <!-- TAB 1: CATASTRO Y REGISTRO -->
+                <div class="tab-pane flex flex-col gap-space-lg" id="tab-catastro">
+                  <div class="grid grid-cols-1 lg:grid-cols-12 gap-space-md">
+                    
+                    <!-- Cadastral Attributes & Legal Registry Cards -->
+                    <div class="lg:col-span-5 flex flex-col gap-space-md">
+                      
+                      <!-- Cadastral Identification -->
+                      <div class="p-space-md rounded-lg bg-surface border border-sandstone-border flex flex-col gap-space-sm">
+                        <div class="flex items-center justify-between pb-1 border-b border-sandstone-border/60">
+                          <span class="font-label-caps text-primary uppercase text-[10px] font-bold">_ficha_catastral_oficial</span>
+                          <span class="font-label-tabular-sm text-outline">Sede Electrónica</span>
+                        </div>
+                        <div class="flex flex-col gap-1 bg-stone-surface/40 p-space-sm rounded border border-sandstone-border/60">
+                          <span class="font-label-caps text-outline text-[10px]">Referencia Catastral</span>
+                          <div class="flex items-center justify-between gap-2">
+                            <span class="font-label-tabular text-label-tabular font-bold text-primary tracking-wider" id="val-ref-catastral">08019A014000320001KL</span>
+                            <button class="p-1 rounded hover:bg-stone-surface text-outline hover:text-primary transition-colors cursor-pointer" onclick="window.copiarRefCatastral()" title="Copiar referencia" type="button">
+                              <span class="material-symbols-outlined text-[16px]">content_copy</span>
+                            </button>
+                          </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-space-sm">
+                          <div class="flex flex-col bg-stone-surface/40 p-space-sm rounded border border-sandstone-border/60">
+                            <span class="font-label-caps text-outline text-[10px]">Año Construcción</span>
+                            <span class="font-body-sm text-body-sm font-semibold text-charcoal-text" id="val-ano">1928 (Finca Clásica)</span>
+                          </div>
+                          <div class="flex flex-col bg-stone-surface/40 p-space-sm rounded border border-sandstone-border/60">
+                            <span class="font-label-caps text-outline text-[10px]">Calificación Urbanística</span>
+                            <span class="font-body-sm text-body-sm font-semibold text-charcoal-text">Clave 13b (Eixample)</span>
+                          </div>
+                        </div>
+                        <div class="flex flex-col bg-stone-surface/40 p-space-sm rounded border border-sandstone-border/60">
+                          <span class="font-label-caps text-outline text-[10px]">Municipio y Distrito</span>
+                          <span class="font-body-sm text-body-sm font-semibold text-charcoal-text" id="val-municipio-distrito">Barcelona • L'Eixample - La Dreta de l'Eixample</span>
+                        </div>
+                      </div>
+
+                      <!-- Competent Land Registry Card -->
+                      <div class="p-space-md rounded-lg bg-surface border border-sandstone-border flex flex-col gap-space-sm">
+                        <div class="flex items-center justify-between pb-1 border-b border-sandstone-border/60">
+                          <span class="font-label-caps text-primary uppercase text-[10px] font-bold">_registro_propiedad_competente</span>
+                          <span class="font-label-tabular-sm text-emerald-700 font-semibold">Jurisdicción Validada</span>
+                        </div>
+                        <div class="flex flex-col gap-0.5">
+                          <span class="font-body-md text-body-md font-bold text-charcoal-text" id="val-registro-num">Registro de la Propiedad Nº 14 de Barcelona</span>
+                          <span class="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-1" id="val-registro-sede">
+                            <span class="material-symbols-outlined text-[14px] text-outline">location_on</span>
+                            <span>Carrer de Bergara, 10, 4ª Planta, 08002 Barcelona</span>
+                          </span>
+                          <span class="font-label-tabular-sm text-label-tabular-sm text-secondary flex items-center gap-1 mt-1 font-semibold" id="val-registro-tel">
+                            <span class="material-symbols-outlined text-[14px]">call</span>
+                            <span>+34 933 01 24 55</span>
+                          </span>
+                        </div>
+                        <div class="pt-2 flex items-center justify-between border-t border-sandstone-border/50">
+                          <a class="text-primary hover:text-forest-muted font-body-sm text-body-sm font-semibold flex items-center gap-1 underline underline-offset-2" href="#" onclick="event.preventDefault(); window.mostrarToast('Descargando Nota Simple preliminar...');">
+                            <span class="material-symbols-outlined text-[16px] text-terracotta-accent">file_open</span>
+                            <span>Solicitar Nota Simple Registral</span>
+                          </a>
+                          <span class="font-label-tabular-sm text-label-tabular-sm text-outline">Arancel: 9,02 €</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- 4. VISOR CARTOGRÁFICO INTERACTIVO (LEAFLET.JS) -->
+                    <div class="lg:col-span-7 flex flex-col gap-space-xs">
+                      <div class="flex items-center justify-between px-space-xs">
+                        <div class="flex items-center gap-2">
+                          <span class="font-label-caps text-outline uppercase text-[10px] font-semibold">_visor_cartográfico_icgc_&amp;_osm</span>
+                          <span class="px-1.5 py-0.2 rounded bg-stone-surface font-label-tabular-sm text-label-tabular-sm text-primary font-semibold text-[10px]">Leaflet v1.9.4</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                          <span class="font-label-tabular-sm text-label-tabular-sm text-outline">EPSG:25831 / WGS84</span>
+                        </div>
+                      </div>
+
+                      <!-- Leaflet Dynamic Map Container -->
+                      <div class="relative w-full h-[380px] rounded-lg overflow-hidden border border-sandstone-border" id="map-container">
+                        <div id="leaflet-map" class="w-full h-full min-h-[380px]"></div>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+
+                <!-- TAB 2: UNDERWRITING & P&L -->
+                <div class="tab-pane hidden flex flex-col gap-space-lg" id="tab-finanzas">
+                  <div class="flex items-center justify-between pb-space-xs border-b border-sandstone-border/60">
+                    <div class="flex flex-col">
+                      <span class="font-headline-md text-headline-md font-bold text-primary">_modelo_de_adquisición &amp; P&amp;L 10Y</span>
+                      <span class="font-body-sm text-body-sm text-on-surface-variant">Parámetros indexados a IPC Catalunya + amortización lineal financiera</span>
+                    </div>
+                    <span class="px-2 py-1 rounded bg-stone-surface border border-sandstone-border font-label-tabular-sm text-label-tabular-sm text-primary font-semibold">Moneda: EUR (€)</span>
+                  </div>
+
+                  <div class="grid grid-cols-1 lg:grid-cols-12 gap-space-lg items-start">
+                    <!-- Underwriting Data Table -->
+                    <div class="lg:col-span-8 overflow-x-auto rounded-lg border border-sandstone-border">
+                      <table class="w-full text-left font-body-sm text-body-sm">
+                        <thead>
+                          <tr class="bg-stone-surface/60 text-charcoal-text font-label-caps text-label-caps text-[10px] uppercase border-b border-sandstone-border">
+                            <th class="py-2.5 px-3">Línea de Inversión / Partida Financiera</th>
+                            <th class="py-2.5 px-3 text-right">Métrica / %</th>
+                            <th class="py-2.5 px-3 text-right">Importe (€)</th>
+                          </tr>
+                        </thead>
+                        <tbody class="divide-y divide-sandstone-border/60">
+                          <tr class="bg-surface-container-lowest hover:bg-stone-surface/30 transition-colors">
+                            <td class="py-2 px-3 font-semibold text-charcoal-text">Precio de Compra Pactado</td>
+                            <td class="py-2 px-3 text-right font-label-tabular text-label-tabular text-outline">2.909 €/m²</td>
+                            <td class="py-2 px-3 text-right font-label-tabular text-label-tabular font-bold text-primary" id="row-precio">320.000 €</td>
+                          </tr>
+                          <tr class="bg-surface-container-lowest hover:bg-stone-surface/30 transition-colors">
+                            <td class="py-2 px-3 text-on-surface-variant pl-6">Impuesto Transmisiones Patrimoniales (ITP)</td>
+                            <td class="py-2 px-3 text-right font-label-tabular text-label-tabular text-outline">10,00 %</td>
+                            <td class="py-2 px-3 text-right font-label-tabular text-label-tabular text-charcoal-text" id="row-itp">32.000 €</td>
+                          </tr>
+                          <tr class="bg-surface-container-lowest hover:bg-stone-surface/30 transition-colors">
+                            <td class="py-2 px-3 text-on-surface-variant pl-6">Gastos Transacción (AJD, Notaría, Gestoría)</td>
+                            <td class="py-2 px-3 text-right font-label-tabular text-label-tabular text-outline">1,50 %</td>
+                            <td class="py-2 px-3 text-right font-label-tabular text-label-tabular text-charcoal-text" id="row-ajd">4.800 €</td>
+                          </tr>
+                          <tr class="bg-surface-container-lowest hover:bg-stone-surface/30 transition-colors">
+                            <td class="py-2 px-3 text-on-surface-variant pl-6">Presupuesto CapEx Adecuación Inicial</td>
+                            <td class="py-2 px-3 text-right font-label-tabular text-label-tabular text-outline">168 €/m²</td>
+                            <td class="py-2 px-3 text-right font-label-tabular text-label-tabular text-charcoal-text" id="row-capex">18.500 €</td>
+                          </tr>
+                          <tr class="bg-stone-surface/50 font-semibold text-primary">
+                            <td class="py-2.5 px-3">Total Inversión Inicial Requerida</td>
+                            <td class="py-2.5 px-3 text-right font-label-tabular text-label-tabular">100,00 %</td>
+                            <td class="py-2.5 px-3 text-right font-label-tabular text-label-tabular font-bold text-primary" id="row-inversion-total">375.300 €</td>
+                          </tr>
+                          <tr class="bg-surface-container-lowest hover:bg-stone-surface/30 transition-colors">
+                            <td class="py-2 px-3 font-semibold text-charcoal-text pt-4">Renta Bruta Contractual Estimada (Gross Rent)</td>
+                            <td class="py-2 px-3 text-right font-label-tabular text-label-tabular text-outline pt-4">3.850 €/mes</td>
+                            <td class="py-2 px-3 text-right font-label-tabular text-label-tabular font-bold text-emerald-800 pt-4" id="row-renta-anual">46.200 €</td>
+                          </tr>
+                          <tr class="bg-surface-container-lowest hover:bg-stone-surface/30 transition-colors">
+                            <td class="py-2 px-3 text-error pl-6">(-) Impuesto Bienes Inmuebles (IBI) BCN</td>
+                            <td class="py-2 px-3 text-right font-label-tabular text-label-tabular text-outline">Tipo 0,66%</td>
+                            <td class="py-2 px-3 text-right font-label-tabular text-label-tabular text-error" id="row-ibi">-1.250 €</td>
+                          </tr>
+                          <tr class="bg-surface-container-lowest hover:bg-stone-surface/30 transition-colors">
+                            <td class="py-2 px-3 text-error pl-6">(-) Cuotas Comunidad de Propietarios</td>
+                            <td class="py-2 px-3 text-right font-label-tabular text-label-tabular text-outline">Ordinaria</td>
+                            <td class="py-2 px-3 text-right font-label-tabular text-label-tabular text-error" id="row-comunidad">-1.100 €</td>
+                          </tr>
+                          <tr class="bg-surface-container-lowest hover:bg-stone-surface/30 transition-colors">
+                            <td class="py-2 px-3 text-error pl-6">(-) Seguro Multirriesgo &amp; RC Continente</td>
+                            <td class="py-2 px-3 text-right font-label-tabular text-label-tabular text-outline">Anual</td>
+                            <td class="py-2 px-3 text-right font-label-tabular text-label-tabular text-error" id="row-seguro">-450 €</td>
+                          </tr>
+                          <tr class="bg-surface-container-lowest hover:bg-stone-surface/30 transition-colors">
+                            <td class="py-2 px-3 text-error pl-6">(-) Fondo de Reserva Técnico / Vacancia (2,1%)</td>
+                            <td class="py-2 px-3 text-right font-label-tabular text-label-tabular text-outline">Prudencial</td>
+                            <td class="py-2 px-3 text-right font-label-tabular text-label-tabular text-error" id="row-reserva">-1.000 €</td>
+                          </tr>
+                          <tr class="bg-badge-living-bg font-bold text-primary border-t border-emerald-900/20">
+                            <td class="py-2.5 px-3">Net Operating Income (NOI Neto Anual)</td>
+                            <td class="py-2.5 px-3 text-right font-label-tabular text-label-tabular">Margen: 91,7%</td>
+                            <td class="py-2.5 px-3 text-right font-label-tabular text-label-tabular font-extrabold text-primary" id="row-noi">42.400 €</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+
+                    <!-- Regulatory & Yield Simulation Sidebar Card -->
+                    <div class="lg:col-span-4 flex flex-col gap-space-md">
+                      <div class="p-space-md rounded-lg bg-surface border border-sandstone-border flex flex-col gap-space-xs">
+                        <div class="flex items-center gap-1.5 text-secondary">
+                          <span class="material-symbols-outlined text-[18px]">policy</span>
+                          <span class="font-label-caps uppercase text-[10px] font-bold">_marco_legal_ley_vivienda</span>
+                        </div>
+                        <p class="font-body-sm text-body-sm text-on-surface-variant leading-snug">
+                          Barcelona está calificada formalmente como <strong class="text-charcoal-text">Zona de Mercat Residencial Tensionat</strong>. Si se destina a uso residencial permanente, la renta queda topada por el Índice MIVAU o contrato anterior. La tipología <strong class="text-charcoal-text">Local Comercial (Retail)</strong> goza de libertad de pactos (LAU Terciaria).
+                        </p>
+                      </div>
+
+                      <div class="p-space-md rounded-lg bg-surface border border-sandstone-border flex flex-col gap-space-sm">
+                        <span class="font-label-caps text-primary uppercase text-[10px] font-bold">_ratios_de_retorno</span>
+                        <div class="flex items-center justify-between py-1.5 bg-stone-surface/40 px-2.5 rounded border border-sandstone-border/60">
+                          <span class="font-body-sm text-body-sm text-on-surface-variant">Payback Estimado:</span>
+                          <span class="font-label-tabular text-label-tabular font-bold text-primary" id="box-payback">8.8 años</span>
+                        </div>
+                        <div class="flex items-center justify-between py-1.5 bg-stone-surface/40 px-2.5 rounded border border-sandstone-border/60">
+                          <span class="font-body-sm text-body-sm text-on-surface-variant">Cap Rate sobre Inversión Total:</span>
+                          <span class="font-label-tabular text-label-tabular font-bold text-emerald-800" id="box-cap-rate">11.30 %</span>
+                        </div>
+                        <div class="flex items-center justify-between py-1.5 bg-stone-surface/40 px-2.5 rounded border border-sandstone-border/60">
+                          <span class="font-body-sm text-body-sm text-on-surface-variant">TIR Proyecto Desapalancado (10Y):</span>
+                          <span class="font-label-tabular text-label-tabular font-bold text-secondary" id="box-tir">8.95 %</span>
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+
+                <!-- TAB 3: MOVILIDAD & PARKING -->
+                <div class="tab-pane hidden flex flex-col gap-space-lg" id="tab-movilidad">
+                  <div class="grid grid-cols-1 md:grid-cols-3 gap-space-md">
+                    <div class="p-space-md rounded-lg bg-surface border border-sandstone-border flex flex-col gap-space-xs">
+                      <div class="flex items-center justify-between">
+                        <span class="font-label-caps text-outline uppercase text-[10px] font-semibold">_déficit_estacionamiento</span>
+                        <span class="material-symbols-outlined text-error text-[18px]">no_crash</span>
+                      </div>
+                      <div class="font-headline-lg text-headline-lg font-bold text-error">90 / 100</div>
+                      <span class="font-body-sm text-body-sm text-on-surface-variant">Rotación crítica: cuenca de captación sin plazas libres en radio 300m.</span>
+                    </div>
+                    <div class="p-space-md rounded-lg bg-surface border border-sandstone-border flex flex-col gap-space-xs">
+                      <div class="flex items-center justify-between">
+                        <span class="font-label-caps text-outline uppercase text-[10px] font-semibold">_área_verde_azul_b:sm</span>
+                        <span class="material-symbols-outlined text-secondary text-[18px]">local_parking</span>
+                      </div>
+                      <div class="font-headline-lg text-headline-lg font-bold text-secondary">98 % Ocupación</div>
+                      <span class="font-body-sm text-body-sm text-on-surface-variant">Horas punta 10:00 - 13:30h y 17:00 - 19:30h (Días laborables).</span>
+                    </div>
+                    <div class="p-space-md rounded-lg bg-surface border border-sandstone-border flex flex-col gap-space-xs">
+                      <div class="flex items-center justify-between">
+                        <span class="font-label-caps text-outline uppercase text-[10px] font-semibold">_puntos_recarga_ev</span>
+                        <span class="material-symbols-outlined text-primary text-[18px]">electric_bolt</span>
+                      </div>
+                      <div class="font-headline-lg text-headline-lg font-bold text-primary">6 Hubs Rápidos</div>
+                      <span class="font-body-sm text-body-sm text-on-surface-variant">Red Endesa X y Smou B:SM a menos de 150m (Balmes / Pelai).</span>
+                    </div>
+                  </div>
+
+                  <div class="grid grid-cols-1 lg:grid-cols-2 gap-space-md">
+                    <div class="p-space-md rounded-lg bg-surface border border-sandstone-border flex flex-col gap-space-sm">
+                      <span class="font-label-caps text-primary uppercase text-[10px] font-bold">_flujos_tránsito_parking_subterráneo</span>
+                      <div class="flex flex-col gap-2">
+                        <div class="flex items-center justify-between p-2 rounded bg-stone-surface/40 border border-sandstone-border/60">
+                          <div class="flex flex-col">
+                            <span class="font-body-sm text-body-sm font-semibold text-charcoal-text">Parking Saba Plaça Catalunya (420 plazas)</span>
+                            <span class="font-label-tabular-sm text-label-tabular-sm text-outline">A 240 m a pie • Conexión directa</span>
+                          </div>
+                          <span class="px-2 py-0.5 rounded bg-badge-living-bg text-primary font-label-tabular-sm text-label-tabular-sm font-semibold">Sinergia Alta</span>
+                        </div>
+                        <div class="flex items-center justify-between p-2 rounded bg-stone-surface/40 border border-sandstone-border/60">
+                          <div class="flex flex-col">
+                            <span class="font-body-sm text-body-sm font-semibold text-charcoal-text">Parking B:SM Pelai (195 plazas)</span>
+                            <span class="font-label-tabular-sm text-label-tabular-sm text-outline">A 120 m a pie • Tarificación comercial Smou</span>
+                          </div>
+                          <span class="px-2 py-0.5 rounded bg-badge-living-bg text-primary font-label-tabular-sm text-label-tabular-sm font-semibold">Sinergia Alta</span>
+                        </div>
+                        <div class="flex items-center justify-between p-2 rounded bg-stone-surface/40 border border-sandstone-border/60">
+                          <div class="flex flex-col">
+                            <span class="font-body-sm text-body-sm font-semibold text-charcoal-text">Zona Carga y Descarga (DUM)</span>
+                            <span class="font-label-tabular-sm text-label-tabular-sm text-outline">3 plazas reservadas frente al núm. 16</span>
+                          </div>
+                          <span class="px-2 py-0.5 rounded bg-stone-surface text-charcoal-text font-label-tabular-sm text-label-tabular-sm font-semibold">Logística OK</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="p-space-md rounded-lg bg-surface border border-sandstone-border flex flex-col gap-space-sm">
+                      <span class="font-label-caps text-primary uppercase text-[10px] font-bold">_sensibilidad_meteorológica</span>
+                      <div class="p-space-sm rounded bg-stone-surface/40 border border-sandstone-border/60 flex flex-col gap-2">
+                        <div class="flex items-center justify-between">
+                          <span class="font-body-sm text-body-sm font-medium text-charcoal-text">Afluencia en Días de Lluvia</span>
+                          <span class="font-label-tabular-sm text-label-tabular-sm font-bold text-secondary">+22% vehículos / -18% a pie</span>
+                        </div>
+                        <div class="w-full bg-sandstone-border h-2 rounded-full overflow-hidden">
+                          <div class="bg-secondary h-full rounded-full" style="width: 72%;"></div>
+                        </div>
+                        <span class="font-body-sm text-body-sm text-on-surface-variant text-[11px]">
+                          El eje Balmes-Pelai actúa como embudo distribuidor hacia el centro neurálgico; los vehículos privados saturan los parkings subterráneos en eventos de precipitaciones continuadas.
+                        </span>
+                      </div>
+                      <div class="p-space-sm rounded bg-stone-surface/40 border border-sandstone-border/60 flex items-center justify-between">
+                        <div class="flex flex-col">
+                          <span class="font-body-sm text-body-sm font-semibold text-charcoal-text">Parada Bicing Eléctrico</span>
+                          <span class="font-label-tabular-sm text-label-tabular-sm text-outline">Estación #62 (24 anclajes activos) a 45m</span>
+                        </div>
+                        <span class="font-label-tabular-sm text-label-tabular-sm text-primary font-semibold">Rotación 8.4 usos/día</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- TAB 4: ENTORNO (OCR) -->
+                <div class="tab-pane hidden flex flex-col gap-space-lg" id="tab-entorno">
+                  <div class="grid grid-cols-1 md:grid-cols-3 gap-space-md">
+                    <div class="p-space-md rounded-lg bg-surface border border-sandstone-border flex flex-col gap-1">
+                      <span class="font-label-caps text-outline uppercase text-[10px] font-semibold">_población_flotante</span>
+                      <div class="font-headline-lg text-headline-lg font-bold text-primary">2.8x Residente</div>
+                      <span class="font-body-sm text-body-sm text-on-surface-variant">Alta concentración de oficinas y turistas.</span>
+                    </div>
+                    <div class="p-space-md rounded-lg bg-surface border border-sandstone-border flex flex-col gap-1">
+                      <span class="font-label-caps text-outline uppercase text-[10px] font-semibold">_renta_media_hogar (ine)</span>
+                      <div class="font-headline-lg text-headline-lg font-bold text-emerald-800" id="val-renta-ine">38.450 €</div>
+                      <span class="font-body-sm text-body-sm text-on-surface-variant">Sección censal 0801902008 (+26% vs BCN).</span>
+                    </div>
+                    <div class="p-space-md rounded-lg bg-surface border border-sandstone-border flex flex-col gap-1">
+                      <span class="font-label-caps text-outline uppercase text-[10px] font-semibold">_competencia_directa (150m)</span>
+                      <div class="font-headline-lg text-headline-lg font-bold text-charcoal-text">3 Locales</div>
+                      <span class="font-body-sm text-body-sm text-on-surface-variant">Densidad equilibrada, baja canibalización.</span>
+                    </div>
+                  </div>
+
+                  <!-- Retail OCR Sustainability Table -->
+                  <div class="p-space-md rounded-lg bg-surface border border-sandstone-border flex flex-col gap-space-sm">
+                    <div class="flex items-center justify-between pb-1 border-b border-sandstone-border/60">
+                      <div class="flex flex-col">
+                        <span class="font-headline-md text-headline-md font-bold text-primary">_viabilidad_retail: Modelo OCR (Occupancy Cost Ratio)</span>
+                        <span class="font-body-sm text-body-sm text-on-surface-variant">Cálculo de sostenibilidad de la renta propuesta para el operador comercial</span>
+                      </div>
+                      <span class="px-2 py-1 rounded bg-badge-living-bg text-primary font-label-tabular-sm text-label-tabular-sm font-semibold" id="val-ocr-ratio">OCR Saludable: 12.5%</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-space-sm pt-2">
+                      <div class="bg-stone-surface/40 p-space-sm rounded border border-sandstone-border/60">
+                        <span class="font-label-caps text-outline text-[10px]">Facturación Mensual Req.</span>
+                        <div class="font-headline-md text-headline-md font-bold text-charcoal-text mt-1" id="val-ocr-facturacion">30.800 €</div>
+                        <span class="font-label-tabular-sm text-label-tabular-sm text-outline">Para renta estimada</span>
+                      </div>
+                      <div class="bg-stone-surface/40 p-space-sm rounded border border-sandstone-border/60">
+                        <span class="font-label-caps text-outline text-[10px]">Tickets Diarios Requeridos</span>
+                        <div class="font-headline-md text-headline-md font-bold text-primary mt-1" id="val-ocr-tickets">410 tickets/día</div>
+                        <span class="font-label-tabular-sm text-label-tabular-sm text-outline">A ticket medio 2.50 €</span>
+                      </div>
+                      <div class="bg-stone-surface/40 p-space-sm rounded border border-sandstone-border/60">
+                        <span class="font-label-caps text-outline text-[10px]">Tasa de Captura Peatonal</span>
+                        <div class="font-headline-md text-headline-md font-bold text-emerald-800 mt-1" id="val-ocr-captura">3.2 %</div>
+                        <span class="font-label-tabular-sm text-label-tabular-sm text-outline">Sobre flujo horario pico</span>
+                      </div>
+                      <div class="bg-stone-surface/40 p-space-sm rounded border border-sandstone-border/60">
+                        <span class="font-label-caps text-outline text-[10px]">Umbral de Riesgo Impago</span>
+                        <div class="font-headline-md text-headline-md font-bold text-emerald-800 mt-1" id="val-ocr-riesgo">Bajo (1.4/10)</div>
+                        <span class="font-label-tabular-sm text-label-tabular-sm text-outline">Margen operador amplio</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- TAB 5: PEATONES & ACÚSTICA -->
+                <div class="tab-pane hidden flex flex-col gap-space-lg" id="tab-acustica">
+                  <div class="grid grid-cols-1 lg:grid-cols-12 gap-space-md">
+                    <!-- Pedestrian Count & Terrace Feasibility -->
+                    <div class="lg:col-span-5 flex flex-col gap-space-md">
+                      <div class="p-space-md rounded-lg bg-surface border border-sandstone-border flex flex-col gap-space-sm">
+                        <span class="font-label-caps text-outline uppercase text-[10px] font-semibold">_aforo_peatonal_estimado</span>
+                        <div class="font-headline-xl text-headline-xl font-bold text-primary" id="val-viandantes">420 viandantes / hora</div>
+                        <span class="font-body-sm text-body-sm text-on-surface-variant">
+                          Medición consolidada promedio día laborable (Eje Carrer de Balmes con Pelai). Picos de 680 viandantes/h a las 14:00h y 19:00h.
+                        </span>
+                      </div>
+
+                      <!-- Sidewalk Terrace Status Badge -->
+                      <div class="p-space-md rounded-lg bg-surface border border-sandstone-border flex flex-col gap-space-xs">
+                        <span class="font-label-caps text-primary uppercase text-[10px] font-bold">_ordenanza_municipal_de_terrazas</span>
+                        <div class="p-space-sm rounded bg-stone-surface/40 border border-sandstone-border/60 flex items-start gap-2" id="val-terraza">
+                          <span class="material-symbols-outlined text-primary text-[20px] flex-shrink-0">check_circle</span>
+                          <div class="flex flex-col">
+                            <span class="font-body-sm text-body-sm font-bold text-primary">Viabilidad Alta</span>
+                            <span class="font-body-sm text-body-sm text-on-surface-variant text-[11px] leading-snug">
+                              Acera &gt; 4.5 m de anchura total. Ancho libre de paso peatonal garantizado &gt; 2.0 m según exigencias del Distrito Eixample.
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Acoustic Facade Decibel Meters -->
+                    <div class="lg:col-span-7 p-space-md rounded-lg bg-surface border border-sandstone-border flex flex-col gap-space-sm">
+                      <div class="flex items-center justify-between pb-1 border-b border-sandstone-border/60">
+                        <span class="font-label-caps text-primary uppercase text-[10px] font-bold">_mapa_acústico_bcn</span>
+                        <span class="font-label-tabular-sm text-label-tabular-sm text-outline">Unidad: dBA Leq</span>
+                      </div>
+
+                      <div class="flex flex-col gap-space-sm">
+                        <!-- Metric 1: Vianants_Ld -->
+                        <div class="bg-stone-surface/40 p-space-sm rounded border border-sandstone-border/60 flex flex-col gap-1">
+                          <div class="flex items-center justify-between">
+                            <span class="font-body-sm text-body-sm font-semibold text-charcoal-text">Ruido Peatonal Diurno (Vianants_Ld)</span>
+                            <span class="font-label-tabular text-label-tabular font-bold text-secondary" id="val-ruido-vianants-ld">62 dBA</span>
+                          </div>
+                          <div class="w-full bg-sandstone-border h-2 rounded-full overflow-hidden">
+                            <div class="bg-secondary h-full rounded-full" id="bar-ruido-vianants-ld" style="width: 62%;"></div>
+                          </div>
+                          <span class="font-label-tabular-sm text-label-tabular-sm text-outline text-[10px]">Nivel confortable para terrazas y actividad comercial diurna.</span>
+                        </div>
+
+                        <!-- Metric 2: Vianants_Le -->
+                        <div class="bg-stone-surface/40 p-space-sm rounded border border-sandstone-border/60 flex flex-col gap-1">
+                          <div class="flex items-center justify-between">
+                            <span class="font-body-sm text-body-sm font-semibold text-charcoal-text">Ruido Tarde / Atardecer (Vianants_Le)</span>
+                            <span class="font-label-tabular text-label-tabular font-bold text-secondary" id="val-ruido-vianants-le">59 dBA</span>
+                          </div>
+                          <div class="w-full bg-sandstone-border h-2 rounded-full overflow-hidden">
+                            <div class="bg-secondary h-full rounded-full" id="bar-ruido-vianants-le" style="width: 59%;"></div>
+                          </div>
+                        </div>
+
+                        <!-- Metric 3: Oci_Ln -->
+                        <div class="bg-stone-surface/40 p-space-sm rounded border border-sandstone-border/60 flex flex-col gap-1">
+                          <div class="flex items-center justify-between">
+                            <span class="font-body-sm text-body-sm font-semibold text-charcoal-text">Ocio Nocturno (Oci_Ln - 23h a 07h)</span>
+                            <span class="font-label-tabular text-label-tabular font-bold text-emerald-800" id="val-ruido-oci-ln">48 dBA</span>
+                          </div>
+                          <div class="w-full bg-sandstone-border h-2 rounded-full overflow-hidden">
+                            <div class="bg-emerald-700 h-full rounded-full" id="bar-ruido-oci-ln" style="width: 48%;"></div>
+                          </div>
+                          <span class="font-label-tabular-sm text-label-tabular-sm text-outline text-[10px]">Cumple ZATHN (Zona Acústicamente Tensionada en Horario Nocturno).</span>
+                        </div>
+
+                        <!-- Metric 4: Transit_Ld -->
+                        <div class="bg-stone-surface/40 p-space-sm rounded border border-sandstone-border/60 flex flex-col gap-1">
+                          <div class="flex items-center justify-between">
+                            <span class="font-body-sm text-body-sm font-semibold text-charcoal-text">Tráfico Rodado Diurno (Transit_Ld)</span>
+                            <span class="font-label-tabular text-label-tabular font-bold text-secondary" id="val-ruido-transit-ld">66 dBA</span>
+                          </div>
+                          <div class="w-full bg-sandstone-border h-2 rounded-full overflow-hidden">
+                            <div class="bg-secondary h-full rounded-full" id="bar-ruido-transit-ld" style="width: 66%;"></div>
+                          </div>
+                          <span class="font-label-tabular-sm text-label-tabular-sm text-outline text-[10px]">Requiere carpintería técnica con aislamiento mín. 35 dB en caso residencial.</span>
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+
+                <!-- TAB 6: CLIMA 365 DÍAS -->
+                <div class="tab-pane hidden flex flex-col gap-space-lg" id="tab-clima">
+                  <div class="flex items-center justify-between pb-space-xs border-b border-sandstone-border/60">
+                    <div class="flex flex-col">
+                      <span class="font-headline-md text-headline-md font-bold text-primary">_auditoría_climática_trailing_365 (Open-Meteo &amp; Meteocat)</span>
+                      <span class="font-body-sm text-body-sm text-on-surface-variant">Incidencia directa sobre demanda energética, confort térmico y afluencia física</span>
+                    </div>
+                    <span class="px-2 py-1 rounded bg-stone-surface border border-sandstone-border font-label-tabular-sm text-label-tabular-sm text-charcoal-text font-semibold">Serie Real Anual</span>
+                  </div>
+
+                  <!-- 6 Tarjetas de Clima 365 Días -->
+                  <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-space-sm">
+                    <div class="p-space-sm rounded bg-surface border border-sandstone-border flex flex-col gap-1 text-center">
+                      <span class="font-label-caps text-outline uppercase text-[10px] font-semibold">Días con Lluvia</span>
+                      <span class="font-headline-lg text-headline-lg font-bold text-secondary" id="clima-dias-lluvia">52 días</span>
+                      <span class="font-label-tabular-sm text-label-tabular-sm text-outline">&gt; 1 mm / 24h</span>
+                    </div>
+                    <div class="p-space-sm rounded bg-surface border border-sandstone-border flex flex-col gap-1 text-center">
+                      <span class="font-label-caps text-outline uppercase text-[10px] font-semibold">Precipitación</span>
+                      <span class="font-headline-lg text-headline-lg font-bold text-secondary" id="clima-precipitacion">485 mm</span>
+                      <span class="font-label-tabular-sm text-label-tabular-sm text-outline">Año acumulado</span>
+                    </div>
+                    <div class="p-space-sm rounded bg-surface border border-sandstone-border flex flex-col gap-1 text-center">
+                      <span class="font-label-caps text-outline uppercase text-[10px] font-semibold">Ola de Calor</span>
+                      <span class="font-headline-lg text-headline-lg font-bold text-terracotta-accent" id="clima-ola-calor">38 días</span>
+                      <span class="font-label-tabular-sm text-label-tabular-sm text-outline">Tmax &gt; 32 °C</span>
+                    </div>
+                    <div class="p-space-sm rounded bg-surface border border-sandstone-border flex flex-col gap-1 text-center">
+                      <span class="font-label-caps text-outline uppercase text-[10px] font-semibold">Noches Tropicales</span>
+                      <span class="font-headline-lg text-headline-lg font-bold text-terracotta-accent" id="clima-noches-tropicales">74 noches</span>
+                      <span class="font-label-tabular-sm text-label-tabular-sm text-outline">Tmin &gt; 20 °C</span>
+                    </div>
+                    <div class="p-space-sm rounded bg-surface border border-sandstone-border flex flex-col gap-1 text-center">
+                      <span class="font-label-caps text-outline uppercase text-[10px] font-semibold">Grados Calefacción</span>
+                      <span class="font-headline-lg text-headline-lg font-bold text-primary" id="clima-hdd">840 HDD</span>
+                      <span class="font-label-tabular-sm text-label-tabular-sm text-outline">Base 18 °C</span>
+                    </div>
+                    <div class="p-space-sm rounded bg-surface border border-sandstone-border flex flex-col gap-1 text-center">
+                      <span class="font-label-caps text-outline uppercase text-[10px] font-semibold">Grados Refrigeración</span>
+                      <span class="font-headline-lg text-headline-lg font-bold text-primary" id="clima-cdd">495 CDD</span>
+                      <span class="font-label-tabular-sm text-label-tabular-sm text-outline">Base 21 °C</span>
+                    </div>
+                  </div>
+
+                  <!-- Climatic Impact on Commercial Yield and HVAC Demand -->
+                  <div class="p-space-md rounded-lg bg-surface border border-sandstone-border flex flex-col gap-space-sm">
+                    <span class="font-label-caps text-primary uppercase text-[10px] font-bold">_resiliencia_climática_&amp;_capex</span>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-space-md">
+                      <div class="bg-stone-surface/40 p-space-sm rounded border border-sandstone-border/60 flex flex-col gap-1">
+                        <span class="font-body-sm text-body-sm font-semibold text-charcoal-text">Demanda Estacional Climatización (HVAC)</span>
+                        <p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+                          El inmueble presenta una alta demanda de refrigeración entre junio y septiembre debida al efecto isla de calor urbana. Se presupuesta un coste operacional eléctrico de <strong class="text-charcoal-text">1.820 €/año</strong> (consumo medio 92 kWh/m²/año).
+                        </p>
+                      </div>
+                      <div class="bg-stone-surface/40 p-space-sm rounded border border-sandstone-border/60 flex flex-col gap-1">
+                        <span class="font-body-sm text-body-sm font-semibold text-charcoal-text">Efecto Lluvia sobre Tráfico Peatonal Comercial</span>
+                        <p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+                          Con únicamente 52 días de precipitación efectiva al año, la exposición exterior y terrazas del emplazamiento cuentan con una operatividad continua del <strong class="text-charcoal-text">85,7% de las jornadas anuales</strong>, maximizando la rentabilidad comercial.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- 6. BOTTOM INSTITUTIONAL EXPORT & QUICK SELECTOR DOCK -->
+            <div class="bg-surface-container-lowest rounded-xl p-space-md border border-sandstone-border shadow-[0_1px_3px_rgba(27,28,26,0.03)] flex flex-col sm:flex-row items-center justify-between gap-space-md">
+              <!-- Mode Dossier Selector -->
+              <div class="flex items-center gap-space-sm w-full sm:w-auto">
+                <span class="font-label-caps text-outline uppercase text-[10px] whitespace-nowrap font-semibold">_modo_informe:</span>
+                <div class="inline-flex rounded-lg bg-stone-surface p-0.5 border border-sandstone-border/60">
+                  <button class="px-2.5 py-1 rounded-md font-label-tabular-sm text-label-tabular-sm font-semibold bg-surface-container-lowest text-primary shadow-sm transition-colors cursor-pointer" id="btn-mode-onepager" onclick="window.cambiarModoInforme('onepager')" type="button">One-Pager</button>
+                  <button class="px-2.5 py-1 rounded-md font-label-tabular-sm text-label-tabular-sm font-medium text-charcoal-text hover:text-primary transition-colors cursor-pointer" id="btn-mode-estandar" onclick="window.cambiarModoInforme('estandar')" type="button">Estándar (2p)</button>
+                  <button class="px-2.5 py-1 rounded-md font-label-tabular-sm text-label-tabular-sm font-medium text-charcoal-text hover:text-primary transition-colors cursor-pointer" id="btn-mode-completo" onclick="window.cambiarModoInforme('completo')" type="button">Dossier Full</button>
+                </div>
+              </div>
+
+              <!-- Download & Export Actions -->
+              <div class="flex items-center gap-space-sm w-full sm:w-auto justify-end">
+                <button class="h-8 px-3 rounded bg-surface hover:bg-stone-surface text-charcoal-text border border-sandstone-border font-body-sm text-body-sm font-semibold flex items-center gap-1.5 transition-colors shadow-sm cursor-pointer" id="btn-descargar-excel" onclick="window.descargarExcel()" type="button">
+                  <span class="material-symbols-outlined text-primary text-[16px]">table_view</span>
+                  <span>Descargar Modelo (.xlsx)</span>
+                </button>
+                <button class="h-8 px-3 rounded bg-primary text-on-primary hover:bg-forest-muted font-body-sm text-body-sm font-semibold flex items-center gap-1.5 transition-colors shadow-sm cursor-pointer" id="btn-descargar-pdf" onclick="window.descargarPDF()" type="button">
+                  <span class="material-symbols-outlined text-[16px]">picture_as_pdf</span>
+                  <span>Imprimir Dossier (PDF)</span>
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Inline fallback logic for UI navigation before copilot.js loads -->
+        <script>
+          (function() {
+            // Toast notification helper
+            window.mostrarToast = function(mensaje) {
+              var toast = document.getElementById('action-toast');
+              var txt = document.getElementById('toast-text');
+              if (!toast || !txt) return;
+              txt.textContent = mensaje;
+              toast.classList.remove('translate-y-20', 'opacity-0');
+              toast.classList.add('translate-y-0', 'opacity-100');
+              setTimeout(function() {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+              }, 3000);
+            };
+
+            // Tab switching engine
+            window.cambiarTab = function(tabId) {
+              var panes = document.querySelectorAll('.tab-pane');
+              panes.forEach(function(pane) {
+                pane.classList.add('hidden');
+              });
+              var activePane = document.getElementById(tabId);
+              if (activePane) {
+                activePane.classList.remove('hidden');
+              }
+
+              var tabBtns = document.querySelectorAll('.tab-btn');
+              tabBtns.forEach(function(btn) {
+                btn.classList.remove('bg-surface-container-lowest', 'text-primary', 'border-t-2', 'border-primary', 'shadow-sm', 'font-semibold');
+                btn.classList.add('text-on-surface-variant', 'font-medium');
+              });
+
+              var activeBtn = document.getElementById('btn-' + tabId);
+              if (activeBtn) {
+                activeBtn.classList.remove('text-on-surface-variant', 'font-medium');
+                activeBtn.classList.add('bg-surface-container-lowest', 'text-primary', 'border-t-2', 'border-primary', 'shadow-sm', 'font-semibold');
+              }
+            };
+
+            // Isochrone button toggle
+            window.cambiarIsocrona = function(minutos) {
+              var btns = [5, 10, 15];
+              btns.forEach(function(m) {
+                var b = document.getElementById('iso-' + m);
+                if (!b) return;
+                if (m === minutos) {
+                  b.classList.remove('bg-surface', 'text-charcoal-text');
+                  b.classList.add('bg-primary', 'text-on-primary');
+                } else {
+                  b.classList.remove('bg-primary', 'text-on-primary');
+                  b.classList.add('bg-surface', 'text-charcoal-text');
+                }
+              });
+              window.mostrarToast('Isócrona fijada a ' + minutos + ' min a pie');
+            };
+
+            // Copy Cadastral Reference
+            window.copiarRefCatastral = function() {
+              var refEl = document.getElementById('val-ref-catastral');
+              var ref = refEl ? refEl.textContent : '';
+              if (navigator.clipboard && ref) {
+                navigator.clipboard.writeText(ref).then(function() {
+                  window.mostrarToast('Referencia ' + ref + ' copiada al portapapeles');
+                });
+              } else {
+                window.mostrarToast('Referencia copiada al portapapeles');
+              }
+            };
+
+            // Mode dossier switcher
+            window.cambiarModoInforme = function(modo) {
+              var modos = ['onepager', 'estandar', 'completo'];
+              modos.forEach(function(m) {
+                var el = document.getElementById('btn-mode-' + m);
+                if (!el) return;
+                if (m === modo) {
+                  el.classList.remove('text-charcoal-text', 'font-medium');
+                  el.classList.add('bg-surface-container-lowest', 'text-primary', 'font-semibold', 'shadow-sm');
+                } else {
+                  el.classList.remove('bg-surface-container-lowest', 'text-primary', 'font-semibold', 'shadow-sm');
+                  el.classList.add('text-charcoal-text', 'font-medium');
+                }
+              });
+              window.mostrarToast('Modo de informe fijado: ' + modo.toUpperCase());
+            };
+
+            // Download Actions
+            window.descargarExcel = function() {
+              window.mostrarToast('Generando modelo de flujos de caja DCF (.xlsx)...');
+            };
+
+            window.descargarPDF = function() {
+              window.mostrarToast('Compilando dossier ejecutivo en PDF...');
+              setTimeout(function() {
+                window.print();
+              }, 600);
+            };
+          })();
+        </script>
+
+        <!-- Conexión con motor asíncrono copilot.js -->
+        <script src="/static/js/copilot.js"></script>
+
+      </div>
+    </main>
+  </div>
+</body>
+</html>
