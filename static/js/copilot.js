@@ -16,10 +16,10 @@
   // ==========================================
   // ESTADO GLOBAL Y VARIABLES DE MÓDULO
   // ==========================================
-  // URL base dinámica: local si ejecutas en localhost, o la URL de Render en producción
-  const API_BASE_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+  // URL base oficial del servicio en Render.com
+  const API_BASE_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname.endsWith('onrender.com'))
     ? '' 
-    : (window.RENDER_API_URL || (window.location.hostname.endsWith('onrender.com') || window.location.hostname.endsWith('hf.space') ? '' : 'https://bcn-location-copilot.onrender.com'));
+    : 'https://bcn-location-api.onrender.com';
 
   let map = null;
   let assetLayerGroup = null;
