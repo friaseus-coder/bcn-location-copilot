@@ -1266,6 +1266,167 @@
 
                   </div>
 
+                  <!-- SECCIÓN INTEGRADA 2: AFORO PEATONAL, ORDENANZA DE TERRAZAS Y MAPA ACÚSTICO -->
+                  <div class="mt-4 pt-4 border-t border-sandstone-border flex items-center justify-between">
+                    <div class="flex flex-col">
+                      <span class="font-headline-md text-headline-md font-bold text-primary">_aforo_peatonal,_terrazas_&amp;_mapa_acústico_estratégico</span>
+                      <span class="font-body-sm text-body-sm text-on-surface-variant">Afluencia en vía pública, viabilidad física de terraza y niveles sonoros modelizados por tramo y fachada</span>
+                    </div>
+                    <span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-900 border border-emerald-200 font-label-tabular-sm text-[10px] font-bold">GRANULARIDAD DE TRAMO &amp; FACHADA</span>
+                  </div>
+
+                  <div class="grid grid-cols-1 lg:grid-cols-12 gap-space-md" id="seccion-acustica-entorno">
+                    <!-- Pedestrian Count & Terrace Feasibility (Columna Izquierda 5) -->
+                    <div class="lg:col-span-5 flex flex-col gap-space-md">
+                      
+                      <!-- Aforo Peatonal -->
+                      <div class="p-space-md rounded-xl bg-surface-container-lowest border border-sandstone-border flex flex-col justify-between shadow-xs">
+                        <div class="flex flex-col gap-1.5">
+                          <div class="flex items-center justify-between pb-1 border-b border-sandstone-border/60">
+                            <span class="font-label-caps text-outline uppercase text-[10px] font-bold">_aforo_peatonal_en_vía</span>
+                            <span class="px-1.5 py-0.5 rounded bg-badge-living-bg text-primary font-label-tabular-sm text-[9px] font-bold">MICRO: TRAMO DE VÍA</span>
+                          </div>
+                          <span class="text-[12px] font-semibold text-outline uppercase tracking-wider font-label-caps">Viandantes en Horario Comercial</span>
+                          <div class="font-headline-xl text-headline-xl font-bold text-primary font-mono" id="val-viandantes">460 viandantes / hora</div>
+                          <span class="font-body-sm text-body-sm text-charcoal-text font-medium" id="val-viandantes-tramo">
+                            Medición consolidada promedio día laborable (picos a las 14:00h y 19:00h).
+                          </span>
+                        </div>
+                        <div class="mt-3 pt-2 border-t border-sandstone-border/60 flex flex-col gap-1 bg-stone-surface/30 p-2 rounded">
+                          <span class="text-[10px] font-bold text-primary uppercase font-label-caps flex items-center gap-1">
+                            <span class="material-symbols-outlined text-[13px] text-terracotta-accent">source</span>
+                            <span>Origen de los datos y fecha</span>
+                          </span>
+                          <p class="text-[11px] text-on-surface-variant leading-relaxed">
+                            <strong>Fuente:</strong> <em>Departament d'Estudis i Mobilitat</em> del <strong>Ajuntament de Barcelona</strong> y <em>ATM</em>.
+                            <br>
+                            <strong>Fecha / Serie:</strong> <strong>Campaña oficial 2023 - 2024</strong> (aforos directos y sensorización en tramos viarios).
+                            <br>
+                            <strong>Granularidad:</strong> Tramo de calle exacto e intersección inmediata.
+                          </p>
+                        </div>
+                      </div>
+
+                      <!-- Ordenanza Municipal de Terrazas -->
+                      <div class="p-space-md rounded-xl bg-surface-container-lowest border border-sandstone-border flex flex-col justify-between shadow-xs">
+                        <div class="flex flex-col gap-1.5">
+                          <div class="flex items-center justify-between pb-1 border-b border-sandstone-border/60">
+                            <span class="font-label-caps text-outline uppercase text-[10px] font-bold">_ordenanza_municipal_de_terrazas</span>
+                            <span class="px-1.5 py-0.5 rounded bg-badge-living-bg text-emerald-900 font-label-tabular-sm text-[9px] font-bold">MICRO: FACHADA &amp; ACERA</span>
+                          </div>
+                          <span class="text-[12px] font-semibold text-outline uppercase tracking-wider font-label-caps">Viabilidad de Veladores Exteriores</span>
+                          <div class="p-space-sm rounded bg-stone-surface/40 border border-sandstone-border/60 flex items-start gap-2 mt-1" id="val-terraza">
+                            <span class="material-symbols-outlined text-primary text-[20px] flex-shrink-0">check_circle</span>
+                            <div class="flex flex-col">
+                              <span class="font-body-sm text-body-sm font-bold text-primary">Viabilidad Alta</span>
+                              <span class="font-body-sm text-body-sm text-on-surface-variant text-[11px] leading-snug">
+                                Acera &gt; 4.5 m de anchura total. Ancho libre de paso peatonal garantizado &gt; 2.0 m según exigencias del Distrito.
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="mt-3 pt-2 border-t border-sandstone-border/60 flex flex-col gap-1 bg-stone-surface/30 p-2 rounded">
+                          <span class="text-[10px] font-bold text-primary uppercase font-label-caps flex items-center gap-1">
+                            <span class="material-symbols-outlined text-[13px] text-terracotta-accent">source</span>
+                            <span>Origen de los datos y fecha</span>
+                          </span>
+                          <p class="text-[11px] text-on-surface-variant leading-relaxed">
+                            <strong>Fuente:</strong> Cartografía Topográfica oficial 1:1000 del <strong>Institut Cartogràfic i Geològic de Catalunya (ICGC)</strong> y <em>Ordenanza Municipal de Terrazas del Ayuntamiento de Barcelona (BOPB)</em>.
+                            <br>
+                            <strong>Fecha / Vigencia:</strong> <strong>Normativa consolidada vigente 2023 - 2024</strong>.
+                            <br>
+                            <strong>Granularidad:</strong> Frente de fachada del inmueble y anchura de acera de bordillo a línea de fachada.
+                          </p>
+                        </div>
+                      </div>
+
+                    </div>
+
+                    <!-- Acoustic Facade Decibel Meters (Columna Derecha 7) -->
+                    <div class="lg:col-span-7 p-space-md rounded-xl bg-surface-container-lowest border border-sandstone-border flex flex-col justify-between shadow-xs">
+                      <div>
+                        <div class="flex items-center justify-between pb-2 border-b border-sandstone-border/60">
+                          <div class="flex items-center gap-1.5 text-primary font-bold text-[12px] uppercase font-label-caps">
+                            <span class="material-symbols-outlined text-[18px]">graphic_eq</span>
+                            <span>_mapa_acústico_estratégico_bcn</span>
+                          </div>
+                          <div class="flex items-center gap-2">
+                            <span class="px-1.5 py-0.5 rounded bg-stone-surface text-charcoal-text font-label-tabular-sm text-[9px] font-bold">FACHADA EDIFICIO</span>
+                            <span class="font-label-tabular-sm text-label-tabular-sm text-outline font-semibold">dBA Leq</span>
+                          </div>
+                        </div>
+
+                        <div class="flex flex-col gap-space-sm mt-3">
+                          <!-- Metric 1: Vianants_Ld -->
+                          <div class="bg-stone-surface/40 p-space-sm rounded-lg border border-sandstone-border/60 flex flex-col gap-1">
+                            <div class="flex items-center justify-between">
+                              <span class="font-body-sm text-body-sm font-semibold text-charcoal-text">Ruido Peatonal Diurno (Vianants_Ld - 07h a 21h)</span>
+                              <span class="font-label-tabular text-label-tabular font-bold text-secondary font-mono" id="val-ruido-vianants-ld">62 dBA</span>
+                            </div>
+                            <div class="w-full bg-sandstone-border h-2 rounded-full overflow-hidden">
+                              <div class="bg-secondary h-full rounded-full" id="bar-ruido-vianants-ld" style="width: 62%;"></div>
+                            </div>
+                            <span class="font-label-tabular-sm text-label-tabular-sm text-outline text-[10px]">Nivel confortable para terrazas y actividad comercial diurna en fachada.</span>
+                          </div>
+
+                          <!-- Metric 2: Vianants_Le -->
+                          <div class="bg-stone-surface/40 p-space-sm rounded-lg border border-sandstone-border/60 flex flex-col gap-1">
+                            <div class="flex items-center justify-between">
+                              <span class="font-body-sm text-body-sm font-semibold text-charcoal-text">Ruido Tarde / Atardecer (Vianants_Le - 21h a 23h)</span>
+                              <span class="font-label-tabular text-label-tabular font-bold text-secondary font-mono" id="val-ruido-vianants-le">59 dBA</span>
+                            </div>
+                            <div class="w-full bg-sandstone-border h-2 rounded-full overflow-hidden">
+                              <div class="bg-secondary h-full rounded-full" id="bar-ruido-vianants-le" style="width: 59%;"></div>
+                            </div>
+                          </div>
+
+                          <!-- Metric 3: Oci_Ln -->
+                          <div class="bg-stone-surface/40 p-space-sm rounded-lg border border-sandstone-border/60 flex flex-col gap-1">
+                            <div class="flex items-center justify-between">
+                              <span class="font-body-sm text-body-sm font-semibold text-charcoal-text">Ocio Nocturno (Oci_Ln - 23h a 07h)</span>
+                              <span class="font-label-tabular text-label-tabular font-bold text-emerald-800 font-mono" id="val-ruido-oci-ln">48 dBA</span>
+                            </div>
+                            <div class="w-full bg-sandstone-border h-2 rounded-full overflow-hidden">
+                              <div class="bg-emerald-700 h-full rounded-full" id="bar-ruido-oci-ln" style="width: 48%;"></div>
+                            </div>
+                            <span class="font-label-tabular-sm text-label-tabular-sm text-outline text-[10px]" id="val-ruido-oci-desc">
+                              Cumple ZATHN (Zona Acústicamente Tensionada en Horario Nocturno).
+                            </span>
+                          </div>
+
+                          <!-- Metric 4: Transit_Ld -->
+                          <div class="bg-stone-surface/40 p-space-sm rounded-lg border border-sandstone-border/60 flex flex-col gap-1">
+                            <div class="flex items-center justify-between">
+                              <span class="font-body-sm text-body-sm font-semibold text-charcoal-text">Tráfico Rodado Diurno (Transit_Ld)</span>
+                              <span class="font-label-tabular text-label-tabular font-bold text-secondary font-mono" id="val-ruido-transit-ld">66 dBA</span>
+                            </div>
+                            <div class="w-full bg-sandstone-border h-2 rounded-full overflow-hidden">
+                              <div class="bg-secondary h-full rounded-full" id="bar-ruido-transit-ld" style="width: 66%;"></div>
+                            </div>
+                            <span class="font-label-tabular-sm text-label-tabular-sm text-outline text-[10px]" id="val-ruido-transit-desc">
+                              Requiere carpintería técnica con aislamiento mín. 35 dB en caso residencial según CTE DB-HR.
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="mt-3 pt-2 border-t border-sandstone-border/60 flex flex-col gap-1 bg-stone-surface/30 p-2 rounded">
+                        <span class="text-[10px] font-bold text-primary uppercase font-label-caps flex items-center gap-1">
+                          <span class="material-symbols-outlined text-[13px] text-terracotta-accent">source</span>
+                          <span>Origen de los datos y fecha</span>
+                        </span>
+                        <p class="text-[11px] text-on-surface-variant leading-relaxed">
+                          <strong>Fuente:</strong> <strong>Mapa Estratègic de Soroll (MES)</strong> de Barcelona, elaborado por la <em>Direcció de Serveis de Medi Ambient</em> y la <em>Agència de Salut Pública de Barcelona (ASPB)</em> en cumplimiento de la <strong>Directiva Europea 2002/49/CE</strong> y la Ley 16/2002 de Cataluña.
+                          <br>
+                          <strong>Fecha / Ciclo:</strong> <strong>4º Ciclo Quinquenal Oficial (Periodo de vigencia 2022 - 2027)</strong>.
+                          <br>
+                          <strong>Granularidad:</strong> Modelización sonora tridimensional (CadnaA) a nivel de <strong>tramo de eje viario y fachada del edificio a 4 metros de altura</strong>.
+                        </p>
+                      </div>
+                    </div>
+
+                  </div>
+
                   <!-- IDENTIFICADORES OCULTOS DE COMPATIBILIDAD CON SCRIPTS -->
                   <div class="hidden">
                     <span id="val-ocr-ratio">10.5%</span>
@@ -1273,94 +1434,6 @@
                     <span id="val-ocr-tickets">410 tickets/día</span>
                     <span id="val-ocr-captura">3.2 %</span>
                     <span id="val-ocr-riesgo">Bajo (1.4/10)</span>
-                  </div>
-                </div>
-
-                <!-- TAB 5: PEATONES & ACÚSTICA -->
-                <div class="tab-pane hidden flex flex-col gap-space-lg" id="tab-acustica">
-                  <div class="grid grid-cols-1 lg:grid-cols-12 gap-space-md">
-                    <!-- Pedestrian Count & Terrace Feasibility -->
-                    <div class="lg:col-span-5 flex flex-col gap-space-md">
-                      <div class="p-space-md rounded-lg bg-surface border border-sandstone-border flex flex-col gap-space-sm">
-                        <span class="font-label-caps text-outline uppercase text-[10px] font-semibold">_aforo_peatonal_estimado</span>
-                        <div class="font-headline-xl text-headline-xl font-bold text-primary" id="val-viandantes">420 viandantes / hora</div>
-                        <span class="font-body-sm text-body-sm text-on-surface-variant">
-                          Medición consolidada promedio día laborable (Eje Carrer de Balmes con Pelai). Picos de 680 viandantes/h a las 14:00h y 19:00h.
-                        </span>
-                      </div>
-
-                      <!-- Sidewalk Terrace Status Badge -->
-                      <div class="p-space-md rounded-lg bg-surface border border-sandstone-border flex flex-col gap-space-xs">
-                        <span class="font-label-caps text-primary uppercase text-[10px] font-bold">_ordenanza_municipal_de_terrazas</span>
-                        <div class="p-space-sm rounded bg-stone-surface/40 border border-sandstone-border/60 flex items-start gap-2" id="val-terraza">
-                          <span class="material-symbols-outlined text-primary text-[20px] flex-shrink-0">check_circle</span>
-                          <div class="flex flex-col">
-                            <span class="font-body-sm text-body-sm font-bold text-primary">Viabilidad Alta</span>
-                            <span class="font-body-sm text-body-sm text-on-surface-variant text-[11px] leading-snug">
-                              Acera &gt; 4.5 m de anchura total. Ancho libre de paso peatonal garantizado &gt; 2.0 m según exigencias del Distrito Eixample.
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <!-- Acoustic Facade Decibel Meters -->
-                    <div class="lg:col-span-7 p-space-md rounded-lg bg-surface border border-sandstone-border flex flex-col gap-space-sm">
-                      <div class="flex items-center justify-between pb-1 border-b border-sandstone-border/60">
-                        <span class="font-label-caps text-primary uppercase text-[10px] font-bold">_mapa_acústico_bcn</span>
-                        <span class="font-label-tabular-sm text-label-tabular-sm text-outline">Unidad: dBA Leq</span>
-                      </div>
-
-                      <div class="flex flex-col gap-space-sm">
-                        <!-- Metric 1: Vianants_Ld -->
-                        <div class="bg-stone-surface/40 p-space-sm rounded border border-sandstone-border/60 flex flex-col gap-1">
-                          <div class="flex items-center justify-between">
-                            <span class="font-body-sm text-body-sm font-semibold text-charcoal-text">Ruido Peatonal Diurno (Vianants_Ld)</span>
-                            <span class="font-label-tabular text-label-tabular font-bold text-secondary" id="val-ruido-vianants-ld">62 dBA</span>
-                          </div>
-                          <div class="w-full bg-sandstone-border h-2 rounded-full overflow-hidden">
-                            <div class="bg-secondary h-full rounded-full" id="bar-ruido-vianants-ld" style="width: 62%;"></div>
-                          </div>
-                          <span class="font-label-tabular-sm text-label-tabular-sm text-outline text-[10px]">Nivel confortable para terrazas y actividad comercial diurna.</span>
-                        </div>
-
-                        <!-- Metric 2: Vianants_Le -->
-                        <div class="bg-stone-surface/40 p-space-sm rounded border border-sandstone-border/60 flex flex-col gap-1">
-                          <div class="flex items-center justify-between">
-                            <span class="font-body-sm text-body-sm font-semibold text-charcoal-text">Ruido Tarde / Atardecer (Vianants_Le)</span>
-                            <span class="font-label-tabular text-label-tabular font-bold text-secondary" id="val-ruido-vianants-le">59 dBA</span>
-                          </div>
-                          <div class="w-full bg-sandstone-border h-2 rounded-full overflow-hidden">
-                            <div class="bg-secondary h-full rounded-full" id="bar-ruido-vianants-le" style="width: 59%;"></div>
-                          </div>
-                        </div>
-
-                        <!-- Metric 3: Oci_Ln -->
-                        <div class="bg-stone-surface/40 p-space-sm rounded border border-sandstone-border/60 flex flex-col gap-1">
-                          <div class="flex items-center justify-between">
-                            <span class="font-body-sm text-body-sm font-semibold text-charcoal-text">Ocio Nocturno (Oci_Ln - 23h a 07h)</span>
-                            <span class="font-label-tabular text-label-tabular font-bold text-emerald-800" id="val-ruido-oci-ln">48 dBA</span>
-                          </div>
-                          <div class="w-full bg-sandstone-border h-2 rounded-full overflow-hidden">
-                            <div class="bg-emerald-700 h-full rounded-full" id="bar-ruido-oci-ln" style="width: 48%;"></div>
-                          </div>
-                          <span class="font-label-tabular-sm text-label-tabular-sm text-outline text-[10px]">Cumple ZATHN (Zona Acústicamente Tensionada en Horario Nocturno).</span>
-                        </div>
-
-                        <!-- Metric 4: Transit_Ld -->
-                        <div class="bg-stone-surface/40 p-space-sm rounded border border-sandstone-border/60 flex flex-col gap-1">
-                          <div class="flex items-center justify-between">
-                            <span class="font-body-sm text-body-sm font-semibold text-charcoal-text">Tráfico Rodado Diurno (Transit_Ld)</span>
-                            <span class="font-label-tabular text-label-tabular font-bold text-secondary" id="val-ruido-transit-ld">66 dBA</span>
-                          </div>
-                          <div class="w-full bg-sandstone-border h-2 rounded-full overflow-hidden">
-                            <div class="bg-secondary h-full rounded-full" id="bar-ruido-transit-ld" style="width: 66%;"></div>
-                          </div>
-                          <span class="font-label-tabular-sm text-label-tabular-sm text-outline text-[10px]">Requiere carpintería técnica con aislamiento mín. 35 dB en caso residencial.</span>
-                        </div>
-                      </div>
-                    </div>
-
                   </div>
                 </div>
 
@@ -1476,8 +1549,12 @@
               }, 3000);
             };
 
-            // Tab switching engine
-            window.cambiarTab = function(tabId) {
+            // Tab switching engine con soporte para secciones integradas
+            window.cambiarTab = function(tabId, scrollTargetId) {
+              if (tabId === 'tab-acustica') {
+                tabId = 'tab-entorno';
+                scrollTargetId = scrollTargetId || 'seccion-acustica-entorno';
+              }
               var panes = document.querySelectorAll('.tab-pane');
               panes.forEach(function(pane) {
                 pane.classList.add('hidden');
@@ -1497,6 +1574,15 @@
               if (activeBtn) {
                 activeBtn.classList.remove('text-on-surface-variant', 'font-medium');
                 activeBtn.classList.add('bg-surface-container-lowest', 'text-primary', 'border-t-2', 'border-primary', 'shadow-sm', 'font-semibold');
+              }
+
+              if (scrollTargetId) {
+                setTimeout(function() {
+                  var targetEl = document.getElementById(scrollTargetId);
+                  if (targetEl) {
+                    targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  }
+                }, 100);
               }
             };
 

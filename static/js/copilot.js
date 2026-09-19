@@ -586,21 +586,28 @@
       setText('val-ocr-ratio', `OCR Objetivo: ${ocr.ratio_saludable}`);
     }
 
-    // G. Acústica & Viandantes
+    // G. Acústica & Viandantes (Micro-granularidad de tramo y fachada)
     if (acustica.viandantes_hora) {
       setText('val-viandantes', `${formatInt.format(acustica.viandantes_hora)} viandantes / hora`);
+    }
+    if (acustica.viandantes_tramo) {
+      setText('val-viandantes-tramo', acustica.viandantes_tramo);
+    }
+    if (acustica.viandantes_fuente) {
+      setText('val-viandantes-fuente', acustica.viandantes_fuente);
     }
     if (acustica.apto_terraza !== undefined) {
       const elTerraza = document.getElementById('val-terraza');
       if (elTerraza) {
         const esApto = acustica.apto_terraza;
+        const statusTexto = acustica.terraza_status || (esApto ? 'Viabilidad Alta' : 'Restricción de Terraza');
         elTerraza.innerHTML = `
           <span class="material-symbols-outlined ${esApto ? 'text-primary' : 'text-error'} text-[20px] flex-shrink-0">
             ${esApto ? 'check_circle' : 'cancel'}
           </span>
           <div class="flex flex-col">
             <span class="font-body-sm text-body-sm font-bold ${esApto ? 'text-primary' : 'text-error'}">
-              ${esApto ? 'Viabilidad Alta' : 'Restricción de Terraza'}
+              ${statusTexto}
             </span>
             <span class="font-body-sm text-body-sm text-on-surface-variant text-[11px] leading-snug">
               ${acustica.terraza_detalle || (esApto ? 'Acera > 4.5 m de anchura total. Ancho libre garantizado.' : 'Anchura de acera o ZATHN restringe veladores.')}
@@ -609,8 +616,11 @@
         `;
       }
     }
+    if (acustica.terraza_fuente) {
+      setText('val-terraza-fuente', acustica.terraza_fuente);
+    }
 
-    // Barras de Ruido dBA
+    // Barras de Ruido dBA y Diagnóstico ZATHN / Fachada
     const dbaVianLd = ruido.vianants_ld || 62;
     setText('val-ruido-vianants-ld', `${dbaVianLd} dBA`);
     setBarWidth('bar-ruido-vianants-ld', dbaVianLd);
@@ -622,10 +632,19 @@
     const dbaOciLn = ruido.oci_ln || 48;
     setText('val-ruido-oci-ln', `${dbaOciLn} dBA`);
     setBarWidth('bar-ruido-oci-ln', dbaOciLn);
+    if (ruido.oci_desc) {
+      setText('val-ruido-oci-desc', ruido.oci_desc);
+    }
 
     const dbaTransit = ruido.transit_ld || 66;
     setText('val-ruido-transit-ld', `${dbaTransit} dBA`);
     setBarWidth('bar-ruido-transit-ld', dbaTransit);
+    if (ruido.transit_desc) {
+      setText('val-ruido-transit-desc', ruido.transit_desc);
+    }
+    if (ruido.fuente) {
+      setText('val-ruido-fuente', ruido.fuente);
+    }
 
     // 6 Tarjetas de Clima 365 días
     if (clima.dias_lluvia !== undefined) setText('clima-dias-lluvia', `${clima.dias_lluvia} días`);
