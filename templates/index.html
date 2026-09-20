@@ -174,341 +174,40 @@
 
       <!-- 3. BARRA DE BÚSQUEDA MULTIDATO PROVINCIAL (ERGONÓMICA) -->
       <div class="relative flex items-center gap-2 flex-1 max-w-3xl">
-        <!-- Municipio Selector -->
-        <div class="relative min-w-[150px] max-w-[190px]">
-          <select id="select-municipio" class="w-full h-9 pl-2.5 pr-7 rounded bg-surface border border-sandstone-border font-body-sm text-body-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary appearance-none cursor-pointer truncate">
-            <option value="Abrera">Abrera</option>
-            <option value="Aguilar de Segarra">Aguilar de Segarra</option>
-            <option value="Aiguafreda">Aiguafreda</option>
-            <option value="Alella">Alella</option>
-            <option value="Alpens">Alpens</option>
-            <option value="Arenys de Mar">Arenys de Mar</option>
-            <option value="Arenys de Munt">Arenys de Munt</option>
-            <option value="Argençola">Argençola</option>
-            <option value="Argentona">Argentona</option>
-            <option value="Artés">Artés</option>
-            <option value="Avià">Avià</option>
-            <option value="Avinyó">Avinyó</option>
-            <option value="Avinyonet del Penedès">Avinyonet del Penedès</option>
-            <option value="Badalona">Badalona</option>
-            <option value="Badia del Vallès">Badia del Vallès</option>
-            <option value="Bagà">Bagà</option>
-            <option value="Balenyà">Balenyà</option>
-            <option value="Balsareny">Balsareny</option>
-            <option value="Barberà del Vallès">Barberà del Vallès</option>
-            <option value="Barcelona" selected>Barcelona</option>
-            <option value="Begues">Begues</option>
-            <option value="Bellprat">Bellprat</option>
-            <option value="Berga">Berga</option>
-            <option value="Bigues i Riells del Fai">Bigues i Riells del Fai</option>
-            <option value="Borredà">Borredà</option>
-            <option value="Cabrera d'Anoia">Cabrera d'Anoia</option>
-            <option value="Cabrera de Mar">Cabrera de Mar</option>
-            <option value="Cabrils">Cabrils</option>
-            <option value="Calaf">Calaf</option>
-            <option value="Calders">Calders</option>
-            <option value="Caldes d'Estrac">Caldes d'Estrac</option>
-            <option value="Caldes de Montbui">Caldes de Montbui</option>
-            <option value="Calella">Calella</option>
-            <option value="Calldetenes">Calldetenes</option>
-            <option value="Callús">Callús</option>
-            <option value="Calonge de Segarra">Calonge de Segarra</option>
-            <option value="Campins">Campins</option>
-            <option value="Canet de Mar">Canet de Mar</option>
-            <option value="Canovelles">Canovelles</option>
-            <option value="Cànoves i Samalús">Cànoves i Samalús</option>
-            <option value="Canyelles">Canyelles</option>
-            <option value="Capellades">Capellades</option>
-            <option value="Capolat">Capolat</option>
-            <option value="Cardedeu">Cardedeu</option>
-            <option value="Cardona">Cardona</option>
-            <option value="Carme">Carme</option>
-            <option value="Casserres">Casserres</option>
-            <option value="Castell de l'Areny">Castell de l'Areny</option>
-            <option value="Castellar de n'Hug">Castellar de n'Hug</option>
-            <option value="Castellar del Riu">Castellar del Riu</option>
-            <option value="Castellar del Vallès">Castellar del Vallès</option>
-            <option value="Castellbell i el Vilar">Castellbell i el Vilar</option>
-            <option value="Castellbisbal">Castellbisbal</option>
-            <option value="Castellcir">Castellcir</option>
-            <option value="Castelldefels">Castelldefels</option>
-            <option value="Castellet i la Gornal">Castellet i la Gornal</option>
-            <option value="Castellfollit de Riubregós">Castellfollit de Riubregós</option>
-            <option value="Castellfollit del Boix">Castellfollit del Boix</option>
-            <option value="Castellgalí">Castellgalí</option>
-            <option value="Castellnou de Bages">Castellnou de Bages</option>
-            <option value="Castellolí">Castellolí</option>
-            <option value="Castellterçol">Castellterçol</option>
-            <option value="Castellví de la Marca">Castellví de la Marca</option>
-            <option value="Castellví de Rosanes">Castellví de Rosanes</option>
-            <option value="Centelles">Centelles</option>
-            <option value="Cercs">Cercs</option>
-            <option value="Cerdanyola del Vallès">Cerdanyola del Vallès</option>
-            <option value="Cervelló">Cervelló</option>
-            <option value="Collbató">Collbató</option>
-            <option value="Collsuspina">Collsuspina</option>
-            <option value="Copons">Copons</option>
-            <option value="Corbera de Llobregat">Corbera de Llobregat</option>
-            <option value="Cornellà de Llobregat">Cornellà de Llobregat</option>
-            <option value="Cubelles">Cubelles</option>
-            <option value="Dosrius">Dosrius</option>
-            <option value="El Bruc">El Bruc</option>
-            <option value="El Brull">El Brull</option>
-            <option value="El Masnou">El Masnou</option>
-            <option value="El Papiol">El Papiol</option>
-            <option value="El Pla del Penedès">El Pla del Penedès</option>
-            <option value="El Pont de Vilomara i Rocafort">El Pont de Vilomara i Rocafort</option>
-            <option value="El Prat de Llobregat">El Prat de Llobregat</option>
-            <option value="Els Hostalets de Pierola">Els Hostalets de Pierola</option>
-            <option value="Els Prats de Rei">Els Prats de Rei</option>
-            <option value="Esparreguera">Esparreguera</option>
-            <option value="Esplugues de Llobregat">Esplugues de Llobregat</option>
-            <option value="Figaró-Montmany">Figaró-Montmany</option>
-            <option value="Fígols">Fígols</option>
-            <option value="Fogars de la Selva">Fogars de la Selva</option>
-            <option value="Fogars de Montclús">Fogars de Montclús</option>
-            <option value="Folgueroles">Folgueroles</option>
-            <option value="Fonollosa">Fonollosa</option>
-            <option value="Font-rubí">Font-rubí</option>
-            <option value="Gaià">Gaià</option>
-            <option value="Gallifa">Gallifa</option>
-            <option value="Gavà">Gavà</option>
-            <option value="Gelida">Gelida</option>
-            <option value="Gironella">Gironella</option>
-            <option value="Gisclareny">Gisclareny</option>
-            <option value="Granera">Granera</option>
-            <option value="Granollers">Granollers</option>
-            <option value="Gualba">Gualba</option>
-            <option value="Guardiola de Berguedà">Guardiola de Berguedà</option>
-            <option value="Gurb">Gurb</option>
-            <option value="Igualada">Igualada</option>
-            <option value="Jorba">Jorba</option>
-            <option value="L'Ametlla del Vallès">L'Ametlla del Vallès</option>
-            <option value="L'Espunyola">L'Espunyola</option>
-            <option value="L'Esquirol">L'Esquirol</option>
-            <option value="L'Estany">L'Estany</option>
-            <option value="L'Hospitalet de Llobregat">L'Hospitalet de Llobregat</option>
-            <option value="La Garriga">La Garriga</option>
-            <option value="La Granada">La Granada</option>
-            <option value="La Llacuna">La Llacuna</option>
-            <option value="La Llagosta">La Llagosta</option>
-            <option value="La Nou de Berguedà">La Nou de Berguedà</option>
-            <option value="La Palma de Cervelló">La Palma de Cervelló</option>
-            <option value="La Pobla de Claramunt">La Pobla de Claramunt</option>
-            <option value="La Pobla de Lillet">La Pobla de Lillet</option>
-            <option value="La Quar">La Quar</option>
-            <option value="La Roca del Vallès">La Roca del Vallès</option>
-            <option value="La Torre de Claramunt">La Torre de Claramunt</option>
-            <option value="Les Cabanyes">Les Cabanyes</option>
-            <option value="Les Franqueses del Vallès">Les Franqueses del Vallès</option>
-            <option value="Les Masies de Roda">Les Masies de Roda</option>
-            <option value="Les Masies de Voltregà">Les Masies de Voltregà</option>
-            <option value="Lliçà d'Amunt">Lliçà d'Amunt</option>
-            <option value="Lliçà de Vall">Lliçà de Vall</option>
-            <option value="Llinars del Vallès">Llinars del Vallès</option>
-            <option value="Lluçà">Lluçà</option>
-            <option value="Malgrat de Mar">Malgrat de Mar</option>
-            <option value="Malla">Malla</option>
-            <option value="Manlleu">Manlleu</option>
-            <option value="Manresa">Manresa</option>
-            <option value="Marganell">Marganell</option>
-            <option value="Martorell">Martorell</option>
-            <option value="Martorelles">Martorelles</option>
-            <option value="Masquefa">Masquefa</option>
-            <option value="Matadepera">Matadepera</option>
-            <option value="Mataró">Mataró</option>
-            <option value="Mediona">Mediona</option>
-            <option value="Moià">Moià</option>
-            <option value="Molins de Rei">Molins de Rei</option>
-            <option value="Mollet del Vallès">Mollet del Vallès</option>
-            <option value="Monistrol de Calders">Monistrol de Calders</option>
-            <option value="Monistrol de Montserrat">Monistrol de Montserrat</option>
-            <option value="Montcada i Reixac">Montcada i Reixac</option>
-            <option value="Montclar">Montclar</option>
-            <option value="Montesquiu">Montesquiu</option>
-            <option value="Montgat">Montgat</option>
-            <option value="Montmajor">Montmajor</option>
-            <option value="Montmaneu">Montmaneu</option>
-            <option value="Montmeló">Montmeló</option>
-            <option value="Montornès del Vallès">Montornès del Vallès</option>
-            <option value="Montseny">Montseny</option>
-            <option value="Muntanyola">Muntanyola</option>
-            <option value="Mura">Mura</option>
-            <option value="Navarcles">Navarcles</option>
-            <option value="Navàs">Navàs</option>
-            <option value="Òdena">Òdena</option>
-            <option value="Olèrdola">Olèrdola</option>
-            <option value="Olesa de Bonesvalls">Olesa de Bonesvalls</option>
-            <option value="Olesa de Montserrat">Olesa de Montserrat</option>
-            <option value="Olivella">Olivella</option>
-            <option value="Olost">Olost</option>
-            <option value="Olvan">Olvan</option>
-            <option value="Orís">Orís</option>
-            <option value="Oristà">Oristà</option>
-            <option value="Orpí">Orpí</option>
-            <option value="Òrrius">Òrrius</option>
-            <option value="Pacs del Penedès">Pacs del Penedès</option>
-            <option value="Palafolls">Palafolls</option>
-            <option value="Palau-solità i Plegamans">Palau-solità i Plegamans</option>
-            <option value="Pallejà">Pallejà</option>
-            <option value="Parets del Vallès">Parets del Vallès</option>
-            <option value="Perafita">Perafita</option>
-            <option value="Piera">Piera</option>
-            <option value="Pineda de Mar">Pineda de Mar</option>
-            <option value="Polinyà">Polinyà</option>
-            <option value="Pontons">Pontons</option>
-            <option value="Prats de Lluçanès">Prats de Lluçanès</option>
-            <option value="Premià de Dalt">Premià de Dalt</option>
-            <option value="Premià de Mar">Premià de Mar</option>
-            <option value="Puig-reig">Puig-reig</option>
-            <option value="Puigdàlber">Puigdàlber</option>
-            <option value="Pujalt">Pujalt</option>
-            <option value="Rajadell">Rajadell</option>
-            <option value="Rellinars">Rellinars</option>
-            <option value="Ripollet">Ripollet</option>
-            <option value="Roda de Ter">Roda de Ter</option>
-            <option value="Rubí">Rubí</option>
-            <option value="Rubió">Rubió</option>
-            <option value="Rupit i Pruit">Rupit i Pruit</option>
-            <option value="Sabadell">Sabadell</option>
-            <option value="Sagàs">Sagàs</option>
-            <option value="Saldes">Saldes</option>
-            <option value="Sallent">Sallent</option>
-            <option value="Sant Adrià de Besòs">Sant Adrià de Besòs</option>
-            <option value="Sant Agustí de Lluçanès">Sant Agustí de Lluçanès</option>
-            <option value="Sant Andreu de la Barca">Sant Andreu de la Barca</option>
-            <option value="Sant Andreu de Llavaneres">Sant Andreu de Llavaneres</option>
-            <option value="Sant Antoni de Vilamajor">Sant Antoni de Vilamajor</option>
-            <option value="Sant Bartomeu del Grau">Sant Bartomeu del Grau</option>
-            <option value="Sant Boi de Llobregat">Sant Boi de Llobregat</option>
-            <option value="Sant Boi de Lluçanès">Sant Boi de Lluçanès</option>
-            <option value="Sant Cebrià de Vallalta">Sant Cebrià de Vallalta</option>
-            <option value="Sant Celoni">Sant Celoni</option>
-            <option value="Sant Climent de Llobregat">Sant Climent de Llobregat</option>
-            <option value="Sant Cugat del Vallès">Sant Cugat del Vallès</option>
-            <option value="Sant Cugat Sesgarrigues">Sant Cugat Sesgarrigues</option>
-            <option value="Sant Esteve de Palautordera">Sant Esteve de Palautordera</option>
-            <option value="Sant Esteve Sesrovires">Sant Esteve Sesrovires</option>
-            <option value="Sant Feliu de Codines">Sant Feliu de Codines</option>
-            <option value="Sant Feliu de Llobregat">Sant Feliu de Llobregat</option>
-            <option value="Sant Feliu Sasserra">Sant Feliu Sasserra</option>
-            <option value="Sant Fost de Campsentelles">Sant Fost de Campsentelles</option>
-            <option value="Sant Fruitós de Bages">Sant Fruitós de Bages</option>
-            <option value="Sant Hipòlit de Voltregà">Sant Hipòlit de Voltregà</option>
-            <option value="Sant Iscle de Vallalta">Sant Iscle de Vallalta</option>
-            <option value="Sant Jaume de Frontanyà">Sant Jaume de Frontanyà</option>
-            <option value="Sant Joan de Vilatorrada">Sant Joan de Vilatorrada</option>
-            <option value="Sant Joan Despí">Sant Joan Despí</option>
-            <option value="Sant Julià de Cerdanyola">Sant Julià de Cerdanyola</option>
-            <option value="Sant Julià de Vilatorta">Sant Julià de Vilatorta</option>
-            <option value="Sant Just Desvern">Sant Just Desvern</option>
-            <option value="Sant Llorenç d'Hortons">Sant Llorenç d'Hortons</option>
-            <option value="Sant Llorenç Savall">Sant Llorenç Savall</option>
-            <option value="Sant Martí d'Albars">Sant Martí d'Albars</option>
-            <option value="Sant Martí de Centelles">Sant Martí de Centelles</option>
-            <option value="Sant Martí de Tous">Sant Martí de Tous</option>
-            <option value="Sant Martí Sarroca">Sant Martí Sarroca</option>
-            <option value="Sant Martí Sesgueioles">Sant Martí Sesgueioles</option>
-            <option value="Sant Mateu de Bages">Sant Mateu de Bages</option>
-            <option value="Sant Pere de Ribes">Sant Pere de Ribes</option>
-            <option value="Sant Pere de Riudebitlles">Sant Pere de Riudebitlles</option>
-            <option value="Sant Pere de Torelló">Sant Pere de Torelló</option>
-            <option value="Sant Pere de Vilamajor">Sant Pere de Vilamajor</option>
-            <option value="Sant Pere Sallavinera">Sant Pere Sallavinera</option>
-            <option value="Sant Pol de Mar">Sant Pol de Mar</option>
-            <option value="Sant Quintí de Mediona">Sant Quintí de Mediona</option>
-            <option value="Sant Quirze de Besora">Sant Quirze de Besora</option>
-            <option value="Sant Quirze del Vallès">Sant Quirze del Vallès</option>
-            <option value="Sant Quirze Safaja">Sant Quirze Safaja</option>
-            <option value="Sant Sadurní d'Anoia">Sant Sadurní d'Anoia</option>
-            <option value="Sant Sadurní d'Osormort">Sant Sadurní d'Osormort</option>
-            <option value="Sant Salvador de Guardiola">Sant Salvador de Guardiola</option>
-            <option value="Sant Vicenç de Castellet">Sant Vicenç de Castellet</option>
-            <option value="Sant Vicenç de Montalt">Sant Vicenç de Montalt</option>
-            <option value="Sant Vicenç de Torelló">Sant Vicenç de Torelló</option>
-            <option value="Sant Vicenç dels Horts">Sant Vicenç dels Horts</option>
-            <option value="Santa Cecília de Voltregà">Santa Cecília de Voltregà</option>
-            <option value="Santa Coloma de Cervelló">Santa Coloma de Cervelló</option>
-            <option value="Santa Coloma de Gramenet">Santa Coloma de Gramenet</option>
-            <option value="Santa Eugènia de Berga">Santa Eugènia de Berga</option>
-            <option value="Santa Eulàlia de Riuprimer">Santa Eulàlia de Riuprimer</option>
-            <option value="Santa Eulàlia de Ronçana">Santa Eulàlia de Ronçana</option>
-            <option value="Santa Fe del Penedès">Santa Fe del Penedès</option>
-            <option value="Santa Margarida de Montbui">Santa Margarida de Montbui</option>
-            <option value="Santa Margarida i els Monjos">Santa Margarida i els Monjos</option>
-            <option value="Santa Maria d'Oló">Santa Maria d'Oló</option>
-            <option value="Santa Maria de Besora">Santa Maria de Besora</option>
-            <option value="Santa Maria de Martorelles">Santa Maria de Martorelles</option>
-            <option value="Santa Maria de Merlès">Santa Maria de Merlès</option>
-            <option value="Santa Maria de Miralles">Santa Maria de Miralles</option>
-            <option value="Santa Maria de Palautordera">Santa Maria de Palautordera</option>
-            <option value="Santa Perpètua de Mogoda">Santa Perpètua de Mogoda</option>
-            <option value="Santa Susanna">Santa Susanna</option>
-            <option value="Santpedor">Santpedor</option>
-            <option value="Sentmenat">Sentmenat</option>
-            <option value="Seva">Seva</option>
-            <option value="Sitges">Sitges</option>
-            <option value="Sobremunt">Sobremunt</option>
-            <option value="Sora">Sora</option>
-            <option value="Subirats">Subirats</option>
-            <option value="Súria">Súria</option>
-            <option value="Tagamanent">Tagamanent</option>
-            <option value="Talamanca">Talamanca</option>
-            <option value="Taradell">Taradell</option>
-            <option value="Tavèrnoles">Tavèrnoles</option>
-            <option value="Tavertet">Tavertet</option>
-            <option value="Teià">Teià</option>
-            <option value="Terrassa">Terrassa</option>
-            <option value="Tiana">Tiana</option>
-            <option value="Tona">Tona</option>
-            <option value="Tordera">Tordera</option>
-            <option value="Torelló">Torelló</option>
-            <option value="Torrelavit">Torrelavit</option>
-            <option value="Torrelles de Foix">Torrelles de Foix</option>
-            <option value="Torrelles de Llobregat">Torrelles de Llobregat</option>
-            <option value="Ullastrell">Ullastrell</option>
-            <option value="Vacarisses">Vacarisses</option>
-            <option value="Vallbona d'Anoia">Vallbona d'Anoia</option>
-            <option value="Vallcebre">Vallcebre</option>
-            <option value="Vallgorguina">Vallgorguina</option>
-            <option value="Vallirana">Vallirana</option>
-            <option value="Vallromanes">Vallromanes</option>
-            <option value="Veciana">Veciana</option>
-            <option value="Vic">Vic</option>
-            <option value="Vilada">Vilada</option>
-            <option value="Viladecans">Viladecans</option>
-            <option value="Viladecavalls">Viladecavalls</option>
-            <option value="Vilafranca del Penedès">Vilafranca del Penedès</option>
-            <option value="Vilalba Sasserra">Vilalba Sasserra</option>
-            <option value="Vilanova de Sau">Vilanova de Sau</option>
-            <option value="Vilanova del Camí">Vilanova del Camí</option>
-            <option value="Vilanova del Vallès">Vilanova del Vallès</option>
-            <option value="Vilanova i la Geltrú">Vilanova i la Geltrú</option>
-            <option value="Vilassar de Dalt">Vilassar de Dalt</option>
-            <option value="Vilassar de Mar">Vilassar de Mar</option>
-            <option value="Vilobí del Penedès">Vilobí del Penedès</option>
-            <option value="Viver i Serrateix">Viver i Serrateix</option>
-          </select>
-          <span class="material-symbols-outlined absolute right-1.5 top-1/2 -translate-y-1/2 pointer-events-none text-outline text-[16px]">expand_more</span>
+        <!-- Municipio Selector con Autocompletado Predictivo -->
+        <div class="relative min-w-[150px] max-w-[185px]">
+          <span class="material-symbols-outlined absolute left-2 top-1/2 -translate-y-1/2 text-outline text-[16px] pointer-events-none">location_city</span>
+          <input id="input-municipio" type="text" autocomplete="off" value="Barcelona" placeholder="Municipio..." 
+            class="w-full h-9 pl-7 pr-6 rounded bg-surface border border-sandstone-border font-body-sm text-body-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all font-semibold"
+            title="Escriba para buscar municipio de la provincia (ej. Barcelona, Badalona, Sabadell, Mataró...)" onfocus="this.select()" />
+          <input type="hidden" id="select-municipio" value="Barcelona" />
+          <span id="btn-toggle-municipios" class="material-symbols-outlined absolute right-1.5 top-1/2 -translate-y-1/2 text-outline text-[16px] cursor-pointer hover:text-charcoal-text">expand_more</span>
+          <!-- Dropdown Sugerencias Municipios -->
+          <div id="sugerencias-municipios" class="hidden absolute top-full left-0 right-0 mt-1 max-h-64 overflow-y-auto bg-surface-container-lowest border border-sandstone-border rounded-lg shadow-xl z-50 divide-y divide-sandstone-border/60">
+          </div>
         </div>
 
-        <!-- Input Calle (Nombre de la vía) -->
+        <!-- Input Calle (Nombre de la vía) con Selección Total al Marcar -->
         <div class="relative flex-1 min-w-[160px]">
           <span class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-outline text-[16px]">location_searching</span>
-          <input class="w-full h-9 pl-8 pr-2 rounded bg-surface border border-sandstone-border font-body-sm text-body-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" id="input-calle" autocomplete="off" placeholder="Calle / Vía (ej. Balmes)" type="text" value="Carrer de Balmes"/>
+          <input class="w-full h-9 pl-8 pr-2 rounded bg-surface border border-sandstone-border font-body-sm text-body-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" id="input-calle" autocomplete="off" placeholder="Calle / Vía (ej. Balmes)" type="text" value="Carrer de Balmes" onfocus="this.select()" />
           <!-- Sugerencias Vías (Contenedor Flotante Oculto para API ICGC Pelias) -->
           <div class="hidden absolute top-full left-0 right-0 mt-1 max-h-60 overflow-y-auto bg-surface-container-lowest border border-sandstone-border rounded-lg shadow-xl z-50 divide-y divide-sandstone-border/60" id="sugerencias-vias">
           </div>
         </div>
 
-        <!-- Input Número de policía (Ancho fijo ~80px) -->
-        <div class="w-[80px] flex-shrink-0">
-          <input class="w-full h-9 px-2 text-center rounded bg-surface border border-sandstone-border font-body-sm text-body-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" id="input-numero" max="9999" min="1" placeholder="Nº" type="number" value="12"/>
+        <!-- Input Número de policía con Validación en Catastro OVC -->
+        <div class="relative w-[85px] flex-shrink-0">
+          <input class="w-full h-9 pl-2 pr-6 text-center rounded bg-surface border border-sandstone-border font-body-sm text-body-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary font-bold" id="input-numero" max="9999" min="1" placeholder="Nº" type="text" value="12" autocomplete="off" onfocus="this.select()" />
+          <span id="badge-catastro-numero" class="material-symbols-outlined absolute right-1.5 top-1/2 -translate-y-1/2 text-[15px] text-emerald-600 transition-colors pointer-events-none" title="Validado con Sede Electrónica de Catastro">verified</span>
+          <!-- Dropdown Sugerencias Números Reales de Catastro -->
+          <div id="sugerencias-numeros-catastro" class="hidden absolute top-full left-0 w-52 mt-1 max-h-52 overflow-y-auto bg-surface-container-lowest border border-sandstone-border rounded-lg shadow-xl z-50 p-2 text-xs">
+          </div>
         </div>
 
-        <!-- Selector Desplegable Planta / Piso / Local disponible -->
-        <div class="relative min-w-[130px] max-w-[160px] flex-shrink-0">
-          <select id="input-piso" class="w-full h-9 pl-2.5 pr-7 rounded bg-surface border border-sandstone-border font-body-sm text-body-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary appearance-none cursor-pointer truncate">
+        <!-- Selector Desplegable Entidades Registrales (Ordenado estrictamente desde los Bajos) -->
+        <div class="relative min-w-[145px] max-w-[185px] flex-shrink-0 group">
+          <select id="input-piso" class="w-full h-9 pl-2.5 pr-7 rounded bg-surface border border-sandstone-border font-body-sm text-body-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary appearance-none cursor-pointer truncate font-medium" title="Entidades registrales de Catastro (organizadas desde los Bajos)">
             <option value="Bajos / Local">Planta Baja (Local)</option>
             <option value="Entresuelo">Entresuelo</option>
             <option value="Principal" selected>Principal</option>
@@ -522,6 +221,8 @@
             <option value="Edificio Entero">Edificio Entero</option>
           </select>
           <span class="material-symbols-outlined absolute right-1.5 top-1/2 -translate-y-1/2 pointer-events-none text-outline text-[16px]">expand_more</span>
+          <!-- Badge contextual con Radiografía de la Finca -->
+          <div id="badge-radiografia-edificio" class="hidden absolute top-full left-0 right-0 mt-1 p-2 bg-stone-900/95 text-stone-100 text-[10px] rounded shadow-lg z-40 leading-tight"></div>
         </div>
 
         <!-- Input hidden fallback for legacy compatibility -->
@@ -531,6 +232,16 @@
         <button class="h-9 px-3.5 rounded bg-primary text-on-primary hover:bg-forest-muted font-body-sm text-body-sm font-semibold flex items-center gap-1.5 whitespace-nowrap shadow-sm transition-colors cursor-pointer" id="btn-analizar" type="button">
           <span class="material-symbols-outlined text-[16px]">travel_explore</span>
           <span>Analizar</span>
+        </button>
+
+        <!-- Insignia Global de Estado de Sincronización de Fuentes -->
+        <button type="button" id="btn-estado-origenes" onclick="window.abrirModalOrigenes()" class="h-9 px-3 rounded bg-surface border border-sandstone-border hover:bg-stone-surface text-charcoal-text font-body-sm text-[11px] font-semibold flex items-center gap-1.5 whitespace-nowrap transition-all shadow-xs cursor-pointer group" title="Haga clic para ver la auditoría en tiempo real de los 17 orígenes de datos">
+          <span class="relative flex h-2 w-2">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" id="ping-estado-origenes"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-600" id="dot-estado-origenes"></span>
+          </span>
+          <span id="txt-estado-origenes" class="text-primary font-bold">17/17 Fuentes OK</span>
+          <span class="material-symbols-outlined text-[15px] text-outline group-hover:text-primary transition-colors">tune</span>
         </button>
       </div>
 
@@ -551,6 +262,14 @@
             <button class="px-2.5 py-1 text-center font-label-tabular-sm text-[11px] rounded bg-surface border border-sandstone-border text-charcoal-text hover:bg-stone-surface font-medium transition-all cursor-pointer" id="iso-15" onclick="window.cambiarIsocrona(15)" type="button" title="Cuenca metropolitana a pie (15 min / 1.000m)">15 min</button>
           </div>
         </div>
+
+        <!-- Botón Global Visor GIS / Pantalla Completa (Opción 4) -->
+        <button type="button" onclick="window.abrirModalMapaFullscreen()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary hover:bg-forest-muted text-white text-[12px] font-semibold transition-all shadow-xs cursor-pointer group" title="Explorar visor cartográfico e isócronas a pantalla completa">
+          <span class="material-symbols-outlined text-[17px] text-[#ffd166] group-hover:scale-110 transition-transform">map</span>
+          <span class="hidden md:inline font-headline-md">_visor_cartográfico_gis</span>
+          <span class="md:hidden font-headline-md">Mapa</span>
+        </button>
+
         <div class="h-6 w-px bg-sandstone-border"></div>
         <!-- Institutional Header Badge (Sin marcas privadas) -->
         <div class="flex items-center gap-space-sm pl-1">
@@ -595,6 +314,7 @@
                   <div class="flex items-center gap-1.5">
                     <span class="font-headline-md text-[14px] font-bold text-primary truncate leading-tight">Ficha Técnica Oficial</span>
                     <span class="px-1.5 py-0.2 rounded bg-primary text-on-primary font-label-tabular-sm text-[9px] font-medium">Catastro OVC</span>
+                    <span id="marca-origen-catastro"></span>
                   </div>
                   <span class="font-label-caps text-outline uppercase text-[9px] tracking-wider truncate font-medium">Auditoría Territorial Verificada</span>
                 </div>
@@ -750,6 +470,7 @@
                     <span>Registro Competente</span>
                   </span>
                   <div class="flex items-center gap-1">
+                    <span id="marca-origen-registro"></span>
                     <span class="px-1 py-0.2 rounded bg-emerald-100 text-emerald-800 font-label-tabular-sm text-[8px] font-bold">Jurisdicción OK</span>
                     <span class="material-symbols-outlined text-[15px] text-outline transition-transform duration-200 group-open:rotate-180">expand_more</span>
                   </div>
@@ -779,7 +500,10 @@
                   <span class="material-symbols-outlined text-[16px] text-amber-800">gavel</span>
                   <span>_plan_de_usos_&amp;_normativa</span>
                 </div>
-                <span class="px-1.5 py-0.5 rounded bg-amber-200/70 text-amber-950 font-label-tabular-sm text-[9px] font-bold" id="val-pla-dusos-badge">REGULADO</span>
+                <div class="flex items-center gap-1.5">
+                  <span id="marca-origen-regulacion"></span>
+                  <span class="px-1.5 py-0.5 rounded bg-amber-200/70 text-amber-950 font-label-tabular-sm text-[9px] font-bold" id="val-pla-dusos-badge">REGULADO</span>
+                </div>
               </div>
               <div class="flex flex-col gap-1">
                 <div class="text-[12px] font-bold text-amber-950 leading-snug" id="val-pla-dusos-titulo">
@@ -812,9 +536,12 @@
                     <span class="font-body-sm text-body-sm font-semibold truncate text-[#592a05]">Regulación Especial Eixample (Susp. C3/Hostelería)</span>
                   </div>
                 </div>
-                <button type="button" onclick="window.abrirModalInfo('regulacion')" class="p-1 rounded text-amber-800/70 hover:text-amber-950 hover:bg-amber-200/50 transition-colors flex-shrink-0 cursor-pointer" title="Ver origen oficial y normativa aplicada">
-                  <span class="material-symbols-outlined text-[17px]">info</span>
-                </button>
+                <div class="flex items-center gap-1.5 flex-shrink-0">
+                  <span id="marca-origen-regulacion-banner"></span>
+                  <button type="button" onclick="window.abrirModalInfo('regulacion')" class="p-1 rounded text-amber-800/70 hover:text-amber-950 hover:bg-amber-200/50 transition-colors flex-shrink-0 cursor-pointer" title="Ver origen oficial y normativa aplicada">
+                    <span class="material-symbols-outlined text-[17px]">info</span>
+                  </button>
+                </div>
               </div>
 
               <!-- Banner 2: Parking Catchment Deficit (#badge-parking) -->
@@ -828,9 +555,12 @@
                     <span class="font-body-sm text-body-sm font-semibold truncate text-[#11314d]">90 / 100 (Alta Presión Área Verde/Azul)</span>
                   </div>
                 </div>
-                <button type="button" onclick="window.abrirModalInfo('parking')" class="p-1 rounded text-sky-800/70 hover:text-sky-950 hover:bg-sky-200/50 transition-colors flex-shrink-0 cursor-pointer" title="Ver metodología y cálculo de la cuenca">
-                  <span class="material-symbols-outlined text-[17px]">info</span>
-                </button>
+                <div class="flex items-center gap-1.5 flex-shrink-0">
+                  <span id="marca-origen-parking"></span>
+                  <button type="button" onclick="window.abrirModalInfo('parking')" class="p-1 rounded text-sky-800/70 hover:text-sky-950 hover:bg-sky-200/50 transition-colors flex-shrink-0 cursor-pointer" title="Ver metodología y cálculo de la cuenca">
+                    <span class="material-symbols-outlined text-[17px]">info</span>
+                  </button>
+                </div>
               </div>
 
               <!-- Banner 3: Transit Metro Proximity (#badge-transporte) -->
@@ -844,9 +574,12 @@
                     <span class="font-body-sm text-body-sm font-semibold truncate text-charcoal-text">Metro Universitat (L1/L2) a 280 m (3 min a pie)</span>
                   </div>
                 </div>
-                <button type="button" onclick="window.abrirModalInfo('transporte')" class="p-1 rounded text-outline hover:text-primary hover:bg-stone-surface transition-colors flex-shrink-0 cursor-pointer" title="Ver red oficial TMB y cálculo de distancia">
-                  <span class="material-symbols-outlined text-[17px]">info</span>
-                </button>
+                <div class="flex items-center gap-1.5 flex-shrink-0">
+                  <span id="marca-origen-transporte"></span>
+                  <button type="button" onclick="window.abrirModalInfo('transporte')" class="p-1 rounded text-outline hover:text-primary hover:bg-stone-surface transition-colors flex-shrink-0 cursor-pointer" title="Ver red oficial TMB y cálculo de distancia">
+                    <span class="material-symbols-outlined text-[17px]">info</span>
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -859,28 +592,8 @@
               <span id="kpi-noi-sub">NOI: 21.312 €/año</span>
             </div>
 
-            <!-- 4.1 VISOR CARTOGRÁFICO INTERACTIVO (LEAFLET.JS & ISÓCRONAS) -->
-            <div class="bg-surface-container-lowest rounded-xl border border-sandstone-border shadow-[0_1px_3px_rgba(27,28,26,0.03)] overflow-hidden p-space-sm flex flex-col gap-2" id="bloque-mapa-cartografico">
-              <div class="flex items-center justify-between px-1">
-                <div class="flex items-center gap-2">
-                  <span class="material-symbols-outlined text-[16px] text-primary">map</span>
-                  <span class="font-label-caps text-primary uppercase text-[10px] font-bold">_visor_cartográfico_icgc_&amp;_osm</span>
-                  <span class="px-1.5 py-0.2 rounded bg-stone-surface font-label-tabular-sm text-primary font-semibold text-[10px]">Leaflet v1.9.4</span>
-                  <span class="font-label-tabular-sm text-outline text-[10px] hidden sm:inline" id="lbl-mapa-isocrona-info">EPSG:25831 / WGS84 • Isócrona activa: 5 min (~300 m)</span>
-                </div>
-                <div class="flex items-center gap-2">
-                  <button type="button" id="btn-toggle-map" onclick="window.toggleVisorMapa()" class="text-xs text-outline hover:text-primary flex items-center gap-0.5 cursor-pointer font-medium px-2 py-0.5 rounded hover:bg-stone-surface transition-colors">
-                    <span id="txt-toggle-map">Plegar mapa</span>
-                    <span class="material-symbols-outlined text-[16px]" id="icon-toggle-map">expand_less</span>
-                  </button>
-                </div>
-              </div>
-
-              <!-- Leaflet Dynamic Map Container -->
-              <div class="relative w-full h-[260px] transition-all duration-300 rounded-lg overflow-hidden border border-sandstone-border" id="map-container">
-                <div id="leaflet-map" class="w-full h-full min-h-[260px]"></div>
-              </div>
-            </div>
+            <!-- Dock de reserva cuando el mapa no está activo en tabs o modal -->
+            <div id="dock-mapa-reserva" class="hidden"></div>
 
             <!-- 5. CENTRAL TABBED ANALYSIS ENGINE -->
             <div class="bg-surface-container-lowest rounded-xl border border-sandstone-border shadow-[0_1px_3px_rgba(27,28,26,0.03)] overflow-hidden flex flex-col min-h-[560px]">
@@ -939,7 +652,10 @@
                             <span class="material-symbols-outlined text-[18px] text-primary">apartment</span>
                             <span>_1._renta_oficial_incasòl</span>
                           </div>
-                          <span class="px-2 py-0.5 rounded bg-badge-living-bg text-emerald-900 font-label-tabular-sm text-[10px] font-bold">ZONA MÁS BAJA</span>
+                          <div class="flex items-center gap-1.5">
+                            <span id="marca-origen-incasol"></span>
+                            <span class="px-2 py-0.5 rounded bg-badge-living-bg text-emerald-900 font-label-tabular-sm text-[10px] font-bold">ZONA MÁS BAJA</span>
+                          </div>
                         </div>
                         <div class="pt-1 text-[11px] font-semibold text-outline uppercase tracking-wider font-label-caps" id="disp-incasol-subtitulo">
                           Ámbito Micro Territorial
@@ -978,7 +694,10 @@
                             <span class="material-symbols-outlined text-[18px] text-amber-900">receipt_long</span>
                             <span>_2._impuesto_bienes_inmuebles_(ibi)</span>
                           </div>
-                          <span class="px-2 py-0.5 rounded bg-amber-100 text-amber-950 font-label-tabular-sm text-[10px] font-bold">MUNICIPAL</span>
+                          <div class="flex items-center gap-1.5">
+                            <span id="marca-origen-ibi"></span>
+                            <span class="px-2 py-0.5 rounded bg-amber-100 text-amber-950 font-label-tabular-sm text-[10px] font-bold">MUNICIPAL</span>
+                          </div>
                         </div>
                         <div class="pt-1 text-[11px] font-semibold text-outline uppercase tracking-wider font-label-caps">
                           Gravamen Local Oficial
@@ -1059,7 +778,10 @@
                     <div class="p-space-md rounded-lg bg-surface border border-sandstone-border flex flex-col gap-space-xs">
                       <div class="flex items-center justify-between">
                         <span class="font-label-caps text-outline uppercase text-[10px] font-semibold">_déficit_estacionamiento</span>
-                        <span class="material-symbols-outlined text-error text-[18px]">no_crash</span>
+                        <div class="flex items-center gap-1.5">
+                          <span id="marca-origen-movilidad"></span>
+                          <span class="material-symbols-outlined text-error text-[18px]">no_crash</span>
+                        </div>
                       </div>
                       <div class="font-headline-lg text-headline-lg font-bold text-error" id="mov-deficit-score">90 / 100</div>
                       <span class="font-body-sm text-body-sm text-on-surface-variant" id="mov-deficit-desc">Rotación crítica: cuenca de captación sin plazas libres en radio 300m.</span>
@@ -1154,7 +876,10 @@
                       <div class="flex flex-col gap-1.5">
                         <div class="flex items-center justify-between pb-1 border-b border-sandstone-border/60">
                           <span class="font-label-caps text-outline uppercase text-[10px] font-bold">_afluencia_&amp;_tránsito</span>
-                          <span class="px-1.5 py-0.5 rounded bg-badge-living-bg text-primary font-label-tabular-sm text-[9px] font-bold" id="badge-poblacion-flotante">MICRO: TRAMO CALLE (150m)</span>
+                          <div class="flex items-center gap-1.5">
+                            <span id="marca-origen-pob-flotante"></span>
+                            <span class="px-1.5 py-0.5 rounded bg-badge-living-bg text-primary font-label-tabular-sm text-[9px] font-bold" id="badge-poblacion-flotante">MICRO: TRAMO CALLE (150m)</span>
+                          </div>
                         </div>
                         <span class="text-[12px] font-semibold text-outline uppercase tracking-wider font-label-caps">Población Flotante</span>
                         <div class="font-headline-xl text-headline-xl font-bold text-primary font-mono" id="val-poblacion-flotante">3.6x Residente</div>
@@ -1185,7 +910,10 @@
                       <div class="flex flex-col gap-1.5">
                         <div class="flex items-center justify-between pb-1 border-b border-sandstone-border/60">
                           <span class="font-label-caps text-outline uppercase text-[10px] font-bold">_poder_adquisitivo</span>
-                          <span class="px-1.5 py-0.5 rounded bg-badge-living-bg text-emerald-900 font-label-tabular-sm text-[9px] font-bold" id="badge-renta-ine">MICRO: SECCIÓN CENSAL INE</span>
+                          <div class="flex items-center gap-1.5">
+                            <span id="marca-origen-ine"></span>
+                            <span class="px-1.5 py-0.5 rounded bg-badge-living-bg text-emerald-900 font-label-tabular-sm text-[9px] font-bold" id="badge-renta-ine">MICRO: SECCIÓN CENSAL INE</span>
+                          </div>
                         </div>
                         <span class="text-[12px] font-semibold text-outline uppercase tracking-wider font-label-caps">Renta Media por Hogar</span>
                         <div class="font-headline-xl text-headline-xl font-bold text-emerald-800 font-mono" id="val-renta-ine">52.800 €</div>
@@ -1216,7 +944,10 @@
                       <div class="flex flex-col gap-1.5">
                         <div class="flex items-center justify-between pb-1 border-b border-sandstone-border/60">
                           <span class="font-label-caps text-outline uppercase text-[10px] font-bold">_tejido_comercial</span>
-                          <span class="px-1.5 py-0.5 rounded bg-stone-surface text-charcoal-text font-label-tabular-sm text-[9px] font-bold" id="badge-competencia">MICRO: MANZANA CATASTRAL</span>
+                          <div class="flex items-center gap-1.5">
+                            <span id="marca-origen-competencia"></span>
+                            <span class="px-1.5 py-0.5 rounded bg-stone-surface text-charcoal-text font-label-tabular-sm text-[9px] font-bold" id="badge-competencia">MICRO: MANZANA CATASTRAL</span>
+                          </div>
                         </div>
                         <span class="text-[12px] font-semibold text-outline uppercase tracking-wider font-label-caps">Competencia Directa (150m)</span>
                         <div class="font-headline-xl text-headline-xl font-bold text-charcoal-text font-mono" id="val-competencia">4 Locales en PB</div>
@@ -1262,7 +993,10 @@
                         <div class="flex flex-col gap-1.5">
                           <div class="flex items-center justify-between pb-1 border-b border-sandstone-border/60">
                             <span class="font-label-caps text-outline uppercase text-[10px] font-bold">_aforo_peatonal_en_vía</span>
-                            <span class="px-1.5 py-0.5 rounded bg-badge-living-bg text-primary font-label-tabular-sm text-[9px] font-bold">MICRO: TRAMO DE VÍA</span>
+                            <div class="flex items-center gap-1.5">
+                              <span id="marca-origen-viandantes"></span>
+                              <span class="px-1.5 py-0.5 rounded bg-badge-living-bg text-primary font-label-tabular-sm text-[9px] font-bold">MICRO: TRAMO DE VÍA</span>
+                            </div>
                           </div>
                           <span class="text-[12px] font-semibold text-outline uppercase tracking-wider font-label-caps">Viandantes en Horario Comercial</span>
                           <div class="font-headline-xl text-headline-xl font-bold text-primary font-mono" id="val-viandantes">460 viandantes / hora</div>
@@ -1293,7 +1027,10 @@
                         <div class="flex flex-col gap-1.5">
                           <div class="flex items-center justify-between pb-1 border-b border-sandstone-border/60">
                             <span class="font-label-caps text-outline uppercase text-[10px] font-bold">_ordenanza_municipal_de_terrazas</span>
-                            <span class="px-1.5 py-0.5 rounded bg-badge-living-bg text-emerald-900 font-label-tabular-sm text-[9px] font-bold">MICRO: FACHADA &amp; ACERA</span>
+                            <div class="flex items-center gap-1.5">
+                              <span id="marca-origen-terraza"></span>
+                              <span class="px-1.5 py-0.5 rounded bg-badge-living-bg text-emerald-900 font-label-tabular-sm text-[9px] font-bold">MICRO: FACHADA &amp; ACERA</span>
+                            </div>
                           </div>
                           <span class="text-[12px] font-semibold text-outline uppercase tracking-wider font-label-caps">Viabilidad de Veladores Exteriores</span>
                           <div class="p-space-sm rounded bg-stone-surface/40 border border-sandstone-border/60 flex items-start gap-2 mt-1" id="val-terraza">
@@ -1336,6 +1073,7 @@
                             <span>_auditoría_acústica:_real_vs_normativa</span>
                           </div>
                           <div class="flex items-center gap-1.5 flex-wrap">
+                            <span id="marca-origen-ruido"></span>
                             <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-950 border border-emerald-300 font-label-tabular-sm text-[9px] font-bold flex items-center gap-1 shadow-2xs">
                               <span class="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse"></span>
                               <span>SONÓMETRO FÍSICO REAL</span>
@@ -1353,7 +1091,10 @@
                               <span class="font-bold text-[11px] text-emerald-950 truncate" id="sensor-real-nombre">Estació Acústica Comte d'Urgell</span>
                               <span class="px-1.5 py-0.2 rounded bg-white/80 text-emerald-900 font-mono text-[9px] font-bold border border-emerald-200" id="sensor-real-id">SNT-BCN-EIX-01</span>
                             </div>
-                            <span class="text-[9px] font-bold text-emerald-800 bg-emerald-100 px-1.5 py-0.5 rounded uppercase font-mono" id="sensor-real-distancia">A 45 m del activo</span>
+                            <div class="flex items-center gap-1.5">
+                              <span id="marca-origen-sensor-real"></span>
+                              <span class="text-[9px] font-bold text-emerald-800 bg-emerald-100 px-1.5 py-0.5 rounded uppercase font-mono" id="sensor-real-distancia">A 45 m del activo</span>
+                            </div>
                           </div>
                           <div class="flex flex-col sm:flex-row sm:items-center justify-between text-[10px] text-emerald-900 gap-1 leading-snug">
                             <div class="flex items-center gap-1 truncate">
@@ -1542,6 +1283,7 @@
                       <span class="font-body-sm text-body-sm text-on-surface-variant">Censo de actividades comerciales y empresas activas agrupadas por categoría en la cuenca peatonal</span>
                     </div>
                     <div class="flex items-center gap-2">
+                      <span id="marca-origen-negocios"></span>
                       <span class="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-900 border border-emerald-200 font-label-tabular-sm text-[11px] font-bold flex items-center gap-1.5 shadow-xs" id="lbl-negocios-cuenca-activa">
                         <span class="w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span>
                         <span>Cuenca activa: 5 min (~300 m)</span>
@@ -1643,15 +1385,43 @@
                     </div>
                   </div>
 
-                  <!-- CONTADOR DE RESULTADOS VISIBLES -->
-                  <div class="flex items-center justify-between text-[11px] text-on-surface-variant px-1 font-medium">
-                    <span id="lbl-conteo-visibles">Mostrando 28 negocios en la cuenca de 5 min</span>
-                    <span class="text-outline text-[10px] hidden sm:inline">Haz clic en «Ubicar en mapa» para centrar el visor</span>
-                  </div>
+                  <!-- LAYOUT DIVIDIDO A 2 COLUMNAS (LISTADO + MAPA CONTEXTUAL DOCK) -->
+                  <div class="grid grid-cols-1 lg:grid-cols-12 gap-space-md items-start">
+                    <!-- Columna Izquierda: Listado de Comercios (7 cols) -->
+                    <div class="lg:col-span-7 flex flex-col gap-space-sm">
+                      <div class="flex items-center justify-between text-[11px] text-on-surface-variant px-1 font-medium">
+                        <span id="lbl-conteo-visibles">Mostrando 28 negocios en la cuenca de 5 min</span>
+                        <span class="text-outline text-[10px] hidden sm:inline">Haz clic en «Ubicar en mapa» para enfocar</span>
+                      </div>
 
-                  <!-- LISTADO DINÁMICO DE NEGOCIOS (INYECCIÓN DESDE JS) -->
-                  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-space-sm" id="contenedor-lista-negocios">
-                    <!-- Las fichas con Nombre, Dirección, Categoría y Distancia a pie se renderizan aquí dinámicamente -->
+                      <div class="grid grid-cols-1 sm:grid-cols-2 gap-space-sm max-h-[580px] overflow-y-auto pr-1" id="contenedor-lista-negocios">
+                        <!-- Las fichas con Nombre, Dirección, Categoría y Distancia a pie se renderizan aquí dinámicamente -->
+                      </div>
+                    </div>
+
+                    <!-- Columna Derecha: Mapa Interactivo Embebido (5 cols, Sticky) -->
+                    <div class="lg:col-span-5 sticky top-20 flex flex-col gap-2 p-space-sm bg-surface rounded-xl border border-sandstone-border shadow-xs">
+                      <div class="flex items-center justify-between px-1">
+                        <div class="flex items-center gap-1.5">
+                          <span class="material-symbols-outlined text-[16px] text-primary">storefront</span>
+                          <span class="font-label-caps text-primary uppercase text-[10px] font-bold">_distribución_comercial</span>
+                        </div>
+                        <button type="button" onclick="window.abrirModalMapaFullscreen()" class="text-[11px] text-primary hover:text-terracotta-accent flex items-center gap-1 font-semibold cursor-pointer" title="Expandir visor a pantalla completa">
+                          <span class="material-symbols-outlined text-[14px]">open_in_full</span>
+                          <span>Expandir</span>
+                        </button>
+                      </div>
+                      
+                      <!-- Dock para el Mapa en Tab Negocios -->
+                      <div class="relative w-full h-[490px] rounded-lg overflow-hidden border border-sandstone-border bg-stone-surface" id="dock-mapa-negocios">
+                        <div id="leaflet-map" class="w-full h-full min-h-[490px]"></div>
+                      </div>
+                      
+                      <div class="flex items-center justify-between px-1 text-[10px] text-outline font-label-tabular-sm">
+                        <span>Pines interactivos con aforo comercial</span>
+                        <span class="text-primary font-semibold">ICGC &amp; OpenStreetMap</span>
+                      </div>
+                    </div>
                   </div>
 
                   <!-- BLOQUE DESPLEGABLE: PROCEDENCIA OFICIAL Y CÁLCULO DE DISTANCIA A PIE -->
@@ -1697,6 +1467,7 @@
                       <span class="font-body-sm text-body-sm text-on-surface-variant">Colegios, centros médicos, aparcamientos públicos, zonas verdes, centros de culto y servicios cívicos en la cuenca peatonal</span>
                     </div>
                     <div class="flex items-center gap-2">
+                      <span id="marca-origen-servicios"></span>
                       <span class="px-2.5 py-1 rounded-full bg-blue-50 text-blue-900 border border-blue-200 font-label-tabular-sm text-[11px] font-bold flex items-center gap-1.5 shadow-xs" id="lbl-servicios-cuenca-activa">
                         <span class="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
                         <span>Cuenca activa: 5 min (~300 m)</span>
@@ -1801,15 +1572,43 @@
                     </div>
                   </div>
 
-                  <!-- CONTADOR DE RESULTADOS VISIBLES DE SERVICIOS -->
-                  <div class="flex items-center justify-between text-[11px] text-on-surface-variant px-1 font-medium">
-                    <span id="lbl-conteo-visibles-servicios">Mostrando 18 servicios y equipamientos en la cuenca de 5 min</span>
-                    <span class="text-outline text-[10px] hidden sm:inline">Haz clic en «Ubicar en mapa» para centrar el visor</span>
-                  </div>
+                  <!-- LAYOUT DIVIDIDO A 2 COLUMNAS (LISTADO + MAPA CONTEXTUAL DOCK) -->
+                  <div class="grid grid-cols-1 lg:grid-cols-12 gap-space-md items-start">
+                    <!-- Columna Izquierda: Listado de Equipamientos (7 cols) -->
+                    <div class="lg:col-span-7 flex flex-col gap-space-sm">
+                      <div class="flex items-center justify-between text-[11px] text-on-surface-variant px-1 font-medium">
+                        <span id="lbl-conteo-visibles-servicios">Mostrando 18 servicios y equipamientos en la cuenca de 5 min</span>
+                        <span class="text-outline text-[10px] hidden sm:inline">Haz clic en «Ubicar en mapa» para enfocar</span>
+                      </div>
 
-                  <!-- LISTADO DINÁMICO DE SERVICIOS (INYECCIÓN DESDE JS) -->
-                  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-space-sm" id="contenedor-lista-servicios">
-                    <!-- Las fichas de servicios con Nombre, Dirección, Categoría/Subtipo y Distancia a pie se renderizan aquí dinámicamente -->
+                      <div class="grid grid-cols-1 sm:grid-cols-2 gap-space-sm max-h-[580px] overflow-y-auto pr-1" id="contenedor-lista-servicios">
+                        <!-- Las fichas de servicios con Nombre, Dirección, Categoría/Subtipo y Distancia a pie se renderizan aquí dinámicamente -->
+                      </div>
+                    </div>
+
+                    <!-- Columna Derecha: Mapa Interactivo Embebido (5 cols, Sticky) -->
+                    <div class="lg:col-span-5 sticky top-20 flex flex-col gap-2 p-space-sm bg-surface rounded-xl border border-sandstone-border shadow-xs">
+                      <div class="flex items-center justify-between px-1">
+                        <div class="flex items-center gap-1.5">
+                          <span class="material-symbols-outlined text-[16px] text-blue-900">account_balance</span>
+                          <span class="font-label-caps text-blue-900 uppercase text-[10px] font-bold">_equipamientos_en_mapa</span>
+                        </div>
+                        <button type="button" onclick="window.abrirModalMapaFullscreen()" class="text-[11px] text-primary hover:text-terracotta-accent flex items-center gap-1 font-semibold cursor-pointer" title="Expandir visor a pantalla completa">
+                          <span class="material-symbols-outlined text-[14px]">open_in_full</span>
+                          <span>Expandir</span>
+                        </button>
+                      </div>
+                      
+                      <!-- Dock para el Mapa en Tab Servicios -->
+                      <div class="relative w-full h-[490px] rounded-lg overflow-hidden border border-sandstone-border bg-stone-surface" id="dock-mapa-servicios">
+                        <!-- #leaflet-map se acopla aquí dinámicamente cuando esta pestaña se activa -->
+                      </div>
+                      
+                      <div class="flex items-center justify-between px-1 text-[10px] text-outline font-label-tabular-sm">
+                        <span>Colegios, centros médicos, parkings y zonas verdes</span>
+                        <span class="text-blue-900 font-semibold">Guia Equipaments BCN</span>
+                      </div>
+                    </div>
                   </div>
 
                   <!-- BLOQUE DESPLEGABLE: PROCEDENCIA OFICIAL Y CÁLCULO DE DISTANCIA A PIE DE SERVICIOS -->
@@ -1849,7 +1648,10 @@
                       <span class="font-headline-md text-headline-md font-bold text-primary">_auditoría_climática_trailing_365 (Open-Meteo &amp; Meteocat)</span>
                       <span class="font-body-sm text-body-sm text-on-surface-variant">Incidencia directa sobre demanda energética, confort térmico y afluencia física</span>
                     </div>
-                    <span class="px-2 py-1 rounded bg-stone-surface border border-sandstone-border font-label-tabular-sm text-label-tabular-sm text-charcoal-text font-semibold">Serie Real Anual</span>
+                    <div class="flex items-center gap-2">
+                      <span id="marca-origen-clima"></span>
+                      <span class="px-2 py-1 rounded bg-stone-surface border border-sandstone-border font-label-tabular-sm text-label-tabular-sm text-charcoal-text font-semibold">Serie Real Anual</span>
+                    </div>
                   </div>
 
                   <!-- 6 Tarjetas de Clima 365 Días -->
@@ -1998,11 +1800,13 @@
               if (activePane) {
                 activePane.classList.remove('hidden');
               }
-              if (tabId === 'tab-negocios' && typeof window.renderizarNegocios === 'function') {
-                window.renderizarNegocios();
+              if (tabId === 'tab-negocios') {
+                if (typeof window.renderizarNegocios === 'function') window.renderizarNegocios();
+                if (typeof window.acoplarMapa === 'function') window.acoplarMapa('dock-mapa-negocios');
               }
-              if (tabId === 'tab-servicios' && typeof window.renderizarServicios === 'function') {
-                window.renderizarServicios();
+              if (tabId === 'tab-servicios') {
+                if (typeof window.renderizarServicios === 'function') window.renderizarServicios();
+                if (typeof window.acoplarMapa === 'function') window.acoplarMapa('dock-mapa-servicios');
               }
               if (window.leafletMap) {
                 setTimeout(function() {
@@ -2044,30 +1848,37 @@
                   b.className = 'px-2.5 py-1 text-center font-label-tabular-sm text-[11px] rounded bg-surface border border-sandstone-border text-charcoal-text hover:bg-stone-surface font-medium transition-all cursor-pointer';
                 }
               });
+
+              // Sincronizar también los botones de isócronas del modal si existen
+              btns.forEach(function(m) {
+                var mb = document.getElementById('modal-iso-' + m);
+                if (!mb) return;
+                if (m === minutos) {
+                  mb.className = 'px-2 py-0.5 text-center font-label-tabular-sm text-[10px] rounded bg-primary text-white font-semibold cursor-pointer';
+                } else {
+                  mb.className = 'px-2 py-0.5 text-center font-label-tabular-sm text-[10px] rounded hover:bg-stone-surface text-charcoal-text font-medium cursor-pointer';
+                }
+              });
+
               var lbl = document.getElementById('lbl-isocrona-radio');
               if (lbl) {
                 lbl.textContent = minutos === 5 ? '5 min (~300 m)' : (minutos === 10 ? '10 min (~650 m)' : '15 min (~1.000 m)');
               }
+              var modalSub = document.getElementById('modal-mapa-subtitulo');
+              if (modalSub) {
+                var dir = document.getElementById('input-calle')?.value || 'Carrer de Balmes';
+                var num = document.getElementById('input-numero')?.value || '12';
+                var mun = document.getElementById('input-municipio')?.value || 'Barcelona';
+                var isoText = minutos === 5 ? '5 min (~300 m)' : (minutos === 10 ? '10 min (~650 m)' : '15 min (~1.000 m)');
+                modalSub.textContent = dir + ', ' + num + ', ' + mun + ' • Isócrona activa: ' + isoText;
+              }
               window.mostrarToast('Isócrona fijada a ' + minutos + ' min a pie');
             };
 
-            // Alternar visibilidad/plegado del Visor Cartográfico
+            // Alternar visibilidad/plegado del Visor Cartográfico (delegado a modal)
             window.toggleVisorMapa = function() {
-              var mapCont = document.getElementById('map-container');
-              var txtToggle = document.getElementById('txt-toggle-map');
-              var iconToggle = document.getElementById('icon-toggle-map');
-              if (!mapCont) return;
-              if (mapCont.classList.contains('hidden')) {
-                mapCont.classList.remove('hidden');
-                if (txtToggle) txtToggle.textContent = 'Plegar mapa';
-                if (iconToggle) iconToggle.textContent = 'expand_less';
-                setTimeout(function() {
-                  if (window.leafletMap) window.leafletMap.invalidateSize();
-                }, 150);
-              } else {
-                mapCont.classList.add('hidden');
-                if (txtToggle) txtToggle.textContent = 'Ver mapa';
-                if (iconToggle) iconToggle.textContent = 'expand_more';
+              if (typeof window.abrirModalMapaFullscreen === 'function') {
+                window.abrirModalMapaFullscreen();
               }
             };
 
@@ -2215,6 +2026,126 @@
         </button>
       </div>
 
+    </div>
+  </div>
+
+  <!-- MODAL DE AUDITORÍA Y ESTADO DE TODOS LOS ORÍGENES DE DATOS -->
+  <div id="modal-estado-origenes" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-surface-container-lowest rounded-2xl max-w-4xl w-full max-h-[90vh] flex flex-col shadow-2xl border border-sandstone-border overflow-hidden">
+      <!-- Cabecera -->
+      <div class="px-space-md py-3.5 bg-stone-surface/60 border-b border-sandstone-border flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-primary text-on-primary flex items-center justify-center shadow-xs">
+            <span class="material-symbols-outlined text-[18px]">verified</span>
+          </div>
+          <div class="flex flex-col">
+            <div class="flex items-center gap-2">
+              <span class="font-headline-md text-[15px] font-bold text-primary">Auditoría de Sincronización de Fuentes de Datos</span>
+              <span class="px-2 py-0.5 rounded-full text-[9px] font-bold font-mono bg-emerald-100 text-emerald-900 border border-emerald-300" id="modal-origenes-badge-resumen">17/17 EN VIVO</span>
+            </div>
+            <span class="font-label-tabular-sm text-[10px] text-outline">Verificación al pulsar «Analizar» • Latencias y estado de consulta</span>
+          </div>
+        </div>
+        <button type="button" onclick="window.cerrarModalOrigenes()" class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-stone-surface text-outline hover:text-primary transition-colors cursor-pointer" title="Cerrar modal">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+
+      <!-- Resumen de Métricas -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 p-3 bg-stone-surface/30 border-b border-sandstone-border/60 text-center">
+        <div class="p-2 rounded bg-surface border border-sandstone-border flex flex-col">
+          <span class="text-[9px] font-label-caps uppercase text-outline font-bold">Total Fuentes</span>
+          <span class="text-[16px] font-bold text-charcoal-text font-mono" id="modal-stat-total">17</span>
+        </div>
+        <div class="p-2 rounded bg-emerald-50 border border-emerald-200 flex flex-col">
+          <span class="text-[9px] font-label-caps uppercase text-emerald-800 font-bold">Actualizadas en Vivo</span>
+          <span class="text-[16px] font-bold text-emerald-900 font-mono" id="modal-stat-vivas">15</span>
+        </div>
+        <div class="p-2 rounded bg-amber-50 border border-amber-200 flex flex-col">
+          <span class="text-[9px] font-label-caps uppercase text-amber-800 font-bold">Estimaciones / Fallback</span>
+          <span class="text-[16px] font-bold text-amber-900 font-mono" id="modal-stat-fallbacks">0</span>
+        </div>
+        <div class="p-2 rounded bg-stone-100 border border-stone-200 flex flex-col">
+          <span class="text-[9px] font-label-caps uppercase text-stone-600 font-bold">Sin Cobertura Mun.</span>
+          <span class="text-[16px] font-bold text-stone-700 font-mono" id="modal-stat-no-cobertura">2</span>
+        </div>
+      </div>
+
+      <!-- Tabla de Fuentes -->
+      <div class="overflow-y-auto flex-1 p-space-md">
+        <table class="w-full text-left border-collapse text-[11px]">
+          <thead>
+            <tr class="border-b border-sandstone-border text-[9px] uppercase font-label-caps text-outline">
+              <th class="py-2 pr-2 font-bold">Dato / Módulo</th>
+              <th class="py-2 px-2 font-bold">Organismo / Origen</th>
+              <th class="py-2 px-2 font-bold text-center">Tipo Actualización</th>
+              <th class="py-2 px-2 font-bold text-center">Latencia</th>
+              <th class="py-2 pl-2 font-bold text-right">Estado Actual</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-sandstone-border/60" id="tabla-origenes-tbody">
+            <!-- Renderizado dinámico desde JS con los 17 orígenes -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pie -->
+      <div class="px-space-md py-2.5 bg-stone-surface/40 border-t border-sandstone-border flex items-center justify-between text-[10px] text-outline">
+        <span id="modal-origenes-last-check">Última verificación: --</span>
+        <button type="button" onclick="window.cerrarModalOrigenes()" class="px-4 py-1.5 rounded-lg bg-primary hover:bg-forest-muted text-on-primary font-headline-md text-[12px] font-semibold transition-colors shadow-sm cursor-pointer">
+          Aceptar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL VISOR CARTOGRÁFICO A PANTALLA COMPLETA (OPCIÓN 4) -->
+  <div id="modal-mapa-fullscreen" class="fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex items-center justify-center p-2 sm:p-4 hidden">
+    <div class="bg-surface-container-lowest rounded-2xl w-full max-w-7xl h-[92vh] flex flex-col shadow-2xl border border-sandstone-border overflow-hidden">
+      <!-- Cabecera del Modal -->
+      <div class="px-space-md py-3 bg-stone-surface/70 border-b border-sandstone-border flex items-center justify-between gap-3">
+        <div class="flex items-center gap-3 min-w-0">
+          <div class="w-8 h-8 rounded-lg bg-primary text-on-primary flex items-center justify-center shadow-xs flex-shrink-0">
+            <span class="material-symbols-outlined text-[19px]">map</span>
+          </div>
+          <div class="flex flex-col min-w-0">
+            <div class="flex items-center gap-2">
+              <span class="font-headline-md text-[15px] font-bold text-primary truncate">Visor Cartográfico Geoespacial &amp; Isócronas Peatonales</span>
+              <span class="px-2 py-0.5 rounded-full text-[9px] font-bold font-mono bg-emerald-100 text-emerald-900 border border-emerald-300 flex-shrink-0">ICGC &amp; OSM</span>
+            </div>
+            <span class="font-label-tabular-sm text-[11px] text-outline truncate" id="modal-mapa-subtitulo">Carrer de Balmes, 12, Barcelona • Isócrona activa: 5 min (~300 m)</span>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 flex-shrink-0">
+          <!-- Selector rápido de isócronas dentro del modal -->
+          <div class="hidden sm:flex items-center gap-1 bg-stone-surface p-0.5 rounded-md border border-sandstone-border/70">
+            <button class="px-2 py-0.5 text-center font-label-tabular-sm text-[10px] rounded bg-primary text-white font-semibold cursor-pointer" id="modal-iso-5" onclick="window.cambiarIsocrona(5)" type="button">5 min</button>
+            <button class="px-2 py-0.5 text-center font-label-tabular-sm text-[10px] rounded hover:bg-stone-surface text-charcoal-text font-medium cursor-pointer" id="modal-iso-10" onclick="window.cambiarIsocrona(10)" type="button">10 min</button>
+            <button class="px-2 py-0.5 text-center font-label-tabular-sm text-[10px] rounded hover:bg-stone-surface text-charcoal-text font-medium cursor-pointer" id="modal-iso-15" onclick="window.cambiarIsocrona(15)" type="button">15 min</button>
+          </div>
+
+          <button type="button" onclick="window.cerrarModalMapaFullscreen()" class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-stone-surface text-outline hover:text-primary transition-colors cursor-pointer" title="Cerrar visor cartográfico (ESC)">
+            <span class="material-symbols-outlined text-[20px]">close</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Contenedor del Mapa (Dock del Modal) -->
+      <div class="relative flex-1 w-full h-full bg-stone-surface overflow-hidden" id="dock-mapa-modal">
+        <!-- El elemento #leaflet-map se acoplará aquí dinámicamente -->
+      </div>
+
+      <!-- Pie del Modal -->
+      <div class="px-space-md py-2 bg-stone-surface/40 border-t border-sandstone-border flex items-center justify-between text-[11px] text-outline font-label-tabular-sm">
+        <div class="flex items-center gap-3">
+          <span>Proyección: EPSG:25831 (ETRS89 UTM 31N) / WGS84</span>
+          <span class="hidden md:inline">• Capas oficiales: Catastro OVC + Censo PB Open Data BCN + Sentilo</span>
+        </div>
+        <button type="button" onclick="window.cerrarModalMapaFullscreen()" class="px-3.5 py-1 rounded bg-primary hover:bg-forest-muted text-on-primary font-headline-md text-[11px] font-semibold transition-colors cursor-pointer">
+          Cerrar Visor
+        </button>
+      </div>
     </div>
   </div>
 </body>
