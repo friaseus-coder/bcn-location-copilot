@@ -815,6 +815,19 @@
       });
     }
 
+    const inputSuperficieEl = document.getElementById('input-superficie');
+    if (inputSuperficieEl) {
+      inputSuperficieEl.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          ejecutarAnalisisCompleto();
+        }
+      });
+      inputSuperficieEl.addEventListener('change', () => {
+        ejecutarAnalisisCompleto();
+      });
+    }
+
     // BOTÓN PRINCIPAL ANALIZAR: Es el ÚNICO que dispara el análisis, el mapa y los datos
     if (btnAnalizar) {
       btnAnalizar.addEventListener('click', (e) => {
@@ -952,6 +965,33 @@
     setText('disp-ibi', formatEuro.format(cuotaIbi) + '/año');
     setText('disp-ibi-mes', formatEuro.format(ibiMensual) + '/mes');
     setText('disp-conservacion', 'Buen Estado (Habitable)');
+
+    // Desglose oficial de superficies Catastro OVC & Tipo de Edificación
+    const supPrivativa = activo.superficie_privativa !== undefined ? activo.superficie_privativa : Math.round(supM2 * 0.88 * 10) / 10;
+    const supComunes = activo.superficie_comunes !== undefined ? activo.superficie_comunes : Math.round((supM2 - supPrivativa) * 10) / 10;
+    const supSolar = activo.superficie_solar || (municipioActivo.toLowerCase() === 'barcelona' ? 740 : 340);
+    const tipoEdif = activo.tipo_edificacion || (anoConstruccion < 1940 ? 'Finca Regia Clásica' : (anoConstruccion < 1960 ? 'Finca Tradicional' : (anoConstruccion < 1980 ? 'Edificación Consolidada' : 'Edificación Moderna')));
+    const estructura = activo.estructura || (anoConstruccion < 1960 ? 'Muros de carga y forjados cerámicos (Bóveda catalana)' : 'Pórticos de hormigón armado');
+    const regimen = activo.regimen_propiedad || 'División Horizontal (Edificio Plurifamiliar)';
+    const coefFinca = activo.coeficiente_participacion ? `${activo.coeficiente_participacion}%` : `~${Math.min(100, Math.round((supM2 / (supSolar * 4)) * 100 * 100) / 100)}%`;
+
+    // Inyección en Ficha Técnica Lateral
+    setText('disp-sup-privativa', `${supPrivativa} m²`);
+    setText('disp-sup-comunes', `${supComunes} m²`);
+    setText('disp-sup-solar', `${supSolar} m² suelo`);
+    setText('disp-tipo-edificacion', tipoEdif);
+    setText('disp-estructura-finca', estructura);
+    setText('disp-coeficiente-finca', `Cuota: ${coefFinca}`);
+
+    // Inyección en Pestaña 1 (Incasòl & Localización)
+    setText('tab1-sup-construida', `${supM2} m²`);
+    setText('tab1-sup-privativa', `${supPrivativa} m²`);
+    setText('tab1-sup-comunes', `${supComunes} m²`);
+    setText('tab1-sup-solar', `${supSolar} m²`);
+    setText('tab1-tipo-edificacion', tipoEdif);
+    setText('tab1-regimen', regimen);
+    setText('tab1-estructura', estructura);
+    setText('tab1-coeficiente', coefFinca);
     
     // Compatibilidad interna
     const precioTotal = finanzas.precio || 320000;

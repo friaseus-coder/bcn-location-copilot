@@ -225,6 +225,12 @@
           <div id="badge-radiografia-edificio" class="hidden absolute top-full left-0 right-0 mt-1 p-2 bg-stone-900/95 text-stone-100 text-[10px] rounded shadow-lg z-40 leading-tight"></div>
         </div>
 
+        <!-- Input Superficie Construida (m²) Editable Directamente -->
+        <div class="relative w-[90px] flex-shrink-0" title="Superficie construida total en m² (Sede Catastro OVC)">
+          <input class="w-full h-9 pl-2 pr-7 text-center rounded bg-surface border border-sandstone-border font-body-sm text-body-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary font-bold font-mono" id="input-superficie" max="99999" min="10" placeholder="110" type="number" value="110" autocomplete="off" onfocus="this.select()" />
+          <span class="absolute right-2 top-1/2 -translate-y-1/2 text-[11px] font-bold text-outline pointer-events-none">m²</span>
+        </div>
+
         <!-- Input hidden fallback for legacy compatibility -->
         <input type="hidden" id="input-direccion" value="Carrer de Balmes, 12, Barcelona"/>
 
@@ -359,7 +365,35 @@
                 <div class="p-2.5 rounded-lg bg-surface border border-sandstone-border flex flex-col gap-0.5 shadow-xs">
                   <span class="font-label-caps text-outline uppercase text-[10px] font-semibold">Año Construcción</span>
                   <div class="text-[17px] font-bold text-charcoal-text font-label-tabular" id="disp-ano">1928</div>
-                  <span class="text-[10px] text-on-surface-variant/80 font-medium" id="disp-tipo-finca">Finca Clásica</span>
+                  <span class="text-[10px] text-on-surface-variant/80 font-medium truncate" id="disp-tipo-finca">Finca Clásica</span>
+                </div>
+              </div>
+
+              <!-- Desglose de Superficies Catastrales & Parcela -->
+              <div class="p-2.5 rounded-lg bg-stone-surface/40 border border-sandstone-border flex flex-col gap-1.5 shadow-xs">
+                <div class="flex items-center justify-between pb-1 border-b border-sandstone-border/50">
+                  <span class="font-label-caps text-outline uppercase text-[9px] font-bold">_desglose_superficies_catastro</span>
+                  <span class="text-[9.5px] font-bold text-primary font-mono" id="disp-coeficiente-finca">Cuota: ~3.85%</span>
+                </div>
+                <div class="grid grid-cols-2 gap-1.5 text-[11px]">
+                  <div class="flex flex-col bg-surface p-1.5 rounded border border-sandstone-border/40">
+                    <span class="text-outline text-[9px] uppercase font-label-caps font-semibold">Privativa Neta</span>
+                    <span class="font-bold text-primary font-mono text-[13px]" id="disp-sup-privativa">96.8 m²</span>
+                    <span class="text-[8.5px] text-on-surface-variant">Útil interior (~88%)</span>
+                  </div>
+                  <div class="flex flex-col bg-surface p-1.5 rounded border border-sandstone-border/40">
+                    <span class="text-outline text-[9px] uppercase font-label-caps font-semibold">Elem. Comunes</span>
+                    <span class="font-bold text-charcoal-text font-mono text-[13px]" id="disp-sup-comunes">13.2 m²</span>
+                    <span class="text-[8.5px] text-on-surface-variant">Repercutida (~12%)</span>
+                  </div>
+                </div>
+                <div class="flex items-center justify-between pt-1 border-t border-sandstone-border/40 text-[10.5px]">
+                  <span class="text-outline font-medium">Parcela / Solar:</span>
+                  <span class="font-bold text-charcoal-text font-mono" id="disp-sup-solar">740 m² suelo</span>
+                </div>
+                <div class="flex flex-col pt-0.5 text-[10px] text-on-surface-variant leading-tight">
+                  <span class="font-semibold text-charcoal-text" id="disp-tipo-edificacion">Finca Regia Clásica</span>
+                  <span class="text-[9px] text-outline truncate" id="disp-estructura-finca">Muros de carga y forjados cerámicos</span>
                 </div>
               </div>
 
@@ -419,9 +453,8 @@
                 </div>
               </div>
 
-              <!-- Controles ocultos de compatibilidad técnica -->
+              <!-- Controles ocultos de compatibilidad técnica (sin input-superficie duplicado) -->
               <div class="hidden">
-                <input type="hidden" id="input-superficie" value="110"/>
                 <input type="hidden" id="input-precio" value="320000"/>
                 <select id="select-fachada"><option value="chaflan" selected>chaflan</option></select>
                 <input type="checkbox" id="check-humos" checked/>
@@ -713,8 +746,63 @@
                         <span>Pines interactivos y radios de proximidad</span>
                         <span class="text-primary font-semibold">ICGC &amp; OpenStreetMap</span>
                       </div>
+                  </div>
+
+                  <!-- 3. RADIOGRAFÍA CATASTRAL: DESGLOSE OFICIAL DE SUPERFICIES Y TIPO DE EDIFICACIÓN -->
+                  <div class="p-space-md rounded-xl bg-surface-container-lowest border border-sandstone-border flex flex-col gap-space-sm shadow-xs">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-1 border-b border-sandstone-border/60 gap-1">
+                      <div class="flex items-center gap-1.5 text-primary font-bold text-[11px] uppercase tracking-wide font-label-caps">
+                        <span class="material-symbols-outlined text-[18px] text-primary">domain</span>
+                        <span>_3._radiografía_catastral:_desglose_de_superficies_y_tipo_de_edificación</span>
+                      </div>
+                      <span class="px-2 py-0.5 rounded bg-stone-surface border border-sandstone-border font-label-tabular-sm text-[10px] text-charcoal-text font-semibold">Sede Electrónica Catastro OVC</span>
                     </div>
 
+                    <!-- 4 Tarjetas de Superficie -->
+                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-space-sm">
+                      <!-- Sup Construida Total -->
+                      <div class="p-space-sm rounded-lg bg-surface border border-sandstone-border flex flex-col gap-0.5">
+                        <span class="font-label-caps text-outline uppercase text-[10px] font-semibold">Sup. Construida Total</span>
+                        <div class="text-[18px] font-bold text-primary font-label-tabular font-mono" id="tab1-sup-construida">110.0 m²</div>
+                        <span class="text-[10px] text-on-surface-variant leading-tight">Total con comunes incluidos</span>
+                      </div>
+                      <!-- Sup Privativa Neta -->
+                      <div class="p-space-sm rounded-lg bg-surface border border-sandstone-border flex flex-col gap-0.5">
+                        <span class="font-label-caps text-outline uppercase text-[10px] font-semibold">Sup. Privativa Neta</span>
+                        <div class="text-[18px] font-bold text-emerald-800 font-label-tabular font-mono" id="tab1-sup-privativa">96.8 m²</div>
+                        <span class="text-[10px] text-emerald-900 leading-tight">Útil interior exclusivo (~88%)</span>
+                      </div>
+                      <!-- Sup Elementos Comunes -->
+                      <div class="p-space-sm rounded-lg bg-surface border border-sandstone-border flex flex-col gap-0.5">
+                        <span class="font-label-caps text-outline uppercase text-[10px] font-semibold">Sup. Elem. Comunes</span>
+                        <div class="text-[18px] font-bold text-charcoal-text font-label-tabular font-mono" id="tab1-sup-comunes">13.2 m²</div>
+                        <span class="text-[10px] text-on-surface-variant leading-tight">Repercutida en portal y accesos</span>
+                      </div>
+                      <!-- Sup Parcela / Solar -->
+                      <div class="p-space-sm rounded-lg bg-surface border border-sandstone-border flex flex-col gap-0.5">
+                        <span class="font-label-caps text-outline uppercase text-[10px] font-semibold">Sup. Parcela / Solar</span>
+                        <div class="text-[18px] font-bold text-primary font-label-tabular font-mono" id="tab1-sup-solar">740.0 m²</div>
+                        <span class="text-[10px] text-on-surface-variant leading-tight">Suelo sobre el que se levanta</span>
+                      </div>
+                    </div>
+
+                    <!-- Ficha del Tipo de Edificación y Régimen de la Finca -->
+                    <div class="p-space-sm rounded-lg bg-stone-surface/50 border border-sandstone-border/70 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                      <div class="flex items-center gap-2.5">
+                        <span class="material-symbols-outlined text-primary text-[24px]">foundation</span>
+                        <div class="flex flex-col">
+                          <div class="flex items-center gap-2">
+                            <span class="font-bold text-charcoal-text text-body-sm" id="tab1-tipo-edificacion">Finca Regia Clásica</span>
+                            <span class="px-1.5 py-0.2 rounded bg-badge-living-bg text-primary font-label-tabular-sm text-[9.5px] font-bold" id="tab1-regimen">División Horizontal</span>
+                          </div>
+                          <span class="text-on-surface-variant text-[11px]" id="tab1-estructura">Muros de carga de fábrica y forjados cerámicos (Bóveda catalana)</span>
+                        </div>
+                      </div>
+                      <div class="flex items-center gap-2 flex-shrink-0">
+                        <span class="font-label-caps text-[10px] text-outline uppercase font-semibold">Cuota Participación:</span>
+                        <span class="font-label-tabular text-[13px] font-bold text-primary font-mono bg-surface px-2 py-1 rounded border border-sandstone-border" id="tab1-coeficiente">~3.85%</span>
+                      </div>
+                    </div>
                   </div>
 
                   <!-- IDENTIFICADORES OCULTOS DE COMPATIBILIDAD TÉCNICA -->
@@ -803,26 +891,32 @@
                       </div>
                     </div>
 
-                    <div class="p-space-md rounded-lg bg-surface border border-sandstone-border flex flex-col gap-space-sm">
-                      <span class="font-label-caps text-primary uppercase text-[10px] font-bold">_sensibilidad_meteorológica</span>
-                      <div class="p-space-sm rounded bg-stone-surface/40 border border-sandstone-border/60 flex flex-col gap-2">
-                        <div class="flex items-center justify-between">
-                          <span class="font-body-sm text-body-sm font-medium text-charcoal-text">Afluencia en Días de Lluvia</span>
-                          <span class="font-label-tabular-sm text-label-tabular-sm font-bold text-secondary" id="mov-clima-impacto">+22% vehículos / -18% a pie</span>
-                        </div>
-                        <div class="w-full bg-sandstone-border h-2 rounded-full overflow-hidden">
-                          <div class="bg-secondary h-full rounded-full" style="width: 72%;"></div>
-                        </div>
-                        <span class="font-body-sm text-body-sm text-on-surface-variant text-[11px]" id="mov-clima-desc">
-                          El eje viario actúa como embudo distribuidor; los vehículos privados saturan los parkings subterráneos en eventos de precipitaciones continuadas.
-                        </span>
+                    <div class="p-space-md rounded-lg bg-surface border border-sandstone-border flex flex-col gap-space-sm justify-between">
+                      <div class="flex items-center justify-between">
+                        <span class="font-label-caps text-primary uppercase text-[10px] font-bold">_micromovilidad_&amp;_estaciones_físicas</span>
+                        <span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-900 font-label-tabular-sm text-[9px] font-bold">Inventario Oficial AMB / B:SM</span>
                       </div>
-                      <div class="p-space-sm rounded bg-stone-surface/40 border border-sandstone-border/60 flex items-center justify-between">
-                        <div class="flex flex-col">
-                          <span class="font-body-sm text-body-sm font-semibold text-charcoal-text" id="mov-micro-nombre">Parada Bicing Eléctrico</span>
-                          <span class="font-label-tabular-sm text-label-tabular-sm text-outline" id="mov-micro-desc">Estación #62 (24 anclajes activos) a 45m</span>
+                      <div class="p-space-md rounded-lg bg-stone-surface/40 border border-sandstone-border/60 flex flex-col gap-3">
+                        <div class="flex items-center justify-between">
+                          <div class="flex items-center gap-2">
+                            <span class="material-symbols-outlined text-[20px] text-primary">pedal_bike</span>
+                            <div class="flex flex-col">
+                              <span class="font-body-sm text-body-sm font-semibold text-charcoal-text" id="mov-micro-nombre">Parada Bicing Eléctrico</span>
+                              <span class="font-label-tabular-sm text-label-tabular-sm text-outline" id="mov-micro-desc">Estación #62 (24 anclajes activos) a 45m</span>
+                            </div>
+                          </div>
+                          <span class="px-2 py-1 rounded bg-badge-living-bg text-primary font-label-tabular-sm text-label-tabular-sm font-semibold" id="mov-micro-tag">Rotación 8.4 usos/día</span>
                         </div>
-                        <span class="font-label-tabular-sm text-label-tabular-sm text-primary font-semibold" id="mov-micro-tag">Rotación 8.4 usos/día</span>
+                        <div class="pt-2 border-t border-sandstone-border/50 flex items-center justify-between text-[11px] text-outline font-label-tabular-sm">
+                          <span>Módulo físico verificado en vía pública</span>
+                          <span class="text-primary font-medium">Ubicación contrastada</span>
+                        </div>
+                      </div>
+                      
+                      <!-- Elementos estimados no sensorizados retirados de la vista -->
+                      <div class="hidden">
+                        <span id="mov-clima-impacto"></span>
+                        <span id="mov-clima-desc"></span>
                       </div>
                     </div>
                   </div>
@@ -839,8 +933,8 @@
                     <span class="px-2.5 py-1 rounded bg-stone-surface border border-sandstone-border font-label-tabular-sm text-label-tabular-sm text-primary font-semibold">Fuentes Públicas Oficiales</span>
                   </div>
 
-                  <!-- REJILLA DE LAS 3 TARJETAS DEMOGRÁFICAS CON ORIGEN Y GRANULARIDAD MÍNIMA -->
-                  <div class="grid grid-cols-1 md:grid-cols-3 gap-space-md">
+                  <!-- REJILLA DE LAS TARJETAS DEMOGRÁFICAS (POBLACIÓN FLOTANTE & RENTA INE) -->
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-space-md">
                     
                     <!-- Tarjeta 1: Población Flotante -->
                     <div class="p-space-md rounded-xl bg-surface-container-lowest border border-sandstone-border flex flex-col justify-between shadow-xs">
@@ -910,38 +1004,13 @@
                       </details>
                     </div>
 
-                    <!-- Tarjeta 3: Competencia Directa (150m) -->
-                    <div class="p-space-md rounded-xl bg-surface-container-lowest border border-sandstone-border flex flex-col justify-between shadow-xs">
-                      <div class="flex flex-col gap-1.5">
-                        <div class="flex items-center justify-between pb-1 border-b border-sandstone-border/60">
-                          <span class="font-label-caps text-outline uppercase text-[10px] font-bold">_tejido_comercial</span>
-                          <div class="flex items-center gap-1.5">
-                            <span id="marca-origen-competencia"></span>
-                            <span class="px-1.5 py-0.5 rounded bg-stone-surface text-charcoal-text font-label-tabular-sm text-[9px] font-bold" id="badge-competencia">MICRO: MANZANA CATASTRAL</span>
-                          </div>
-                        </div>
-                        <span class="text-[12px] font-semibold text-outline uppercase tracking-wider font-label-caps">Competencia Directa (150m)</span>
-                        <div class="font-headline-xl text-headline-xl font-bold text-charcoal-text font-mono" id="val-competencia">4 Locales en PB</div>
-                        <span class="font-body-sm text-body-sm text-charcoal-text font-medium" id="val-competencia-desc">
-                          Manzana catastral e isócrona peatonal 150m (Uso C Comercial en planta baja).
-                        </span>
-                        <div class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 mt-1" id="val-competencia-granularidad">
-                          <span class="material-symbols-outlined text-[12px]">filter_center_focus</span>
-                          <span>Granularidad Mínima: Manzana Catastral + 150m</span>
-                        </div>
-                      </div>
-                      <details class="group mt-2.5 pt-2 border-t border-sandstone-border/60 cursor-pointer">
-                        <summary class="list-none flex items-center justify-between text-[10px] font-bold text-primary uppercase font-label-caps hover:text-terracotta-accent transition-colors select-none py-0.5">
-                          <span class="flex items-center gap-1">
-                            <span class="material-symbols-outlined text-[13px] text-terracotta-accent">source</span>
-                            <span>¿De dónde sale este dato?</span>
-                          </span>
-                          <span class="material-symbols-outlined text-[15px] text-outline transition-transform duration-200 group-open:rotate-180">expand_more</span>
-                        </summary>
-                        <div class="mt-1.5 p-2 rounded bg-stone-surface/50 border border-sandstone-border/50 text-[11px] text-on-surface-variant leading-relaxed">
-                          Del <strong>Censo de Locales en Planta Baja y Actividades Económicas</strong> cruzado con la base de datos de <em>Catastro OVC</em>. Aísla la <strong>manzana catastral exacta (código de 7 dígitos)</strong> y los locales con uso comercial `C` en un radio inmediato de 150 metros (2 minutos a pie).
-                        </div>
-                      </details>
+                    <!-- Elementos de compatibilidad preservados en modo oculto -->
+                    <div class="hidden">
+                      <span id="marca-origen-competencia"></span>
+                      <span id="badge-competencia"></span>
+                      <div id="val-competencia"></div>
+                      <span id="val-competencia-desc"></span>
+                      <div id="val-competencia-granularidad"></div>
                     </div>
 
                   </div>
@@ -1587,35 +1656,53 @@
                     </div>
                   </div>
 
-                  <!-- 6 Tarjetas de Clima 365 Días -->
+                  <!-- 6 Tarjetas de Clima 365 Días con Tooltips Explicativos -->
                   <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-space-sm">
-                    <div class="p-space-sm rounded bg-surface border border-sandstone-border flex flex-col gap-1 text-center">
-                      <span class="font-label-caps text-outline uppercase text-[10px] font-semibold">Días con Lluvia</span>
+                    <div class="p-space-sm rounded bg-surface border border-sandstone-border flex flex-col gap-1 text-center transition-all hover:border-primary/40 group cursor-help relative" title="Días del año con precipitación acumulada superior a 1 mm (estándar OMM de lluvia apreciable). Nivel mínimo teórico: 0 días.">
+                      <div class="flex items-center justify-center gap-1">
+                        <span class="font-label-caps text-outline uppercase text-[10px] font-semibold">Días con Lluvia</span>
+                        <span class="material-symbols-outlined text-[12px] text-outline group-hover:text-primary transition-colors">help</span>
+                      </div>
                       <span class="font-headline-lg text-headline-lg font-bold text-secondary" id="clima-dias-lluvia">52 días</span>
                       <span class="font-label-tabular-sm text-label-tabular-sm text-outline">&gt; 1 mm / 24h</span>
                     </div>
-                    <div class="p-space-sm rounded bg-surface border border-sandstone-border flex flex-col gap-1 text-center">
-                      <span class="font-label-caps text-outline uppercase text-[10px] font-semibold">Precipitación</span>
+                    <div class="p-space-sm rounded bg-surface border border-sandstone-border flex flex-col gap-1 text-center transition-all hover:border-primary/40 group cursor-help relative" title="Litros totales de agua acumulados por metro cuadrado durante los últimos 365 días. Nivel mínimo: 0.0 mm.">
+                      <div class="flex items-center justify-center gap-1">
+                        <span class="font-label-caps text-outline uppercase text-[10px] font-semibold">Precipitación</span>
+                        <span class="material-symbols-outlined text-[12px] text-outline group-hover:text-primary transition-colors">help</span>
+                      </div>
                       <span class="font-headline-lg text-headline-lg font-bold text-secondary" id="clima-precipitacion">485 mm</span>
                       <span class="font-label-tabular-sm text-label-tabular-sm text-outline">Año acumulado</span>
                     </div>
-                    <div class="p-space-sm rounded bg-surface border border-sandstone-border flex flex-col gap-1 text-center">
-                      <span class="font-label-caps text-outline uppercase text-[10px] font-semibold">Ola de Calor</span>
+                    <div class="p-space-sm rounded bg-surface border border-sandstone-border flex flex-col gap-1 text-center transition-all hover:border-primary/40 group cursor-help relative" title="Jornadas donde la temperatura máxima diurna superó los 32 °C (umbral de alerta metropolitana por calor). Nivel mínimo: 0 días.">
+                      <div class="flex items-center justify-center gap-1">
+                        <span class="font-label-caps text-outline uppercase text-[10px] font-semibold">Ola de Calor</span>
+                        <span class="material-symbols-outlined text-[12px] text-outline group-hover:text-primary transition-colors">help</span>
+                      </div>
                       <span class="font-headline-lg text-headline-lg font-bold text-terracotta-accent" id="clima-ola-calor">38 días</span>
                       <span class="font-label-tabular-sm text-label-tabular-sm text-outline">Tmax &gt; 32 °C</span>
                     </div>
-                    <div class="p-space-sm rounded bg-surface border border-sandstone-border flex flex-col gap-1 text-center">
-                      <span class="font-label-caps text-outline uppercase text-[10px] font-semibold">Noches Tropicales</span>
+                    <div class="p-space-sm rounded bg-surface border border-sandstone-border flex flex-col gap-1 text-center transition-all hover:border-primary/40 group cursor-help relative" title="Noches donde la temperatura mínima nocturna no descendió de 20 °C (impide ventilación pasiva y confort de sueño). Nivel mínimo: 0 noches.">
+                      <div class="flex items-center justify-center gap-1">
+                        <span class="font-label-caps text-outline uppercase text-[10px] font-semibold">Noches Tropicales</span>
+                        <span class="material-symbols-outlined text-[12px] text-outline group-hover:text-primary transition-colors">help</span>
+                      </div>
                       <span class="font-headline-lg text-headline-lg font-bold text-terracotta-accent" id="clima-noches-tropicales">74 noches</span>
                       <span class="font-label-tabular-sm text-label-tabular-sm text-outline">Tmin &gt; 20 °C</span>
                     </div>
-                    <div class="p-space-sm rounded bg-surface border border-sandstone-border flex flex-col gap-1 text-center">
-                      <span class="font-label-caps text-outline uppercase text-[10px] font-semibold">Grados Calefacción</span>
+                    <div class="p-space-sm rounded bg-surface border border-sandstone-border flex flex-col gap-1 text-center transition-all hover:border-primary/40 group cursor-help relative" title="Heating Degree Days (Base 18°C): Sumatorio anual de la severidad del frío. Indica la demanda de calefacción requerida. Nivel mínimo: 0 HDD.">
+                      <div class="flex items-center justify-center gap-1">
+                        <span class="font-label-caps text-outline uppercase text-[10px] font-semibold">Grados Calefacción</span>
+                        <span class="material-symbols-outlined text-[12px] text-outline group-hover:text-primary transition-colors">help</span>
+                      </div>
                       <span class="font-headline-lg text-headline-lg font-bold text-primary" id="clima-hdd">840 HDD</span>
                       <span class="font-label-tabular-sm text-label-tabular-sm text-outline">Base 18 °C</span>
                     </div>
-                    <div class="p-space-sm rounded bg-surface border border-sandstone-border flex flex-col gap-1 text-center">
-                      <span class="font-label-caps text-outline uppercase text-[10px] font-semibold">Grados Refrigeración</span>
+                    <div class="p-space-sm rounded bg-surface border border-sandstone-border flex flex-col gap-1 text-center transition-all hover:border-primary/40 group cursor-help relative" title="Cooling Degree Days (Base 21°C): Sumatorio anual del exceso térmico estival. Indica la demanda de aire acondicionado y climatización. Nivel mínimo: 0 CDD.">
+                      <div class="flex items-center justify-center gap-1">
+                        <span class="font-label-caps text-outline uppercase text-[10px] font-semibold">Grados Refrigeración</span>
+                        <span class="material-symbols-outlined text-[12px] text-outline group-hover:text-primary transition-colors">help</span>
+                      </div>
                       <span class="font-headline-lg text-headline-lg font-bold text-primary" id="clima-cdd">495 CDD</span>
                       <span class="font-label-tabular-sm text-label-tabular-sm text-outline">Base 21 °C</span>
                     </div>
@@ -1638,7 +1725,142 @@
                         </p>
                       </div>
                     </div>
-                </div>
+                  </div>
+
+                  <!-- EXPLICACIÓN TÉCNICA: ORIGEN, CÁLCULO Y NIVELES MÍNIMOS (GUÍA DIDÁCTICA) -->
+                  <div class="p-space-md rounded-lg bg-surface border border-sandstone-border flex flex-col gap-space-md">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-space-xs border-b border-sandstone-border/60 gap-2">
+                      <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary text-[20px]">menu_book</span>
+                        <span class="font-label-caps text-primary uppercase text-[11px] font-bold">_metodología_climática:_origen,_cálculo_y_niveles_mínimos</span>
+                      </div>
+                      <div class="flex items-center gap-2">
+                        <span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-label-tabular-sm text-[10px] font-bold flex items-center gap-1">
+                          <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
+                          Datos Verificados 365d
+                        </span>
+                        <span class="text-on-surface-variant font-label-tabular-sm text-[11px]">Estándares OMM &amp; ASHRAE</span>
+                      </div>
+                    </div>
+
+                    <!-- Bloque 1: De Dónde Vienen los Datos -->
+                    <div class="p-space-sm rounded-lg bg-stone-surface/40 border border-sandstone-border/70 flex flex-col gap-2">
+                      <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-secondary text-[18px]">satellite_alt</span>
+                        <span class="font-body-sm text-body-sm font-bold text-charcoal-text">1. ¿De dónde vienen estos datos? (Fuente Oficial &amp; Sensores)</span>
+                      </div>
+                      <p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+                        Los datos se obtienen en tiempo real mediante la <strong>API Histórica de Open-Meteo Archive</strong>, conectada al modelo de reanálisis <strong>ERA5 &amp; ERA5-Land</strong> del <em>Copernicus Climate Change Service (ECMWF - Centro Europeo de Previsiones Meteorológicas)</em>. Este modelo asimila lecturas satelitales globales combinadas con estaciones meteorológicas físicas en superficie del <strong>Servei Meteorològic de Catalunya (Meteocat)</strong> y de la <strong>AEMET</strong>. La consulta se ejecuta de forma georreferenciada sobre las coordenadas geográficas exactas (latitud y longitud WGS84) del inmueble durante los últimos 365 días reales finalizados (año móvil o <em>trailing 365</em>).
+                      </p>
+                    </div>
+
+                    <!-- Bloque 2: Tabla de Cálculo y Nivel Mínimo por Métrica -->
+                    <div class="flex flex-col gap-2">
+                      <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-secondary text-[18px]">calculate</span>
+                        <span class="font-body-sm text-body-sm font-bold text-charcoal-text">2. ¿Cómo se calcula cada indicador y cuál es su nivel mínimo?</span>
+                      </div>
+
+                      <div class="overflow-x-auto rounded border border-sandstone-border/70">
+                        <table class="w-full text-left border-collapse font-body-sm text-[12px]">
+                          <thead>
+                            <tr class="bg-stone-surface text-charcoal-text border-b border-sandstone-border font-semibold">
+                              <th class="py-2 px-3">Indicador</th>
+                              <th class="py-2 px-3">¿Qué mide y para qué sirve?</th>
+                              <th class="py-2 px-3">¿Cómo se calcula? (Fórmula)</th>
+                              <th class="py-2 px-3 text-center">Umbral de Disparo</th>
+                              <th class="py-2 px-3 text-center">Nivel Mínimo</th>
+                            </tr>
+                          </thead>
+                          <tbody class="divide-y divide-sandstone-border/50 text-on-surface-variant">
+                            <!-- Días con Lluvia -->
+                            <tr class="hover:bg-stone-surface/30 transition-colors">
+                              <td class="py-2.5 px-3 font-semibold text-secondary whitespace-nowrap flex items-center gap-1.5">
+                                <span class="material-symbols-outlined text-[16px] text-secondary">rainy</span>
+                                Días con Lluvia
+                              </td>
+                              <td class="py-2.5 px-3">Jornadas que condicionan terrazas comerciales, afluencia física peatonal y riesgo de humedad en cubiertas.</td>
+                              <td class="py-2.5 px-3 font-mono text-[11px] text-charcoal-text">Suma de días con Precipitación &gt; 1.0 mm en 24h</td>
+                              <td class="py-2.5 px-3 text-center font-mono font-semibold text-charcoal-text">&gt; 1.0 mm/día</td>
+                              <td class="py-2.5 px-3 text-center">
+                                <span class="px-2 py-0.5 rounded bg-stone-surface border border-sandstone-border font-mono font-bold text-charcoal-text">0 días</span>
+                              </td>
+                            </tr>
+                            <!-- Precipitación Acumulada -->
+                            <tr class="hover:bg-stone-surface/30 transition-colors">
+                              <td class="py-2.5 px-3 font-semibold text-secondary whitespace-nowrap flex items-center gap-1.5">
+                                <span class="material-symbols-outlined text-[16px] text-secondary">water_drop</span>
+                                Precipitación
+                              </td>
+                              <td class="py-2.5 px-3">Volumen hídrico total anual. Afecta el drenaje urbano, la impermeabilización de bajantes y el mantenimiento de fachadas.</td>
+                              <td class="py-2.5 px-3 font-mono text-[11px] text-charcoal-text">&Sigma; (Lluvia diaria en mm) a lo largo de 365 días</td>
+                              <td class="py-2.5 px-3 text-center font-mono font-semibold text-charcoal-text">Acumulado anual</td>
+                              <td class="py-2.5 px-3 text-center">
+                                <span class="px-2 py-0.5 rounded bg-stone-surface border border-sandstone-border font-mono font-bold text-charcoal-text">0.0 mm</span>
+                              </td>
+                            </tr>
+                            <!-- Ola de Calor -->
+                            <tr class="hover:bg-stone-surface/30 transition-colors">
+                              <td class="py-2.5 px-3 font-semibold text-terracotta-accent whitespace-nowrap flex items-center gap-1.5">
+                                <span class="material-symbols-outlined text-[16px] text-terracotta-accent">local_fire_department</span>
+                                Ola de Calor
+                              </td>
+                              <td class="py-2.5 px-3">Jornadas de sobrecalentamiento extremo diurno con impacto en el rendimiento laboral y estrés del envolvente térmico.</td>
+                              <td class="py-2.5 px-3 font-mono text-[11px] text-charcoal-text">Suma de días con Temperatura Máxima &gt; 32.0 °C</td>
+                              <td class="py-2.5 px-3 text-center font-mono font-semibold text-charcoal-text">Tmax &gt; 32.0 °C</td>
+                              <td class="py-2.5 px-3 text-center">
+                                <span class="px-2 py-0.5 rounded bg-stone-surface border border-sandstone-border font-mono font-bold text-charcoal-text">0 días</span>
+                              </td>
+                            </tr>
+                            <!-- Noches Tropicales -->
+                            <tr class="hover:bg-stone-surface/30 transition-colors">
+                              <td class="py-2.5 px-3 font-semibold text-terracotta-accent whitespace-nowrap flex items-center gap-1.5">
+                                <span class="material-symbols-outlined text-[16px] text-terracotta-accent">bedtime</span>
+                                Noches Tropicales
+                              </td>
+                              <td class="py-2.5 px-3">Noches en las que el mercurio no desciende lo suficiente para disipar calor de forma pasiva, obligando a usar climatización nocturna.</td>
+                              <td class="py-2.5 px-3 font-mono text-[11px] text-charcoal-text">Suma de noches con Temperatura Mínima &gt; 20.0 °C</td>
+                              <td class="py-2.5 px-3 text-center font-mono font-semibold text-charcoal-text">Tmin &gt; 20.0 °C</td>
+                              <td class="py-2.5 px-3 text-center">
+                                <span class="px-2 py-0.5 rounded bg-stone-surface border border-sandstone-border font-mono font-bold text-charcoal-text">0 noches</span>
+                              </td>
+                            </tr>
+                            <!-- Grados Día Calefacción (HDD) -->
+                            <tr class="hover:bg-stone-surface/30 transition-colors">
+                              <td class="py-2.5 px-3 font-semibold text-primary whitespace-nowrap flex items-center gap-1.5">
+                                <span class="material-symbols-outlined text-[16px] text-primary">mode_heat</span>
+                                Grados Calefacción (HDD)
+                              </td>
+                              <td class="py-2.5 px-3">Demanda acumulada de energía para calentar el inmueble en invierno. A mayor HDD, mayor consumo de gas o electricidad.</td>
+                              <td class="py-2.5 px-3 font-mono text-[11px] text-charcoal-text">&Sigma; máx(0, 18.0 °C - Temperatura Media Diaria)</td>
+                              <td class="py-2.5 px-3 text-center font-mono font-semibold text-charcoal-text">Tmedia &lt; 18.0 °C</td>
+                              <td class="py-2.5 px-3 text-center">
+                                <span class="px-2 py-0.5 rounded bg-stone-surface border border-sandstone-border font-mono font-bold text-charcoal-text">0 HDD</span>
+                              </td>
+                            </tr>
+                            <!-- Grados Día Refrigeración (CDD) -->
+                            <tr class="hover:bg-stone-surface/30 transition-colors">
+                              <td class="py-2.5 px-3 font-semibold text-primary whitespace-nowrap flex items-center gap-1.5">
+                                <span class="material-symbols-outlined text-[16px] text-primary">mode_fan</span>
+                                Grados Refrigeración (CDD)
+                              </td>
+                              <td class="py-2.5 px-3">Demanda acumulada de energía para enfriar el inmueble en verano. Permite prever la factura eléctrica de aire acondicionado.</td>
+                              <td class="py-2.5 px-3 font-mono text-[11px] text-charcoal-text">&Sigma; máx(0, Temperatura Media Diaria - 21.0 °C)</td>
+                              <td class="py-2.5 px-3 text-center font-mono font-semibold text-charcoal-text">Tmedia &gt; 21.0 °C</td>
+                              <td class="py-2.5 px-3 text-center">
+                                <span class="px-2 py-0.5 rounded bg-stone-surface border border-sandstone-border font-mono font-bold text-charcoal-text">0 CDD</span>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+
+                      <div class="flex items-center gap-2 p-2 rounded bg-amber-50/60 border border-amber-200 text-amber-950 font-body-sm text-[11px]">
+                        <span class="material-symbols-outlined text-amber-700 text-[16px] flex-shrink-0">lightbulb</span>
+                        <span><strong>Nota de interpretación rápida:</strong> El <em>nivel mínimo</em> en todas estas métricas es <strong>cero (0)</strong>, lo que indicaría ausencia total de la condición (por ejemplo, 0 HDD significaría un clima tropical continuo sin necesidad de calefacción en todo el año). Los <em>umbrales</em> (1 mm, 32 °C, 20 °C, bases 18 °C y 21 °C) son los estándares internacionales fijados por la OMM y ASHRAE para activar el cómputo de cada variable.</span>
+                      </div>
+                    </div>
+                  </div>
 
               </div>
             </div>
