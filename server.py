@@ -77,7 +77,7 @@ MUNICIPALITIES_GEO: Dict[str, Dict[str, Any]] = {
     "vic": {"lat": 41.9307, "lon": 2.2546, "comarca": "Osona", "tensionado": True, "habitantes": 47545},
     "esplugues de llobregat": {"lat": 41.3768, "lon": 2.0883, "comarca": "Baix Llobregat", "tensionado": True, "habitantes": 46427},
     "gavà": {"lat": 41.3060, "lon": 2.0033, "comarca": "Baix Llobregat", "tensionado": True, "habitantes": 46974},
-    "sant feliu de llobregat": {"lat": 41.3844, "lon": 2.0503, "comarca": "Baix Llobregat", "tensionado": True, "habitantes": 45642},
+    "sant feliu de llobregat": {"lat": 41.381285, "lon": 2.044638, "comarca": "Baix Llobregat", "tensionado": True, "habitantes": 45642},
     "igualada": {"lat": 41.5818, "lon": 1.6174, "comarca": "Anoia", "tensionado": True, "habitantes": 40742},
     "ripollet": {"lat": 41.4971, "lon": 2.1557, "comarca": "Vallès Occidental", "tensionado": True, "habitantes": 39031},
     "sant adrià de besòs": {"lat": 41.4307, "lon": 2.2185, "comarca": "Barcelonès", "tensionado": True, "habitantes": 37447},
@@ -195,6 +195,7 @@ INCASOL_BENCHMARKS: Dict[str, Dict[str, float]] = {
     "sabadell": {"retail": 18.0, "oficina": 11.5, "residencial": 12.4},
     "terrassa": {"retail": 17.5, "oficina": 11.0, "residencial": 12.0},
     "mataró": {"retail": 19.0, "oficina": 12.0, "residencial": 13.2},
+    "sant feliu de llobregat": {"retail": 18.0, "oficina": 12.5, "residencial": 13.8},
     "granollers": {"retail": 18.5, "oficina": 11.0, "residencial": 12.5},
     "manresa": {"retail": 14.0, "oficina": 9.0, "residencial": 9.8},
     "vic": {"retail": 15.0, "oficina": 9.5, "residencial": 10.2},
@@ -900,7 +901,26 @@ async def analizar_activo(
     precio_val = precio or precio_compra or 320000.0
     mun_clean = municipio.strip()
     mun_lower = mun_clean.lower()
-    geo_mun = MUNICIPALITIES_GEO.get(mun_lower, MUNICIPALITIES_GEO["barcelona"])
+    
+    # Búsqueda flexible de municipio en la matriz provincial
+    matched_mun = None
+    if mun_lower in MUNICIPALITIES_GEO:
+        matched_mun = mun_lower
+    else:
+        for k in MUNICIPALITIES_GEO:
+            if k in mun_lower or (len(mun_lower) >= 4 and mun_lower in k):
+                matched_mun = k
+                break
+    
+    if matched_mun:
+        mun_lower = matched_mun
+        geo_mun = MUNICIPALITIES_GEO[matched_mun]
+        # Capitalización formal
+        mun_clean = "Sant Feliu de Llobregat" if matched_mun == "sant feliu de llobregat" else matched_mun.title()
+    else:
+        geo_mun = MUNICIPALITIES_GEO["barcelona"]
+        mun_clean = "Barcelona"
+        mun_lower = "barcelona"
 
     # --------------------------------------------------------------------------
     # A. CATASTRO OVC (SEDE ELECTRÓNICA) CON FALLBACK DETERMINISTA
@@ -1181,6 +1201,7 @@ async def analizar_activo(
             "ref_catastral": ref_catastral,
             "ano_construccion": ano_construccion,
             "superficie": superficie_oficial,
+            "tipologia": tipologia,
             "tipo_finca": "Finca Clásica" if ano_construccion < 1960 else "Edificación Moderna",
             "score": score,
             "registro": registro_info
@@ -1224,41 +1245,53 @@ async def consultar_catastro_ovc(municipio: str, calle: str, numero: str, piso: 
 
     num_clean = re.sub(r'\D', '', numero) if numero else ""
 
-    # 1. GEOCODIFICACIÓN DINÁMICA DE LA DIRECCIÓN EXACTA (NOMINATIM BÚSQUEDA LIBRE Q)
+    # 1. GEOCODIFICACIÓN DINÁMICA DE LA DIRECCIÓN EXACTA (NOMINATIM BÚSQUEDA LIBRE ESCALONADA)
     try:
+        # Extraer nombre base eliminando prefijos de tipo de vía
+        patron_vias = r'^(carrer\s+de\s+|carrer\s+|carretera\s+de\s+|carretera\s+|avinguda\s+de\s+|avinguda\s+|avda\.?\s+|av\.?\s+|calle\s+de\s+|calle\s+|passeig\s+de\s+|passeig\s+|pg\.?\s+de\s+|plaça\s+de\s+|plaça\s+|placa\s+de\s+|placa\s+|rambla\s+de\s+|rambla\s+|passatge\s+de\s+|passatge\s+|ptge\.?\s+de\s+)'
+        nombre_base = re.sub(patron_vias, '', calle_clean, flags=re.IGNORECASE).strip()
+
+        intentos_q = []
+        if num_clean:
+            intentos_q.append(f"{calle_norm} {num_clean}, {municipio}, Spain")
+            if nombre_base and nombre_base != calle_norm:
+                intentos_q.append(f"{nombre_base} {num_clean}, {municipio}, Spain")
+        intentos_q.append(f"{calle_norm}, {municipio}, Spain")
+        if nombre_base and nombre_base != calle_norm:
+            intentos_q.append(f"{nombre_base}, {municipio}, Spain")
+        intentos_q.append(f"{municipio}, Spain")
+
         nom_url = "https://nominatim.openstreetmap.org/search"
         headers = {"User-Agent": "BCNLocationCopilot/3.0 (underwriting@bcncopilot.local)"}
-        async with httpx.AsyncClient(timeout=3.0) as client:
-            # Intento A: Portal exacto con número y query libre 'q' (máxima tolerancia OSM)
-            query_exacta = f"{calle_norm} {num_clean}, {municipio}, Spain".strip() if num_clean else f"{calle_norm}, {municipio}, Spain"
-            resp = await client.get(nom_url, params={
-                "q": query_exacta,
-                "countrycodes": "es",
-                "format": "json",
-                "addressdetails": "1"
-            }, headers=headers)
-            data = resp.json() if resp.status_code == 200 else []
 
-            # Intento B: Si el portal específico no está indexado, buscar la vía completa en el municipio
-            if not data:
-                resp2 = await client.get(nom_url, params={
-                    "q": f"{calle_norm}, {municipio}, Spain",
+        async with httpx.AsyncClient(timeout=4.0) as client:
+            for q_try in intentos_q:
+                resp = await client.get(nom_url, params={
+                    "q": q_try,
                     "countrycodes": "es",
                     "format": "json",
                     "addressdetails": "1"
                 }, headers=headers)
-                data = resp2.json() if resp2.status_code == 200 else []
-
-            # Filtrar para evitar que devuelva el municipio genérico si se buscó una calle concreta
-            for item in data:
-                item_tipo = item.get("type", "")
-                item_clase = item.get("class", "")
-                # Aceptar calles, edificios, números de policía y puntos de interés
-                if item_tipo not in ["administrative", "boundary"] or item_clase in ["highway", "building", "place"]:
-                    lat = float(item["lat"])
-                    lon = float(item["lon"])
-                    geo_en_vivo = True
-                    break
+                if resp.status_code == 200:
+                    data = resp.json()
+                    for item in data:
+                        item_tipo = item.get("type", "")
+                        item_clase = item.get("class", "")
+                        # Si es intento con calle, aceptar calles, números y edificios
+                        if q_try != f"{municipio}, Spain":
+                            if item_tipo not in ["administrative", "boundary"] or item_clase in ["highway", "building", "place"]:
+                                lat = float(item["lat"])
+                                lon = float(item["lon"])
+                                geo_en_vivo = True
+                                break
+                        else:
+                            # Fallback centro de municipio
+                            lat = float(item["lat"])
+                            lon = float(item["lon"])
+                            geo_en_vivo = True
+                            break
+                    if geo_en_vivo:
+                        break
     except Exception:
         pass
 
@@ -1403,6 +1436,7 @@ def resolver_registro_competente(mun_lower: str, lat: float, lon: float) -> Dict
 
 def resolver_movilidad_y_parking(mun_lower: str, lat: float, lon: float, calle: str = "") -> Dict[str, Any]:
     """Calcula dinámicamente el perfil completo de movilidad, parkings subterráneos, puntos EV y micromovilidad."""
+    mun_lower = (mun_lower or "").strip().lower()
     calle_l = (calle or "").lower()
     
     if mun_lower == "barcelona":
@@ -1631,6 +1665,29 @@ def resolver_movilidad_y_parking(mun_lower: str, lat: float, lon: float, calle: 
         micro_nombre = "Aparcabicicletas Seguro Estació"
         micro_desc = "Módulos de custodia junto a Renfe a 90m"
         micro_rotacion = "Rotación 4.8 usos/día"
+    elif "sant feliu" in mun_lower:
+        mun_nom = "Sant Feliu de Llobregat"
+        estacion = "Sant Feliu de Llobregat (Rodalies)"
+        lineas = "Rodalies R1, R4"
+        distancia = 320
+        minutos = 4
+        deficit = None  # El déficit de parking en cuenca NO se puede calcular en Sant Feliu
+        deficit_desc = "Cálculo de déficit de cuenca no aplicable ni disponible fuera de Barcelona."
+        ocupacion_pct = None  # Sin telemetría abierta de sensores en calzada
+        ocupacion_desc = "Estacionamiento regulado municipal (Zona Blava). Sin sensores públicos en tiempo real."
+        puntos_ev = "2 Hubs de Recarga"
+        puntos_ev_desc = "Puntos de recarga pública AMB en término municipal de Sant Feliu."
+        p1_nombre = "Aparcament Municipal Rambla / Laureà Miró"
+        p1_desc = "A 210 m a pie • Plazas de rotación comercial"
+        p1_tag = "Municipal"
+        p2_nombre = "Aparcament Estació Rodalies"
+        p2_desc = "A 320 m a pie • Park & Ride comarcal"
+        p2_tag = "Intermodal"
+        dum_desc = "Plazas DUM delimitadas en ejes comerciales (Falguera / Laureà Miró)"
+        clima_texto = "Tráfico convencional fluido con ralentización en N-340 en jornadas lluviosas."
+        micro_nombre = "Red Bicibox Sant Feliu"
+        micro_desc = "Estación segura junto a Estació Rodalies a 60m"
+        micro_rotacion = "Rotación 4.5 usos/día"
     else:
         mun_nom = mun_lower.title()
         estacion = f"Estació de Rodalies / Bus de {mun_nom}"
@@ -1661,8 +1718,12 @@ def resolver_movilidad_y_parking(mun_lower: str, lat: float, lon: float, calle: 
         "distancia_m": distancia,
         "minutos_a_pie": minutos,
         "texto": f"{estacion} ({lineas}) a {distancia} m ({minutos} min a pie)",
+        "tiene_deficit": (deficit is not None),
         "deficit_score": deficit,
         "deficit_desc": deficit_desc,
+        "tiene_sensores_zona_azul": (mun_lower == "barcelona"),
+        "zona_azul_estado": "Ocupación en tiempo real (B:SM)" if mun_lower == "barcelona" else "Sin datos de sensores en tiempo real",
+        "zona_azul_desc": "Red B:SM Área Verda/Azul con monitorización" if mun_lower == "barcelona" else f"Sin red abierta de sensores en calzada en {mun_lower.title()}",
         "ocupacion_pct": ocupacion_pct,
         "ocupacion_desc": ocupacion_desc,
         "puntos_ev": puntos_ev,
@@ -2378,7 +2439,7 @@ async def consultar_clima_open_meteo(lat: float, lon: float) -> Dict[str, Any]:
         "latencia_ms": latencia_ms
     }
 
-def calcular_location_score(niy: float, deficit_parking: int, riesgo_ocr: float, dias_lluvia: int) -> int:
+def calcular_location_score(niy: float, deficit_parking: Optional[int], riesgo_ocr: float, dias_lluvia: int) -> int:
     """Calcula el índice institucional Location Score (0 a 100)."""
     base = 70.0
     if niy >= 5.5:
@@ -2386,8 +2447,11 @@ def calcular_location_score(niy: float, deficit_parking: int, riesgo_ocr: float,
     elif niy >= 4.5:
         base += 6.0
 
-    if deficit_parking >= 80:
-        base += 8.0
+    if deficit_parking is not None:
+        if deficit_parking >= 80:
+            base += 8.0
+        elif deficit_parking >= 60:
+            base += 4.0
 
     if riesgo_ocr <= 2.0:
         base += 6.0

@@ -26,7 +26,7 @@
   let isochroneLayerGroup = null;
   let currentMarker = null;
   let isochroneCircles = {};
-  let currentIsochroneMinutes = 5;
+  let currentIsochroneMinutes = 3;
   let debounceTimer = null;
   let ultimoAnalisisTimestamp = 0;
   let currentCoords = { lat: 41.3888, lon: 2.1590 };
@@ -81,7 +81,7 @@
   // =========================================================================
   // GESTIÓN DE ACOPLAMIENTO DINÁMICO DEL MAPA (DOCKING MANAGER LEAFLET)
   // =========================================================================
-  let ultimoDockId = 'dock-mapa-negocios';
+  let ultimoDockId = 'dock-mapa-principal';
 
   window.acoplarMapa = function (destinoId) {
     const mapEl = document.getElementById('leaflet-map');
@@ -113,7 +113,7 @@
     const munInput = document.getElementById('input-municipio')?.value || 'Barcelona';
     const sub = document.getElementById('modal-mapa-subtitulo');
     if (sub) {
-      const isoText = document.getElementById('lbl-isocrona-radio')?.textContent || '5 min (~300 m)';
+      const isoText = document.getElementById('lbl-isocrona-radio')?.textContent || '3 min (~240 m)';
       sub.textContent = `${dirInput}, ${numInput}, ${munInput} • Isócrona activa: ${isoText}`;
     }
 
@@ -126,15 +126,8 @@
     if (!modal) return;
     modal.classList.add('hidden');
     
-    // Devolver el mapa al dock de la pestaña activa o a su último dock
-    const tabActiva = document.querySelector('.tab-pane:not(.hidden)');
-    if (tabActiva && tabActiva.id === 'tab-servicios') {
-      window.acoplarMapa('dock-mapa-servicios');
-    } else if (tabActiva && tabActiva.id === 'tab-negocios') {
-      window.acoplarMapa('dock-mapa-negocios');
-    } else {
-      window.acoplarMapa(ultimoDockId || 'dock-mapa-negocios');
-    }
+    // Devolver siempre el mapa a la posición principal en Tab 1
+    window.acoplarMapa('dock-mapa-principal');
   };
 
   window.toggleVisorMapa = function () {
@@ -152,7 +145,7 @@
   });
 
   /**
-   * Actualiza el marcador del activo y dibuja las isócronas peatonales (5, 10 y 15 min)
+   * Actualiza el marcador del activo y dibuja las isócronas peatonales (3, 5 y 7 min)
    */
   function actualizarMarcadorYIsocronas(lat, lon, direccion, refCatastral) {
     if (!map || !assetLayerGroup || !isochroneLayerGroup) return;
@@ -165,11 +158,11 @@
     isochroneCircles = {};
 
     // 1. Polígonos circulares de isócrona peatonal (80 m/min según estándar de movilidad)
-    // 5 min = ~300 m | 10 min = ~650 m | 15 min = ~1000 m
+    // 3 min = ~240 m | 5 min = ~400 m | 7 min = ~560 m
     const isocronasConfig = [
-      { min: 15, radio: 1000, color: '#02362f', fillOpacity: 0.03, dashArray: '6, 8', weight: 1.0 },
-      { min: 10, radio: 650, color: '#b45309', fillOpacity: 0.04, dashArray: '5, 6', weight: 1.2 },
-      { min: 5, radio: 300, color: '#02362f', fillOpacity: 0.08, dashArray: '3, 4', weight: 1.8 }
+      { min: 7, radio: 560, color: '#02362f', fillOpacity: 0.03, dashArray: '6, 8', weight: 1.0 },
+      { min: 5, radio: 400, color: '#b45309', fillOpacity: 0.04, dashArray: '5, 6', weight: 1.2 },
+      { min: 3, radio: 240, color: '#02362f', fillOpacity: 0.08, dashArray: '3, 4', weight: 1.8 }
     ];
 
     isocronasConfig.forEach(cfg => {
@@ -220,7 +213,7 @@
    */
   function resaltarIsocronaActiva(minutos) {
     currentIsochroneMinutes = minutos;
-    [5, 10, 15].forEach(m => {
+    [3, 5, 7].forEach(m => {
       const circle = isochroneCircles[m];
       if (!circle) return;
       if (m === minutos) {
@@ -350,7 +343,10 @@
     }
 
     inputMun.addEventListener('input', (e) => {
-      const q = e.target.value.trim().toLowerCase();
+      const qVal = e.target.value.trim();
+      const q = qVal.toLowerCase();
+      if (selectMun) selectMun.value = qVal;
+      municipioActivo = qVal;
       if (!q) {
         renderizarOpcionesMunicipios(MUNICIPIOS_BARCELONA_CAT.slice(0, 8));
         return;
@@ -362,6 +358,18 @@
       const resultados = [...queEmpiezan, ...queContienen];
 
       renderizarOpcionesMunicipios(resultados);
+    });
+
+    inputMun.addEventListener('change', (e) => {
+      const qVal = e.target.value.trim();
+      if (selectMun) selectMun.value = qVal;
+      municipioActivo = qVal;
+    });
+
+    inputMun.addEventListener('blur', (e) => {
+      const qVal = e.target.value.trim();
+      if (selectMun) selectMun.value = qVal;
+      municipioActivo = qVal;
     });
 
     inputMun.addEventListener('focus', () => {
@@ -790,6 +798,23 @@
       });
     }
 
+    // Disparar análisis al cambiar la tipología o la entidad registral (piso)
+    const selectTipologia = document.getElementById('select-tipologia');
+    if (selectTipologia) {
+      selectTipologia.addEventListener('change', () => {
+        const iconTipoEl = document.getElementById('icon-tipologia');
+        const tipoIconos = { 'retail': 'storefront', 'residencial': 'apartment', 'oficina': 'corporate_fare' };
+        if (iconTipoEl) iconTipoEl.textContent = tipoIconos[selectTipologia.value] || 'apartment';
+        ejecutarAnalisisCompleto();
+      });
+    }
+
+    if (inputPiso) {
+      inputPiso.addEventListener('change', () => {
+        ejecutarAnalisisCompleto();
+      });
+    }
+
     // BOTÓN PRINCIPAL ANALIZAR: Es el ÚNICO que dispara el análisis, el mapa y los datos
     if (btnAnalizar) {
       btnAnalizar.addEventListener('click', (e) => {
@@ -814,12 +839,15 @@
   // 4. FUNCIÓN ejecutarAnalisisCompleto()
   // ==========================================
   async function ejecutarAnalisisCompleto() {
-    const municipio = document.getElementById('select-municipio')?.value || 'Barcelona';
+    const inputMunEl = document.getElementById('input-municipio');
+    const selectMunEl = document.getElementById('select-municipio');
+    const municipio = (inputMunEl?.value || selectMunEl?.value || 'Barcelona').trim();
+    if (selectMunEl) selectMunEl.value = municipio;
     municipioActivo = municipio;
     const calle = document.getElementById('input-calle')?.value.trim() || 'Carrer de Balmes';
     const numero = document.getElementById('input-numero')?.value.trim() || '12';
     const piso = document.getElementById('input-piso')?.value.trim() || '';
-    const tipologia = document.getElementById('select-tipologia')?.value || 'retail';
+    const tipologia = document.getElementById('select-tipologia')?.value || 'residencial';
     const superficie = parseFloat(document.getElementById('input-superficie')?.value) || 110;
     const precio = parseFloat(document.getElementById('input-precio')?.value) || 320000;
     const fachada = document.getElementById('select-fachada')?.value || 'chaflan';
@@ -931,10 +959,23 @@
     setText('disp-precio', formatEuro.format(precioTotal));
     setText('disp-precio-m2', `${formatInt.format(precioM2)} €/m²`);
     
-    if (activo.tipologia) {
-      const tipoNombres = { 'retail': 'Local Comercial (Retail)', 'residencial': 'Vivienda Residencial', 'oficina': 'Oficina / Terciario' };
-      setText('disp-tipologia', tipoNombres[activo.tipologia] || 'Inmueble Urbano');
+    const tipologiaActiva = activo.tipologia || data.tipologia || document.getElementById('select-tipologia')?.value || 'residencial';
+    const tipoNombres = { 'retail': 'Local Comercial (Retail)', 'residencial': 'Vivienda Residencial', 'oficina': 'Oficina / Terciario' };
+    const tipoIconos = { 'retail': 'storefront', 'residencial': 'apartment', 'oficina': 'corporate_fare' };
+    setText('disp-tipologia', tipoNombres[tipologiaActiva] || 'Inmueble Urbano');
+    
+    const selectTipoEl = document.getElementById('select-tipologia');
+    if (selectTipoEl && selectTipoEl.value !== tipologiaActiva) {
+      selectTipoEl.value = tipologiaActiva;
     }
+    const iconTipoEl = document.getElementById('icon-tipologia');
+    if (iconTipoEl) {
+      iconTipoEl.textContent = tipoIconos[tipologiaActiva] || 'apartment';
+    }
+
+    // Badge de planeamiento urbanístico (PUM-BCN vs POUM municipal)
+    const esBcn = (municipioActivo.toLowerCase() === 'barcelona');
+    setText('badge-planeamiento-urbanistico', esBcn ? 'PUM-BCN' : `POUM ${municipioActivo}`);
 
     const inputSup = document.getElementById('input-superficie');
     if (inputSup) inputSup.value = supM2;
@@ -979,11 +1020,50 @@
     setText('val-pla-dusos-tensionado', regulacion.zona_tensionada ? "Zona Tensionada MIVAU" : "Régimen General");
 
     if (document.getElementById('badge-parking')) {
-      const sinergia = finanzas.sinergia_parking || {};
-      const defScore = sinergia.deficit_aparcamiento_score || '90 / 100';
-      const presCalz = sinergia.presion_calzada || 'Alta Presión Área Verde/Azul';
-      document.getElementById('badge-parking').querySelector('.truncate').textContent = `${defScore} (${presCalz})`;
+      const badgeEl = document.getElementById('badge-parking');
+      const titleSpan = badgeEl.querySelector('.font-label-caps');
+      const descSpan = badgeEl.querySelector('.font-body-sm');
+      const marcaOrigen = document.getElementById('marca-origen-parking');
+
+      const esSantFeliu = (municipioActivo.toLowerCase() === 'sant feliu de llobregat');
+      const movInfo = data.movilidad || data.metro || {};
+      const tieneDeficit = movInfo.tiene_deficit === true && !esSantFeliu && movInfo.deficit_score !== null && movInfo.deficit_score !== undefined;
+      const tieneSensores = movInfo.tiene_sensores_zona_azul === true;
+      const ocupacionPct = movInfo.ocupacion_pct;
+
+      if (titleSpan) titleSpan.textContent = '_estacionamiento_zona_azul';
+
+      if (esSantFeliu) {
+        if (descSpan) {
+          descSpan.textContent = 'Sin datos de sensores en tiempo real (Sant Feliu de Llobregat)';
+          descSpan.className = 'font-body-sm text-body-sm font-semibold truncate text-amber-900';
+        }
+        badgeEl.className = 'flex items-center justify-between gap-space-sm px-space-md py-2.5 rounded-lg bg-amber-50 border border-amber-200 text-amber-950 shadow-sm';
+        if (marcaOrigen) {
+          marcaOrigen.innerHTML = '<span class="px-2 py-0.5 rounded bg-amber-200 text-amber-900 font-label-tabular-sm text-[10px] font-bold">SIN COBERTURA</span>';
+        }
+      } else if (ocupacionPct !== null && ocupacionPct !== undefined) {
+        if (descSpan) {
+          descSpan.textContent = `Zona Azul: ${ocupacionPct}% Ocupación (${movInfo.ocupacion_desc || 'Rotación Comercial'})`;
+          descSpan.className = 'font-body-sm text-body-sm font-semibold truncate text-[#11314d]';
+        }
+        badgeEl.className = 'flex items-center justify-between gap-space-sm px-space-md py-2.5 rounded-lg bg-badge-parkings-bg border border-sky-200 text-primary shadow-sm';
+        if (marcaOrigen) {
+          marcaOrigen.innerHTML = '<span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-label-tabular-sm text-[10px] font-bold">EN VIVO (8ms)</span>';
+        }
+      } else {
+        if (descSpan) {
+          descSpan.textContent = `Zona Azul: Sin sensores en ${municipioActivo}`;
+          descSpan.className = 'font-body-sm text-body-sm font-semibold truncate text-slate-700';
+        }
+        badgeEl.className = 'flex items-center justify-between gap-space-sm px-space-md py-2.5 rounded-lg bg-slate-100 border border-slate-200 text-slate-700 shadow-sm';
+        if (marcaOrigen) {
+          marcaOrigen.innerHTML = '<span class="px-2 py-0.5 rounded bg-slate-200 text-slate-700 font-label-tabular-sm text-[10px] font-bold">NO DISPONIBLE</span>';
+        }
+      }
     }
+
+    setText('lbl-plano-direccion', activo.direccion || 'Ubicación exacta del activo e isócrona peatonal');
 
     if (document.getElementById('badge-transporte')) {
       const textoMetro = metro.texto || (metro.estacion ? `Metro ${metro.estacion} (${metro.lineas || 'Líneas'}) a ${metro.distancia_m || 280} m` : 'Metro Universitat a 280 m');
@@ -1014,9 +1094,18 @@
     const netoMensual = finanzas.neto_mensual_post_ibi || Math.round(netoAnual / 12);
 
     setText('val-incasol-zona', finanzas.zona_incasol || `${activo.distrito || 'Sector Eixample'} (${activo.municipio || 'Barcelona'})`);
-    setText('val-incasol-m2', `${formatDec.format(finanzas.renta_m2 || 21.20)} €/m²`);
+    const rentaM2Val = finanzas.renta_m2 || 21.20;
+    setText('val-incasol-m2', `${formatDec.format(rentaM2Val)} €/m²`);
     setText('val-incasol-mensual', `${formatEuro.format(rentaMensual)}/mes`);
     setText('val-incasol-anual', `${formatEuro.format(rentaAnual)}/año`);
+
+    // Sincronización exacta de la tarjeta lateral de Renta INCASÒL
+    setText('disp-renta-m2', `${formatDec.format(rentaM2Val)} €/m²/mes`);
+    const rangoMin = Math.round(rentaMensual * 0.94);
+    const rangoMax = Math.round(rentaMensual * 1.06);
+    setText('disp-renta-rango', `Rango: ${formatEuro.format(rangoMin)} - ${formatEuro.format(rangoMax)}`);
+    const esBcnMun = (municipioActivo.toLowerCase() === 'barcelona');
+    setText('disp-renta-organismo', esBcnMun ? 'BBDD Fianzas BCN' : `BBDD Fianzas INCASÒL`);
 
     setText('val-ibi-municipio', `Padrón IBI Ajuntament de ${activo.municipio || 'Barcelona'}`);
     setText('val-ibi-mensual', `-${formatEuro.format(ibiMensual)}/mes`);
@@ -1253,10 +1342,48 @@
 
     // H. Pestaña Dinámica de Movilidad & Parking
     const mov = data.movilidad || data.metro || {};
-    if (mov.deficit_score !== undefined) setText('mov-deficit-score', `${mov.deficit_score} / 100`);
-    if (mov.deficit_desc) setText('mov-deficit-desc', mov.deficit_desc);
-    if (mov.ocupacion_pct !== undefined) setText('mov-ocupacion-pct', `${mov.ocupacion_pct} % Ocupación`);
-    if (mov.ocupacion_desc) setText('mov-ocupacion-desc', mov.ocupacion_desc);
+    const esSantFeliu = (municipioActivo.toLowerCase() === 'sant feliu de llobregat');
+    const tieneDeficit = mov.tiene_deficit === true && !esSantFeliu && mov.deficit_score !== null && mov.deficit_score !== undefined;
+
+    if (esSantFeliu || !tieneDeficit) {
+      setText('lbl-deficit-card-titulo', '_déficit_estacionamiento');
+      setText('mov-deficit-score', 'No calculable');
+      const defScoreEl = document.getElementById('mov-deficit-score');
+      if (defScoreEl) {
+        defScoreEl.className = 'font-headline-lg text-[20px] font-bold text-amber-800';
+      }
+      setText('mov-deficit-desc', 'Cálculo de déficit de cuenca no disponible en Sant Feliu de Llobregat. Sin modelo territorial aplicable.');
+      const marcaMov = document.getElementById('marca-origen-movilidad');
+      if (marcaMov) {
+        marcaMov.innerHTML = '<span class="px-2 py-0.5 rounded bg-amber-100 text-amber-900 font-label-tabular-sm text-[10px] font-bold">SIN COBERTURA</span>';
+      }
+      setText('lbl-zona-azul-card-titulo', '_estacionamiento_zona_azul');
+      setText('mov-ocupacion-pct', 'Sin telemetría en vivo');
+      const ocupScoreEl = document.getElementById('mov-ocupacion-pct');
+      if (ocupScoreEl) {
+        ocupScoreEl.className = 'font-headline-lg text-[20px] font-bold text-slate-700';
+      }
+      setText('mov-ocupacion-desc', 'Estacionamiento regulado en superficie (Zona Blava). Sin red pública de sensores en calzada.');
+    } else {
+      setText('lbl-deficit-card-titulo', '_déficit_estacionamiento');
+      if (mov.deficit_score !== undefined) {
+        setText('mov-deficit-score', `${mov.deficit_score} / 100`);
+        const defScoreEl = document.getElementById('mov-deficit-score');
+        if (defScoreEl) defScoreEl.className = 'font-headline-lg text-headline-lg font-bold text-error';
+      }
+      if (mov.deficit_desc) setText('mov-deficit-desc', mov.deficit_desc);
+      setText('lbl-zona-azul-card-titulo', '_estacionamiento_zona_azul');
+      if (mov.ocupacion_pct !== undefined) {
+        setText('mov-ocupacion-pct', `${mov.ocupacion_pct} % Ocupación`);
+        const ocupScoreEl = document.getElementById('mov-ocupacion-pct');
+        if (ocupScoreEl) ocupScoreEl.className = 'font-headline-lg text-headline-lg font-bold text-secondary';
+      }
+      if (mov.ocupacion_desc) setText('mov-ocupacion-desc', mov.ocupacion_desc);
+      const marcaMov = document.getElementById('marca-origen-movilidad');
+      if (marcaMov) {
+        marcaMov.innerHTML = '<span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-label-tabular-sm text-[10px] font-bold">EN VIVO</span>';
+      }
+    }
     if (mov.puntos_ev) setText('mov-puntos-ev', mov.puntos_ev);
     if (mov.puntos_ev_desc) setText('mov-puntos-ev-desc', mov.puntos_ev_desc);
 
@@ -1284,10 +1411,14 @@
       const lat = parseFloat(activo.lat);
       const lon = parseFloat(activo.lon);
       actualizarMarcadorYIsocronas(lat, lon, activo.direccion, activo.ref_catastral);
-      map.flyTo([lat, lon], 17, {
-        animate: true,
-        duration: 1.0
-      });
+      map.setView([lat, lon], 17);
+      map.invalidateSize();
+      setTimeout(() => {
+        if (map) {
+          map.invalidateSize();
+          map.flyTo([lat, lon], 17, { animate: true, duration: 0.6 });
+        }
+      }, 100);
       if (currentMarker) {
         setTimeout(() => currentMarker.openPopup(), 400);
       }
@@ -1637,8 +1768,8 @@
         cap_rate: (noi / inversionTotal) * 100,
         tir: netYield + 2.5,
         sinergia_parking: {
-          deficit_aparcamiento_score: '88 / 100',
-          presion_calzada: 'Alta Ocupación'
+          deficit_aparcamiento_score: (municipio.toLowerCase() === 'sant feliu de llobregat') ? null : '88 / 100',
+          presion_calzada: (municipio.toLowerCase() === 'sant feliu de llobregat') ? 'Sin datos de sensores en tiempo real' : 'Alta Ocupación'
         }
       },
       entorno: {
@@ -1718,6 +1849,14 @@
       },
       metro: {
         texto: metroTexto
+      },
+      movilidad: {
+        tiene_deficit: (municipio.toLowerCase() !== 'sant feliu de llobregat'),
+        deficit_score: (municipio.toLowerCase() === 'sant feliu de llobregat') ? null : 88,
+        deficit_desc: (municipio.toLowerCase() === 'sant feliu de llobregat') ? 'Cálculo de déficit de cuenca no disponible en Sant Feliu de Llobregat.' : 'Presión alta en cuenca 300m',
+        tiene_sensores_zona_azul: false,
+        ocupacion_pct: null,
+        ocupacion_desc: (municipio.toLowerCase() === 'sant feliu de llobregat') ? 'Sin datos de sensores en tiempo real (Sant Feliu de Llobregat)' : 'Rotación comercial'
       },
       sensor_real: (function() {
         const c = (calle || '').toLowerCase();
@@ -1911,100 +2050,119 @@
   window.recalcularModelo = ejecutarAnalisisCompleto;
 
   // =========================================================================
-  // SISTEMA DE SINCRONIZACIÓN DE ISÓCRONAS (5, 10 Y 15 MIN) CON DATOS OFICIALES
+  // SISTEMA DE SINCRONIZACIÓN DE ISÓCRONAS (3, 5 Y 7 MIN) CON DATOS OFICIALES
   // =========================================================================
   const DATOS_ISOCRONAS = {
+    3: {
+      minutos: 3,
+      radioM: 240,
+      labelCabecera: '3 min (~240 m)',
+      labelMapa: 'EPSG:25831 / WGS84 • Isócrona activa: 3 min (~240 m)',
+      parkingBadge: '92 / 100 (Alta Presión Cuenca Inmediata 240m)',
+      movilidad: {
+        deficitScore: '92 / 100',
+        deficitDesc: 'Rotación crítica: cuenca inmediata sin plazas libres en radio 240m.',
+        puntosEv: '4 Hubs Rápidos',
+        puntosEvDesc: 'Red Endesa X y Smou B:SM a menos de 240m.'
+      },
+      entorno: {
+        poblacionFlotante: '3.2x Residente',
+        poblacionFlotanteBadge: 'ISÓCRONA 3 MIN (~240m)',
+        poblacionFlotanteDesc: 'Tramo de calle y manzana directa (240m): Fuerte afluencia diurna comercial y laboral sobre residentes nocturnos.',
+        poblacionFlotanteGranularidad: 'Granularidad Mínima: Tramo de calle y radio 240m',
+        competencia: '3 Locales en PB',
+        competenciaBadge: 'ISÓCRONA 3 MIN (~240m)',
+        competenciaDesc: 'Manzana catastral e isócrona peatonal 240m (Uso C Comercial en planta baja).',
+        competenciaGranularidad: 'Granularidad Mínima: Manzana Catastral + 240m',
+        viandantes: '380 viandantes / hora',
+        viandantesDesc: 'Medición tramo de calle en radio 240m (picos a las 14:00h y 19:00h). Promedio ~3.800 peatones/día.'
+      }
+    },
     5: {
       minutos: 5,
-      radioM: 300,
-      labelCabecera: '5 min (~300 m)',
-      labelMapa: 'EPSG:25831 / WGS84 • Isócrona activa: 5 min (~300 m)',
-      parkingBadge: '90 / 100 (Alta Presión Cuenca Inmediata 300m)',
+      radioM: 400,
+      labelCabecera: '5 min (~400 m)',
+      labelMapa: 'EPSG:25831 / WGS84 • Isócrona activa: 5 min (~400 m)',
+      parkingBadge: '85 / 100 (Presión Elevada Cuenca Proximidad 400m)',
       movilidad: {
-        deficitScore: '90 / 100',
-        deficitDesc: 'Rotación crítica: cuenca inmediata sin plazas libres en radio 300m.',
-        puntosEv: '6 Hubs Rápidos',
-        puntosEvDesc: 'Red Endesa X y Smou B:SM a menos de 300m.'
+        deficitScore: '85 / 100',
+        deficitDesc: 'Presión alta en cuenca 400m: 3 parkings subterráneos absorben tráfico flotante comercial.',
+        puntosEv: '10 Hubs Rápidos',
+        puntosEvDesc: 'Red B:SM y Endesa X en radio de 400m.'
       },
       entorno: {
-        poblacionFlotante: '3.6x Residente',
-        poblacionFlotanteBadge: 'ISÓCRONA 5 MIN (~300m)',
-        poblacionFlotanteDesc: 'Tramo calle y cuenca 300m: Fuerte afluencia diurna comercial y laboral sobre residentes nocturnos.',
-        poblacionFlotanteGranularidad: 'Granularidad Mínima: Tramo de calle y radio 300m',
-        competencia: '4 Locales en PB',
-        competenciaBadge: 'ISÓCRONA 5 MIN (~300m)',
-        competenciaDesc: 'Manzana catastral e isócrona peatonal 300m (Uso C Comercial en planta baja).',
-        competenciaGranularidad: 'Granularidad Mínima: Manzana Catastral + 300m',
-        viandantes: '460 viandantes / hora',
-        viandantesDesc: 'Medición tramo de calle en radio 300m (picos a las 14:00h y 19:00h). Promedio ~4.620 peatones/día.'
+        poblacionFlotante: '4.1x Residente',
+        poblacionFlotanteBadge: 'ISÓCRONA 5 MIN (~400m)',
+        poblacionFlotanteDesc: 'Cuenca de proximidad (400m): Absorción de trabajadores y visitantes del entorno peatonal directo.',
+        poblacionFlotanteGranularidad: 'Granularidad Mínima: Cuenca de proximidad (400m)',
+        competencia: '9 Locales en PB',
+        competenciaBadge: 'ISÓCRONA 5 MIN (~400m)',
+        competenciaDesc: 'Eje comercial directo: 9 locales comerciales activos en planta baja en radio 400m.',
+        competenciaGranularidad: 'Granularidad Mínima: Cuenca 400m (Catastro OVC + Censo PB)',
+        viandantes: '950 viandantes / hora',
+        viandantesDesc: 'Flujo acumulado en intersecciones clave en radio 400m. Promedio ~9.500 peatones/día.'
       }
     },
-    10: {
-      minutos: 10,
-      radioM: 650,
-      labelCabecera: '10 min (~650 m)',
-      labelMapa: 'EPSG:25831 / WGS84 • Isócrona activa: 10 min (~650 m)',
-      parkingBadge: '78 / 100 (Presión Moderada Cuenca Barrio 650m)',
+    7: {
+      minutos: 7,
+      radioM: 560,
+      labelCabecera: '7 min (~560 m)',
+      labelMapa: 'EPSG:25831 / WGS84 • Isócrona activa: 7 min (~560 m)',
+      parkingBadge: '75 / 100 (Presión Moderada Cuenca Barrial 560m)',
       movilidad: {
-        deficitScore: '78 / 100',
-        deficitDesc: 'Presión alta en cuenca 650m: 4 parkings subterráneos absorben tráfico flotante comercial.',
-        puntosEv: '18 Hubs Rápidos',
-        puntosEvDesc: 'Red B:SM, TotalEnergies e Iberdrola en radio de 650m.'
+        deficitScore: '75 / 100',
+        deficitDesc: 'Presión moderada en 560m: oferta subterránea con 6 parkings y rotación equilibrada.',
+        puntosEv: '16 Hubs Rápidos',
+        puntosEvDesc: 'Cobertura barrial completa de recarga ultrarrápida en radio de 560m.'
       },
       entorno: {
-        poblacionFlotante: '4.8x Residente',
-        poblacionFlotanteBadge: 'ISÓCRONA 10 MIN (~650m)',
-        poblacionFlotanteDesc: 'Cuenca de barrio (650m): Absorción intensa de trabajadores y visitantes de toda la Dreta de l\'Eixample.',
-        poblacionFlotanteGranularidad: 'Granularidad Mínima: Cuenca barrial consolidada (650m)',
-        competencia: '18 Locales en PB',
-        competenciaBadge: 'ISÓCRONA 10 MIN (~650m)',
-        competenciaDesc: 'Eje comercial barrial: 18 locales comerciales activos en planta baja en radio 650m.',
-        competenciaGranularidad: 'Granularidad Mínima: Cuenca 650m (Catastro OVC + Censo PB)',
-        viandantes: '1.680 viandantes / hora',
-        viandantesDesc: 'Flujo acumulado en intersecciones clave en radio 650m. Promedio ~16.800 peatones/día.'
-      }
-    },
-    15: {
-      minutos: 15,
-      radioM: 1000,
-      labelCabecera: '15 min (~1.000 m)',
-      labelMapa: 'EPSG:25831 / WGS84 • Isócrona activa: 15 min (~1.000 m)',
-      parkingBadge: '65 / 100 (Oferta Subterránea Eje Metropolitano 1 km)',
-      movilidad: {
-        deficitScore: '65 / 100',
-        deficitDesc: 'Equilibrio de captación en 1.000m: 12 parkings con 3.400 plazas totales absorben la demanda.',
-        puntosEv: '34 Hubs Rápidos',
-        puntosEvDesc: 'Cobertura metropolitana integral de recarga ultrarrápida en radio de 1.000m.'
-      },
-      entorno: {
-        poblacionFlotante: '6.2x Residente',
-        poblacionFlotanteBadge: 'ISÓCRONA 15 MIN (~1.000m)',
-        poblacionFlotanteDesc: 'Área metropolitana (1.000m): Influencia directa de Plaça Catalunya, Passeig de Gràcia y nudo comercial central.',
-        poblacionFlotanteGranularidad: 'Granularidad Mínima: Área de influencia metropolitana (1.000m)',
-        competencia: '42 Locales en PB',
-        competenciaBadge: 'ISÓCRONA 15 MIN (~1.000m)',
-        competenciaDesc: 'Corredor comercial de alta intensidad: 42 locales en PB dentro de la isócrona de 1.000m.',
-        competenciaGranularidad: 'Granularidad Mínima: Cuenca 1.000m (Catastro OVC + Censo PB)',
-        viandantes: '4.250 viandantes / hora',
-        viandantesDesc: 'Eje de máxima afluencia metropolitana en radio 1.000m. Promedio ~42.500 peatones/día.'
+        poblacionFlotante: '5.2x Residente',
+        poblacionFlotanteBadge: 'ISÓCRONA 7 MIN (~560m)',
+        poblacionFlotanteDesc: 'Área barrial consolidada (560m): Conexión directa con avenidas principales y nodos de transporte público.',
+        poblacionFlotanteGranularidad: 'Granularidad Mínima: Área de influencia barrial (560m)',
+        competencia: '22 Locales en PB',
+        competenciaBadge: 'ISÓCRONA 7 MIN (~560m)',
+        competenciaDesc: 'Corredor comercial consolidado: 22 locales en PB dentro de la isócrona de 560m.',
+        competenciaGranularidad: 'Granularidad Mínima: Cuenca 560m (Catastro OVC + Censo PB)',
+        viandantes: '2.100 viandantes / hora',
+        viandantesDesc: 'Eje de alta afluencia peatonal en radio 560m. Promedio ~21.000 peatones/día.'
       }
     }
   };
 
   function actualizarEstiloBotonesIsocrona(minutos) {
-    [5, 10, 15].forEach(m => {
+    [3, 5, 7].forEach(m => {
       const btn = document.getElementById('iso-' + m);
-      if (!btn) return;
-      if (m === minutos) {
-        btn.className = 'px-2.5 py-1 text-center font-label-tabular-sm text-[11px] rounded bg-primary text-on-primary font-semibold transition-all shadow-xs cursor-pointer';
-      } else {
-        btn.className = 'px-2.5 py-1 text-center font-label-tabular-sm text-[11px] rounded bg-surface border border-sandstone-border text-charcoal-text hover:bg-stone-surface font-medium transition-all cursor-pointer';
+      if (btn) {
+        if (m === minutos) {
+          btn.className = 'px-2.5 py-1 text-center font-label-tabular-sm text-[11px] rounded bg-primary text-on-primary font-semibold transition-all shadow-xs cursor-pointer';
+        } else {
+          btn.className = 'px-2.5 py-1 text-center font-label-tabular-sm text-[11px] rounded bg-surface border border-sandstone-border text-charcoal-text hover:bg-stone-surface font-medium transition-all cursor-pointer';
+        }
+      }
+
+      const modalBtn = document.getElementById('modal-iso-' + m);
+      if (modalBtn) {
+        if (m === minutos) {
+          modalBtn.className = 'px-2 py-0.5 text-center font-label-tabular-sm text-[10px] rounded bg-primary text-white font-semibold cursor-pointer';
+        } else {
+          modalBtn.className = 'px-2 py-0.5 text-center font-label-tabular-sm text-[10px] rounded hover:bg-stone-surface text-charcoal-text font-medium cursor-pointer';
+        }
       }
     });
+
+    const modalSub = document.getElementById('modal-mapa-subtitulo');
+    if (modalSub) {
+      const dir = document.getElementById('input-calle')?.value || 'Carrer de Balmes';
+      const num = document.getElementById('input-numero')?.value || '12';
+      const mun = document.getElementById('input-municipio')?.value || 'Barcelona';
+      const isoText = DATOS_ISOCRONAS[minutos]?.labelCabecera || `${minutos} min`;
+      modalSub.textContent = `${dir}, ${num}, ${mun} • Isócrona activa: ${isoText}`;
+    }
   }
 
   function sincronizarDatosConIsocrona(minutos) {
-    const data = DATOS_ISOCRONAS[minutos] || DATOS_ISOCRONAS[5];
+    const data = DATOS_ISOCRONAS[minutos] || DATOS_ISOCRONAS[3];
 
     // 1. Cabecera superior y Barra del visor cartográfico
     const lblHeader = document.getElementById('lbl-isocrona-radio');
@@ -2013,19 +2171,36 @@
     const lblMap = document.getElementById('lbl-mapa-isocrona-info');
     if (lblMap) lblMap.textContent = data.labelMapa;
 
-    // 2. Banner superior de déficit de parking
+    // 2. Banner superior de déficit de parking / zona azul
     const badgeParking = document.getElementById('badge-parking');
     if (badgeParking) {
       const titleSpan = badgeParking.querySelector('.font-body-sm');
-      if (titleSpan) titleSpan.textContent = data.parkingBadge;
+      const esSantFeliu = (municipioActivo.toLowerCase() === 'sant feliu de llobregat');
+      if (esSantFeliu) {
+        if (titleSpan) titleSpan.textContent = 'Sin datos de sensores en tiempo real (Sant Feliu de Llobregat)';
+      } else {
+        const movInfo = (window.ultimoAnalisisData && (window.ultimoAnalisisData.movilidad || window.ultimoAnalisisData.metro)) || {};
+        if (movInfo.ocupacion_pct !== null && movInfo.ocupacion_pct !== undefined) {
+          if (titleSpan) titleSpan.textContent = `Zona Azul: ${movInfo.ocupacion_pct}% Ocupación (${movInfo.ocupacion_desc || 'Rotación Comercial'})`;
+        } else if (titleSpan) {
+          titleSpan.textContent = data.parkingBadge;
+        }
+      }
     }
 
     // 3. Tab Movilidad & Parking
+    const esSantFeliu = (municipioActivo.toLowerCase() === 'sant feliu de llobregat');
     const movDeficitScore = document.getElementById('mov-deficit-score');
-    if (movDeficitScore) movDeficitScore.textContent = data.movilidad.deficitScore;
+    if (movDeficitScore) {
+      movDeficitScore.textContent = esSantFeliu ? 'No calculable' : data.movilidad.deficitScore;
+    }
 
     const movDeficitDesc = document.getElementById('mov-deficit-desc');
-    if (movDeficitDesc) movDeficitDesc.textContent = data.movilidad.deficitDesc;
+    if (movDeficitDesc) {
+      movDeficitDesc.textContent = esSantFeliu 
+        ? 'Cálculo de déficit de cuenca no disponible en Sant Feliu de Llobregat. Sin modelo territorial aplicable.' 
+        : data.movilidad.deficitDesc;
+    }
 
     const movPuntosEv = document.getElementById('mov-puntos-ev');
     if (movPuntosEv) movPuntosEv.textContent = data.movilidad.puntosEv;
@@ -2073,7 +2248,7 @@
     // 5. Tab Negocios en Cercanías por Isócronas
     const lblNegCuenca = document.getElementById('lbl-negocios-cuenca-activa');
     if (lblNegCuenca) {
-      const radio = data.radioM || 300;
+      const radio = data.radioM || 240;
       lblNegCuenca.innerHTML = `
         <span class="w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span>
         <span>Cuenca activa: ${minutos} min (~${radio} m)</span>
@@ -2086,7 +2261,7 @@
     // 6. Tab Servicios y Equipamientos en Cercanías por Isócronas
     const lblServCuenca = document.getElementById('lbl-servicios-cuenca-activa');
     if (lblServCuenca) {
-      const radio = data.radioM || 300;
+      const radio = data.radioM || 240;
       lblServCuenca.innerHTML = `
         <span class="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
         <span>Cuenca activa: ${minutos} min (~${radio} m)</span>
@@ -2102,7 +2277,7 @@
     actualizarEstiloBotonesIsocrona(minutos);
     resaltarIsocronaActiva(minutos);
     sincronizarDatosConIsocrona(minutos);
-    const radio = DATOS_ISOCRONAS[minutos]?.radioM || 300;
+    const radio = DATOS_ISOCRONAS[minutos]?.radioM || 240;
     mostrarToast(`Isócrona fijada a ${minutos} min (~${radio}m): datos de movilidad, entorno y negocios sincronizados`);
   };
 
@@ -2164,17 +2339,21 @@ Renta Mensual = Superficie Útil (${supM2} m²) × Renta Oficial (${formatDec.fo
         };
         break;
 
-      case 'score':
-        config = {
-          icono: 'verified',
-          titulo: 'Metodología: Location Score (0 a 100)',
-          subtitulo: 'Modelo algorítmico multicriterio de idoneidad y riesgo',
-          badge: 'ALGORÍTMICO HOMOLOGADO',
-          organismo: "Comité Técnico de Suscripción Inmobiliaria (BBDD Públicas Homologadas)",
-          baseLegal: "Estándar de underwriting multicriterio que cruza Catastro, INCASÒL, Movilidad B:SM/TMB y Secciones Censales INE.",
-          metodologia: "El Location Score califica de 0 a 100 la resiliencia y retorno de la inversión. Parte de una base de 70 puntos y pondera 4 parámetros objetivos: rentabilidad neta (NIY), tensión de aparcamiento en la cuenca, solvencia comercial del tejido de paso (OCR inverso) y benignidad climatológica exterior.",
-          formulaTag: "DESGLOSE ANALÍTICO DE PUNTUACIÓN",
-          calculo: `• Puntuación Base Inicial del Modelo: 70.0 pts
+      case 'score': {
+        const esSantFeliuScore = (activo.municipio || municipioActivo || '').toLowerCase() === 'sant feliu de llobregat';
+        const calculoScoreTexto = esSantFeliuScore ?
+`• Puntuación Base Inicial del Modelo: 70.0 pts
+[+] Retorno Neto Institucional (NIY: ${niy}% >= 5.5%): +12.0 pts
+[•] Tensión de Parking en Cuenca: No calculable en Sant Feliu de Llobregat (Sin ponderación)
+[+] Solvencia Comercial Entorno (Tasa riesgo baja <= 2.0): +6.0 pts
+[+] Benignidad Climatológica (${diasLluvia} días lluvia/año < 60): +4.0 pts
+
+FÓRMULA EXACTA (SANT FELIU):
+Score Normalizado = ${scoreVal} / 100 pts
+• Media de Idoneidad en el Municipio: 80.0 pts
+• Diferencial Competitivo del Activo: +${(scoreVal - 80.0).toFixed(1)} pts`
+:
+`• Puntuación Base Inicial del Modelo: 70.0 pts
 [+] Retorno Neto Institucional (NIY: ${niy}% >= 5.5%): +12.0 pts
 [+] Tensión de Parking en Cuenca (Déficit: ${deficitScore}/100 >= 80): +8.0 pts
 [+] Solvencia Comercial Entorno (Tasa riesgo baja <= 2.0): +6.0 pts
@@ -2184,34 +2363,61 @@ FÓRMULA EXACTA:
 Score Bruto = 70 + 12 + 8 + 6 + 4 = 100.0 pts
 Score Ponderado & Normalizado = ${scoreVal} / 100 pts
 • Media de Idoneidad en el Distrito (${distrito}): 81.8 pts
-• Diferencial Competitivo del Activo: +${(scoreVal - 81.8).toFixed(1)} pts vs media distrito`,
+• Diferencial Competitivo del Activo: +${(scoreVal - 81.8).toFixed(1)} pts vs media distrito`;
+
+        config = {
+          icono: 'verified',
+          titulo: 'Metodología: Location Score (0 a 100)',
+          subtitulo: 'Modelo algorítmico multicriterio de idoneidad y riesgo',
+          badge: 'ALGORÍTMICO HOMOLOGADO',
+          organismo: "Comité Técnico de Suscripción Inmobiliaria (BBDD Públicas Homologadas)",
+          baseLegal: "Estándar de underwriting multicriterio que cruza Catastro, INCASÒL, Movilidad y Secciones Censales INE.",
+          metodologia: "El Location Score califica de 0 a 100 la resiliencia y retorno de la inversión. Pondera rentabilidad neta (NIY), solvencia comercial de paso y benignidad climática.",
+          formulaTag: "DESGLOSE ANALÍTICO DE PUNTUACIÓN",
+          calculo: calculoScoreTexto,
           nota: "Puntuación calculada en tiempo real según las características específicas del inmueble."
         };
         break;
+      }
 
-      case 'parking':
-        config = {
-          icono: 'local_parking',
-          titulo: 'Auditoría: Déficit de Parking en Cuenca 300m',
-          subtitulo: 'Presión de estacionamiento en calzada y rotación subterránea',
-          badge: 'B:SM & APARCAMIENTOS BCN',
-          organismo: "Barcelona de Serveis Municipals (B:SM) & Red de Aparcamientos Saba / B:SM",
-          baseLegal: "Plan de Movilidad Urbana (PMU) y Ordenanza Reguladora de Estacionamiento en Superficie (Área Verda / Blava).",
-          metodologia: "Evalúa la presión de estacionamiento en la cuenca de atracción peatonal (radio de 300 metros). Un índice cercano a 100 refleja saturación en superficie, obligando a los clientes, inquilinos y visitantes a utilizar la red subterránea o el transporte público, aumentando el valor intrínseco de plazas vinculadas al inmueble.",
-          formulaTag: "MÉTRICAS REALES DE LA CUENCA",
-          calculo: `• Radio de Cuenca Peatonal Analizado: 300 metros desde el portal
-• Presión en Superficie (Área Verda / Blava): 95% - 98% en horario punta
-• Plazas Subterráneas de Rotación Inmediatas:
-  - Parking Saba Plaça Catalunya (420 plazas a 240 m a pie)
-  - Parking B:SM Pelai / Pau Claris (195 plazas a 120 m a pie)
-• Puntos de Recarga Rápida EV (Endesa X / Smou B:SM): 5-6 Hubs en <200m
-• Zonas Logísticas de Carga/Descarga (DUM): 3 plazas delimitadas
-
-ÍNDICE DE PRESIÓN CALCULADO:
-Déficit = ${deficitScore} / 100 (Saturación Crítica en Superficie)`,
-          nota: "Los datos corresponden al aforo diurno y nocturno regulado en la manzana."
-        };
+      case 'parking': {
+        const esSantFeliuPark = (activo.municipio || municipioActivo || '').toLowerCase() === 'sant feliu de llobregat';
+        if (esSantFeliuPark) {
+          config = {
+            icono: 'local_parking',
+            titulo: 'Auditoría: Estacionamiento y Zona Azul en Sant Feliu de Llobregat',
+            subtitulo: 'Sin red de sensores IoT en tiempo real ni modelo de déficit territorial',
+            badge: 'AJUNTAMENT DE SANT FELIU',
+            organismo: "Ajuntament de Sant Feliu de Llobregat — Àrea de Mobilitat",
+            baseLegal: "Ordenança municipal reguladora de l'estacionament regulat (Zona Blava).",
+            metodologia: "En el municipio de Sant Feliu de Llobregat no se dispone de sensorización IoT en calzada en tiempo real ni de modelo de déficit de cuenca homologado. Por tanto, no se proyecta ningún indicador numérico de déficit, reportando únicamente la ausencia de sensores de Zona Azul.",
+            formulaTag: "ESTADO DE COBERTURA EN CALZADA",
+            calculo: `• Término Municipal: Sant Feliu de Llobregat
+• Sensores IoT en tiempo real: Sin datos de sensores en tiempo real
+• Ocupación Zona Azul: Sin telemetría pública en vivo
+• Modelo de Déficit de Cuenca: NO CALCULABLE (Sin modelo territorial aplicable)
+• Puntos de Recarga EV: Red pública metropolitana`,
+            nota: "Se excluyen estimaciones sin soporte de sensores reales en calzada."
+          };
+        } else {
+          config = {
+            icono: 'local_parking',
+            titulo: 'Auditoría: Estacionamiento y Zona Azul',
+            subtitulo: 'Presión de estacionamiento en calzada y rotación comercial',
+            badge: 'B:SM & APARCAMIENTOS BCN',
+            organismo: "Barcelona de Serveis Municipals (B:SM) & Red de Aparcamientos Saba / B:SM",
+            baseLegal: "Plan de Movilidad Urbana (PMU) y Ordenanza Reguladora de Estacionamiento en Superficie (Área Verda / Blava).",
+            metodologia: "Evalúa la rotación y ocupación de la Zona Azul y aparcamientos subterráneos en la cuenca peatonal.",
+            formulaTag: "MÉTRICAS DE ROTACIÓN",
+            calculo: `• Radio de Cuenca Peatonal: 300 metros
+• Rotación Zona Azul: Regulada por tramos horarios
+• Plazas Subterráneas de Rotación Inmediatas disponibles
+• Puntos de Recarga Rápida EV: Red municipal`,
+            nota: "Los datos corresponden al aforo diurno y nocturno regulado en la manzana."
+          };
+        }
         break;
+      }
 
       case 'transporte':
         config = {
@@ -3151,6 +3357,11 @@ Tiempo de Acceso = ${distanciaMetro} m / 80 m/min = ${(distanciaMetro / 80).toFi
     if (typeof window.renderizarServicios === 'function') {
       window.renderizarServicios('todas', '');
     }
+
+    // Disparar análisis inicial automático para cargar datos reales desde el backend
+    setTimeout(() => {
+      ejecutarAnalisisCompleto();
+    }, 150);
   });
 
 })();

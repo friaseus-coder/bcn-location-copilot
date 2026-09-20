@@ -253,13 +253,13 @@
             <span class="material-symbols-outlined text-[18px] text-primary">directions_walk</span>
             <div class="flex flex-col">
               <span class="font-label-caps text-outline uppercase text-[9px] font-bold leading-none">_cuenca_isócrona</span>
-              <span class="font-label-tabular-sm text-primary font-bold text-[10px] leading-tight mt-0.5" id="lbl-isocrona-radio">5 min (~300 m)</span>
+              <span class="font-label-tabular-sm text-primary font-bold text-[10px] leading-tight mt-0.5" id="lbl-isocrona-radio">3 min (~240 m)</span>
             </div>
           </div>
           <div class="flex items-center gap-1 bg-stone-surface/60 p-0.5 rounded-md border border-sandstone-border/50">
-            <button class="px-2.5 py-1 text-center font-label-tabular-sm text-[11px] rounded bg-primary text-on-primary font-semibold transition-all shadow-xs cursor-pointer" id="iso-5" onclick="window.cambiarIsocrona(5)" type="button" title="Cuenca inmediata a pie (5 min / 300m)">5 min</button>
-            <button class="px-2.5 py-1 text-center font-label-tabular-sm text-[11px] rounded bg-surface border border-sandstone-border text-charcoal-text hover:bg-stone-surface font-medium transition-all cursor-pointer" id="iso-10" onclick="window.cambiarIsocrona(10)" type="button" title="Cuenca de barrio a pie (10 min / 650m)">10 min</button>
-            <button class="px-2.5 py-1 text-center font-label-tabular-sm text-[11px] rounded bg-surface border border-sandstone-border text-charcoal-text hover:bg-stone-surface font-medium transition-all cursor-pointer" id="iso-15" onclick="window.cambiarIsocrona(15)" type="button" title="Cuenca metropolitana a pie (15 min / 1.000m)">15 min</button>
+            <button class="px-2.5 py-1 text-center font-label-tabular-sm text-[11px] rounded bg-primary text-on-primary font-semibold transition-all shadow-xs cursor-pointer" id="iso-3" onclick="window.cambiarIsocrona(3)" type="button" title="Cuenca inmediata a pie (3 min / 240m)">3 min</button>
+            <button class="px-2.5 py-1 text-center font-label-tabular-sm text-[11px] rounded bg-surface border border-sandstone-border text-charcoal-text hover:bg-stone-surface font-medium transition-all cursor-pointer" id="iso-5" onclick="window.cambiarIsocrona(5)" type="button" title="Cuenca de proximidad a pie (5 min / 400m)">5 min</button>
+            <button class="px-2.5 py-1 text-center font-label-tabular-sm text-[11px] rounded bg-surface border border-sandstone-border text-charcoal-text hover:bg-stone-surface font-medium transition-all cursor-pointer" id="iso-7" onclick="window.cambiarIsocrona(7)" type="button" title="Cuenca barrial a pie (7 min / 560m)">7 min</button>
           </div>
         </div>
 
@@ -327,19 +327,24 @@
 
             <!-- Ficha Técnica del Inmueble (100% Solo Lectura Informativo) -->
             <div class="flex flex-col gap-space-sm">
-              <!-- Tipología del Activo -->
+              <!-- Tipología del Activo con Selector Sincronizado -->
               <div class="flex flex-col gap-1">
                 <div class="font-label-caps text-outline uppercase flex items-center justify-between text-[10px] font-semibold">
                   <span>_uso_principal_catastral</span>
-                  <span class="text-terracotta-accent font-label-tabular-sm">PUM-BCN</span>
+                  <span class="text-terracotta-accent font-label-tabular-sm" id="badge-planeamiento-urbanistico">PUM-BCN</span>
                 </div>
-                <div class="p-2.5 rounded-lg bg-surface border border-sandstone-border flex items-center justify-between shadow-xs">
-                  <div class="flex items-center gap-2">
-                    <span class="material-symbols-outlined text-primary text-[18px]">apartment</span>
-                    <span class="font-semibold text-charcoal-text text-[13px]" id="disp-tipologia">Vivienda Residencial</span>
+                <div class="p-2 rounded-lg bg-surface border border-sandstone-border flex items-center justify-between shadow-xs hover:border-primary/40 transition-colors">
+                  <div class="flex items-center gap-2 min-w-0 flex-1">
+                    <span class="material-symbols-outlined text-primary text-[18px] flex-shrink-0" id="icon-tipologia">apartment</span>
+                    <select id="select-tipologia" class="bg-transparent font-semibold text-charcoal-text text-[13px] focus:outline-none cursor-pointer w-full" title="Seleccionar uso catastral / destino urbanístico">
+                      <option value="residencial" selected>Vivienda Residencial</option>
+                      <option value="retail">Local Comercial (Retail)</option>
+                      <option value="oficina">Oficina / Terciario</option>
+                    </select>
                   </div>
-                  <span class="px-1.5 py-0.5 rounded bg-stone-surface text-outline font-label-tabular-sm text-[10px] uppercase font-medium">Uso Dominante</span>
+                  <span class="px-1.5 py-0.5 rounded bg-stone-surface text-outline font-label-tabular-sm text-[10px] uppercase font-medium flex-shrink-0">Uso Dominante</span>
                 </div>
+                <span class="hidden" id="disp-tipologia">Vivienda Residencial</span>
               </div>
 
               <!-- Datos Oficiales Clave: Superficie, Año Construcción y Cuota IBI -->
@@ -374,28 +379,18 @@
                   <span class="text-[10.5px] text-on-surface-variant font-mono font-medium" id="disp-renta-m2">35,00 €/m²/mes</span>
                 </div>
                 <div class="flex items-center justify-between pt-0.5 border-t border-sandstone-border/40 text-[9.5px]">
-                  <span class="text-outline">Rango: 3.600 € - 4.100 €</span>
+                  <span class="text-outline" id="disp-renta-rango">Rango: 3.600 € - 4.100 €</span>
                   <button type="button" onclick="window.abrirModalInfo('renta')" class="text-secondary hover:text-primary font-bold inline-flex items-center gap-0.5 cursor-pointer" title="Haga clic para ver el cálculo oficial de rentas INCASÒL">
-                    <span>BBDD Fianzas BCN</span>
+                    <span id="disp-renta-organismo">BBDD Fianzas BCN</span>
                     <span class="material-symbols-outlined text-[11px]">help</span>
                   </button>
                 </div>
               </div>
 
-              <!-- Cuota IBI Municipal Estimada -->
-              <div class="p-2.5 rounded-lg bg-surface border border-sandstone-border flex items-center justify-between shadow-xs">
-                <div class="flex flex-col gap-0.5">
-                  <span class="font-label-caps text-outline uppercase text-[10px] font-semibold">Cuota Estimada IBI</span>
-                  <div class="text-[16px] font-bold text-emerald-800 font-label-tabular" id="disp-ibi">1.248 €/año</div>
-                </div>
-                <div class="flex flex-col items-end gap-0.5">
-                  <span class="text-[11px] font-bold text-emerald-900 font-mono" id="disp-ibi-mes">104 €/mes</span>
-                  <span class="text-[9.5px] text-outline font-medium">Gravamen Municipal</span>
-                </div>
-              </div>
-
               <!-- Identificadores ocultos de compatibilidad -->
               <div class="hidden">
+                <span id="disp-ibi">1.248 €/año</span>
+                <span id="disp-ibi-mes">104 €/mes</span>
                 <span id="disp-precio">320.000 €</span>
                 <span id="disp-precio-m2">2.909 €/m²</span>
               </div>
@@ -426,7 +421,6 @@
 
               <!-- Controles ocultos de compatibilidad técnica -->
               <div class="hidden">
-                <select id="select-tipologia"><option value="retail" selected>retail</option></select>
                 <input type="hidden" id="input-superficie" value="110"/>
                 <input type="hidden" id="input-precio" value="320000"/>
                 <select id="select-fachada"><option value="chaflan" selected>chaflan</option></select>
@@ -544,20 +538,20 @@
                 </div>
               </div>
 
-              <!-- Banner 2: Parking Catchment Deficit (#badge-parking) -->
+              <!-- Banner 2: Parking / Zona Azul (#badge-parking) -->
               <div class="flex items-center justify-between gap-space-sm px-space-md py-2.5 rounded-lg bg-badge-parkings-bg border border-sky-200 text-primary shadow-sm" id="badge-parking">
                 <div class="flex items-center gap-space-sm min-w-0">
                   <div class="w-7 h-7 rounded bg-white flex items-center justify-center flex-shrink-0 text-badge-parkings-text">
                     <span class="material-symbols-outlined text-[18px]">local_parking</span>
                   </div>
                   <div class="flex flex-col min-w-0">
-                    <span class="font-label-caps uppercase text-[10px] text-badge-parkings-text font-bold tracking-wide">_déficit_parking_cuenca</span>
-                    <span class="font-body-sm text-body-sm font-semibold truncate text-[#11314d]">90 / 100 (Alta Presión Área Verde/Azul)</span>
+                    <span class="font-label-caps uppercase text-[10px] text-badge-parkings-text font-bold tracking-wide" id="lbl-parking-banner-titulo">_estacionamiento_zona_azul</span>
+                    <span class="font-body-sm text-body-sm font-semibold truncate text-[#11314d]">Zona Azul: Ocupación y estacionamiento regulado</span>
                   </div>
                 </div>
                 <div class="flex items-center gap-1.5 flex-shrink-0">
                   <span id="marca-origen-parking"></span>
-                  <button type="button" onclick="window.abrirModalInfo('parking')" class="p-1 rounded text-sky-800/70 hover:text-sky-950 hover:bg-sky-200/50 transition-colors flex-shrink-0 cursor-pointer" title="Ver metodología y cálculo de la cuenca">
+                  <button type="button" onclick="window.abrirModalInfo('parking')" class="p-1 rounded text-sky-800/70 hover:text-sky-950 hover:bg-sky-200/50 transition-colors flex-shrink-0 cursor-pointer" title="Ver información de estacionamiento regulado">
                     <span class="material-symbols-outlined text-[17px]">info</span>
                   </button>
                 </div>
@@ -601,8 +595,8 @@
               <!-- Tab Navigation Bar -->
               <div class="flex items-center overflow-x-auto bg-stone-surface/40 px-space-md pt-2 gap-1 border-b border-sandstone-border scrollbar-none">
                 <button class="tab-btn active px-3.5 py-2 rounded-t-md font-headline-md text-[13px] font-semibold flex items-center gap-1.5 transition-all bg-surface-container-lowest text-primary border-t-2 border-primary shadow-sm cursor-pointer" id="btn-tab-finanzas" onclick="window.cambiarTab('tab-finanzas')" type="button">
-                  <span class="material-symbols-outlined text-[16px]">receipt_long</span>
-                  <span>_incasòl_&amp;_ibi</span>
+                  <span class="material-symbols-outlined text-[16px]">apartment</span>
+                  <span>_rentas_oficiales_incasòl</span>
                 </button>
                 <button class="tab-btn px-3.5 py-2 rounded-t-md font-headline-md text-[13px] font-medium flex items-center gap-1.5 transition-all text-on-surface-variant hover:text-primary hover:bg-stone-surface cursor-pointer" id="btn-tab-movilidad" onclick="window.cambiarTab('tab-movilidad')" type="button">
                   <span class="material-symbols-outlined text-[16px]">directions_car</span>
@@ -631,17 +625,17 @@
               <!-- TAB CONTENT CONTAINER -->
               <div class="p-space-lg flex-1 bg-surface-container-lowest">
                 
-                <!-- TAB 1: INCASÒL & IBI (DATOS EXCLUSIVOS ESENCIALES) -->
+                <!-- TAB 1: INCASÒL & PLANO CARTOGRÁFICO -->
                 <div class="tab-pane flex flex-col gap-space-md" id="tab-finanzas">
                   <div class="flex items-center justify-between pb-space-xs border-b border-sandstone-border/60">
                     <div class="flex flex-col">
-                      <span class="font-headline-md text-headline-md font-bold text-primary">_rentas_oficiales_incasòl_&amp;_ibi</span>
-                      <span class="font-body-sm text-body-sm text-on-surface-variant">Datos oficiales públicos al nivel territorial más bajo (Barrio/Zona) e impuesto municipal directo</span>
+                      <span class="font-headline-md text-headline-md font-bold text-primary">_rentas_oficiales_incasòl_&amp;_geolocalización</span>
+                      <span class="font-body-sm text-body-sm text-on-surface-variant">Datos oficiales públicos al nivel territorial más bajo (Barrio/Zona) y plano cartográfico interactivo</span>
                     </div>
-                    <span class="px-2.5 py-1 rounded bg-stone-surface border border-sandstone-border font-label-tabular-sm text-label-tabular-sm text-primary font-semibold">Fuente: INCASÒL &amp; Ajuntament</span>
+                    <span class="px-2.5 py-1 rounded bg-stone-surface border border-sandstone-border font-label-tabular-sm text-label-tabular-sm text-primary font-semibold">Fuente: INCASÒL &amp; ICGC</span>
                   </div>
 
-                  <!-- REJILLA DE LOS DOS ÚNICOS DATOS ESENCIALES -->
+                  <!-- REJILLA A 2 COLUMNAS: INCASÒL + PLANO INTERACTIVO -->
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-space-md">
                     
                     <!-- 1. DATO INCASÒL (ÁMBITO MICRO / BARRIO) -->
@@ -686,75 +680,52 @@
                       </div>
                     </div>
 
-                    <!-- 2. DATO IBI (IMPUESTO DE BIENES INMUEBLES) -->
-                    <div class="p-space-md rounded-xl bg-surface-container-lowest border-2 border-amber-800/30 flex flex-col justify-between shadow-xs">
+                    <!-- 2. PLANO CARTOGRÁFICO Y GEOLOCALIZACIÓN DEL ACTIVO -->
+                    <div class="p-space-md rounded-xl bg-surface-container-lowest border-2 border-primary/30 flex flex-col justify-between shadow-xs">
                       <div class="flex flex-col gap-1">
                         <div class="flex items-center justify-between pb-1 border-b border-sandstone-border/60">
-                          <div class="flex items-center gap-1.5 text-amber-950 font-bold text-[11px] uppercase tracking-wide font-label-caps">
-                            <span class="material-symbols-outlined text-[18px] text-amber-900">receipt_long</span>
-                            <span>_2._impuesto_bienes_inmuebles_(ibi)</span>
+                          <div class="flex items-center gap-1.5 text-primary font-bold text-[11px] uppercase tracking-wide font-label-caps">
+                            <span class="material-symbols-outlined text-[18px] text-primary">map</span>
+                            <span>_2._plano_georreferenciado</span>
                           </div>
                           <div class="flex items-center gap-1.5">
-                            <span id="marca-origen-ibi"></span>
-                            <span class="px-2 py-0.5 rounded bg-amber-100 text-amber-950 font-label-tabular-sm text-[10px] font-bold">MUNICIPAL</span>
+                            <span class="px-2 py-0.5 rounded bg-stone-surface text-primary font-label-tabular-sm text-[10px] font-bold">ETRS89 / WGS84</span>
+                            <button type="button" onclick="window.abrirModalMapaFullscreen()" class="px-2 py-0.5 rounded bg-primary/10 hover:bg-primary/20 text-primary font-label-tabular-sm text-[10px] font-bold inline-flex items-center gap-1 transition-colors cursor-pointer" title="Expandir plano a pantalla completa">
+                              <span class="material-symbols-outlined text-[13px]">open_in_full</span>
+                              <span>EXPANDIR</span>
+                            </button>
                           </div>
                         </div>
                         <div class="pt-1 text-[11px] font-semibold text-outline uppercase tracking-wider font-label-caps">
-                          Gravamen Local Oficial
+                          Entorno Inmobiliario &amp; Isócronas Peatonales
                         </div>
-                        <div class="text-[17px] font-bold text-charcoal-text font-headline-md leading-tight" id="val-ibi-municipio">
-                          Padrón IBI Ajuntament de Barcelona
-                        </div>
-                        <div class="text-[12px] text-on-surface-variant pt-0.5 font-medium">
-                          Tipo general ordenanza fiscal municipal sobre base catastral OVC.
+                        <div class="text-[13px] font-bold text-charcoal-text font-headline-md leading-tight truncate" id="lbl-plano-direccion">
+                          Ubicación exacta del activo e isócrona peatonal
                         </div>
                       </div>
 
-                      <div class="pt-3 mt-3 border-t border-sandstone-border/60 flex flex-col gap-2">
-                        <div class="flex items-baseline justify-between">
-                          <span class="text-[12px] font-medium text-outline">Tipo impositivo aplicado:</span>
-                          <span class="font-label-tabular text-[15px] font-bold text-amber-950 font-mono" id="val-ibi-tipo">0,66 % OVC</span>
-                        </div>
-                        <div class="p-2.5 rounded-lg bg-amber-50 border border-amber-200 flex items-center justify-between">
-                          <div class="flex flex-col">
-                            <span class="font-label-caps text-[9px] uppercase font-bold text-amber-950">Impacto Mensual</span>
-                            <span class="font-label-tabular text-[18px] font-extrabold text-amber-950 font-mono" id="val-ibi-mensual">-104 €/mes</span>
-                          </div>
-                          <div class="flex flex-col text-right">
-                            <span class="font-label-caps text-[9px] uppercase font-bold text-amber-950">Cuota IBI Anual</span>
-                            <span class="font-label-tabular text-[18px] font-extrabold text-rose-800 font-mono" id="val-ibi-anual">-1.248 €/año</span>
-                          </div>
-                        </div>
+                      <!-- Dock para el Mapa en Tab 1 (Posición Principal) -->
+                      <div class="pt-2 mt-2 w-full h-[340px] min-h-[340px] relative rounded-lg overflow-hidden border border-sandstone-border bg-stone-surface shadow-inner" id="dock-mapa-principal">
+                        <div id="leaflet-map" class="w-full h-full min-h-[340px]"></div>
+                      </div>
+
+                      <div class="pt-2 mt-2 border-t border-sandstone-border/60 flex items-center justify-between text-[10px] text-outline font-label-tabular-sm">
+                        <span>Pines interactivos y radios de proximidad</span>
+                        <span class="text-primary font-semibold">ICGC &amp; OpenStreetMap</span>
                       </div>
                     </div>
 
-                  </div>
-
-                  <!-- BALANCE DIRECTO Y LIMPIO POST-IBI -->
-                  <div class="p-space-md rounded-xl bg-stone-surface/60 border border-sandstone-border flex flex-col sm:flex-row items-center justify-between gap- space-sm shadow-xs">
-                    <div class="flex items-center gap-3">
-                      <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-on-primary flex-shrink-0 shadow-sm">
-                        <span class="material-symbols-outlined text-[22px]">calculate</span>
-                      </div>
-                      <div class="flex flex-col">
-                        <span class="font-label-caps text-[10px] text-outline uppercase font-bold">_resultado_directo_limpio</span>
-                        <span class="font-headline-md text-[15px] font-bold text-primary">Renta INCASÒL descontando únicamente el IBI</span>
-                      </div>
-                    </div>
-                    <div class="flex items-center gap-6">
-                      <div class="flex flex-col text-right">
-                        <span class="text-[10px] text-outline font-label-caps uppercase font-semibold">Neto Mensual</span>
-                        <span class="font-label-tabular text-[17px] font-bold text-charcoal-text font-mono" id="val-neto-mensual">2.228 €/mes</span>
-                      </div>
-                      <div class="flex flex-col text-right">
-                        <span class="text-[10px] text-outline font-label-caps uppercase font-semibold">Neto Anual Directo</span>
-                        <span class="font-label-tabular text-[22px] font-extrabold text-emerald-800 font-mono" id="val-neto-anual">26.736 €/año</span>
-                      </div>
-                    </div>
                   </div>
 
                   <!-- IDENTIFICADORES OCULTOS DE COMPATIBILIDAD TÉCNICA -->
                   <div class="hidden">
+                    <span id="val-ibi-municipio"></span>
+                    <span id="val-ibi-tipo"></span>
+                    <span id="val-ibi-mensual"></span>
+                    <span id="val-ibi-anual"></span>
+                    <span id="val-neto-mensual"></span>
+                    <span id="val-neto-anual"></span>
+                    <span id="marca-origen-ibi"></span>
                     <span id="row-precio">320.000 €</span>
                     <span id="row-itp">32.000 €</span>
                     <span id="row-ajd">4.800 €</span>
@@ -775,20 +746,20 @@
                 <!-- TAB 3: MOVILIDAD & PARKING -->
                 <div class="tab-pane hidden flex flex-col gap-space-lg" id="tab-movilidad">
                   <div class="grid grid-cols-1 md:grid-cols-3 gap-space-md">
-                    <div class="p-space-md rounded-lg bg-surface border border-sandstone-border flex flex-col gap-space-xs">
+                    <div class="p-space-md rounded-lg bg-surface border border-sandstone-border flex flex-col gap-space-xs" id="card-deficit-parking">
                       <div class="flex items-center justify-between">
-                        <span class="font-label-caps text-outline uppercase text-[10px] font-semibold">_déficit_estacionamiento</span>
+                        <span class="font-label-caps text-outline uppercase text-[10px] font-semibold" id="lbl-deficit-card-titulo">_déficit_estacionamiento</span>
                         <div class="flex items-center gap-1.5">
                           <span id="marca-origen-movilidad"></span>
-                          <span class="material-symbols-outlined text-error text-[18px]">no_crash</span>
+                          <span class="material-symbols-outlined text-error text-[18px]" id="icon-deficit-card">no_crash</span>
                         </div>
                       </div>
                       <div class="font-headline-lg text-headline-lg font-bold text-error" id="mov-deficit-score">90 / 100</div>
                       <span class="font-body-sm text-body-sm text-on-surface-variant" id="mov-deficit-desc">Rotación crítica: cuenca de captación sin plazas libres en radio 300m.</span>
                     </div>
-                    <div class="p-space-md rounded-lg bg-surface border border-sandstone-border flex flex-col gap-space-xs">
+                    <div class="p-space-md rounded-lg bg-surface border border-sandstone-border flex flex-col gap-space-xs" id="card-zona-azul">
                       <div class="flex items-center justify-between">
-                        <span class="font-label-caps text-outline uppercase text-[10px] font-semibold">_área_verde_azul_b:sm</span>
+                        <span class="font-label-caps text-outline uppercase text-[10px] font-semibold" id="lbl-zona-azul-card-titulo">_estacionamiento_zona_azul</span>
                         <span class="material-symbols-outlined text-secondary text-[18px]">local_parking</span>
                       </div>
                       <div class="font-headline-lg text-headline-lg font-bold text-secondary" id="mov-ocupacion-pct">98 % Ocupación</div>
@@ -1385,44 +1356,25 @@
                     </div>
                   </div>
 
-                  <!-- LAYOUT DIVIDIDO A 2 COLUMNAS (LISTADO + MAPA CONTEXTUAL DOCK) -->
-                  <div class="grid grid-cols-1 lg:grid-cols-12 gap-space-md items-start">
-                    <!-- Columna Izquierda: Listado de Comercios (7 cols) -->
-                    <div class="lg:col-span-7 flex flex-col gap-space-sm">
-                      <div class="flex items-center justify-between text-[11px] text-on-surface-variant px-1 font-medium">
-                        <span id="lbl-conteo-visibles">Mostrando 28 negocios en la cuenca de 5 min</span>
-                        <span class="text-outline text-[10px] hidden sm:inline">Haz clic en «Ubicar en mapa» para enfocar</span>
-                      </div>
-
-                      <div class="grid grid-cols-1 sm:grid-cols-2 gap-space-sm max-h-[580px] overflow-y-auto pr-1" id="contenedor-lista-negocios">
-                        <!-- Las fichas con Nombre, Dirección, Categoría y Distancia a pie se renderizan aquí dinámicamente -->
-                      </div>
-                    </div>
-
-                    <!-- Columna Derecha: Mapa Interactivo Embebido (5 cols, Sticky) -->
-                    <div class="lg:col-span-5 sticky top-20 flex flex-col gap-2 p-space-sm bg-surface rounded-xl border border-sandstone-border shadow-xs">
-                      <div class="flex items-center justify-between px-1">
-                        <div class="flex items-center gap-1.5">
-                          <span class="material-symbols-outlined text-[16px] text-primary">storefront</span>
-                          <span class="font-label-caps text-primary uppercase text-[10px] font-bold">_distribución_comercial</span>
-                        </div>
-                        <button type="button" onclick="window.abrirModalMapaFullscreen()" class="text-[11px] text-primary hover:text-terracotta-accent flex items-center gap-1 font-semibold cursor-pointer" title="Expandir visor a pantalla completa">
+                  <!-- LISTADO DE COMERCIOS A ANCHO COMPLETO -->
+                  <div class="flex flex-col gap-space-sm w-full">
+                    <div class="flex items-center justify-between text-[11px] text-on-surface-variant px-1 font-medium pb-1 border-b border-sandstone-border/40">
+                      <span id="lbl-conteo-visibles">Mostrando 28 negocios en la cuenca de 5 min</span>
+                      <div class="flex items-center gap-3">
+                        <span class="text-outline text-[10px] hidden sm:inline">Haz clic en «Ubicar en mapa» para ver en el visor</span>
+                        <button type="button" onclick="window.abrirModalMapaFullscreen()" class="text-[11px] text-primary hover:text-terracotta-accent flex items-center gap-1 font-semibold cursor-pointer" title="Ver todos los comercios en el mapa a pantalla completa">
                           <span class="material-symbols-outlined text-[14px]">open_in_full</span>
-                          <span>Expandir</span>
+                          <span>Abrir en Plano</span>
                         </button>
                       </div>
-                      
-                      <!-- Dock para el Mapa en Tab Negocios -->
-                      <div class="relative w-full h-[490px] rounded-lg overflow-hidden border border-sandstone-border bg-stone-surface" id="dock-mapa-negocios">
-                        <div id="leaflet-map" class="w-full h-full min-h-[490px]"></div>
-                      </div>
-                      
-                      <div class="flex items-center justify-between px-1 text-[10px] text-outline font-label-tabular-sm">
-                        <span>Pines interactivos con aforo comercial</span>
-                        <span class="text-primary font-semibold">ICGC &amp; OpenStreetMap</span>
-                      </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-space-sm max-h-[580px] overflow-y-auto pr-1" id="contenedor-lista-negocios">
+                      <!-- Las fichas con Nombre, Dirección, Categoría y Distancia a pie se renderizan aquí dinámicamente -->
                     </div>
                   </div>
+                  <!-- Dock de reserva para compatibilidad -->
+                  <div id="dock-mapa-negocios" class="hidden"></div>
 
                   <!-- BLOQUE DESPLEGABLE: PROCEDENCIA OFICIAL Y CÁLCULO DE DISTANCIA A PIE -->
                   <details class="group mt-2 pt-3 border-t border-sandstone-border/60 cursor-pointer">
@@ -1572,44 +1524,25 @@
                     </div>
                   </div>
 
-                  <!-- LAYOUT DIVIDIDO A 2 COLUMNAS (LISTADO + MAPA CONTEXTUAL DOCK) -->
-                  <div class="grid grid-cols-1 lg:grid-cols-12 gap-space-md items-start">
-                    <!-- Columna Izquierda: Listado de Equipamientos (7 cols) -->
-                    <div class="lg:col-span-7 flex flex-col gap-space-sm">
-                      <div class="flex items-center justify-between text-[11px] text-on-surface-variant px-1 font-medium">
-                        <span id="lbl-conteo-visibles-servicios">Mostrando 18 servicios y equipamientos en la cuenca de 5 min</span>
-                        <span class="text-outline text-[10px] hidden sm:inline">Haz clic en «Ubicar en mapa» para enfocar</span>
-                      </div>
-
-                      <div class="grid grid-cols-1 sm:grid-cols-2 gap-space-sm max-h-[580px] overflow-y-auto pr-1" id="contenedor-lista-servicios">
-                        <!-- Las fichas de servicios con Nombre, Dirección, Categoría/Subtipo y Distancia a pie se renderizan aquí dinámicamente -->
-                      </div>
-                    </div>
-
-                    <!-- Columna Derecha: Mapa Interactivo Embebido (5 cols, Sticky) -->
-                    <div class="lg:col-span-5 sticky top-20 flex flex-col gap-2 p-space-sm bg-surface rounded-xl border border-sandstone-border shadow-xs">
-                      <div class="flex items-center justify-between px-1">
-                        <div class="flex items-center gap-1.5">
-                          <span class="material-symbols-outlined text-[16px] text-blue-900">account_balance</span>
-                          <span class="font-label-caps text-blue-900 uppercase text-[10px] font-bold">_equipamientos_en_mapa</span>
-                        </div>
-                        <button type="button" onclick="window.abrirModalMapaFullscreen()" class="text-[11px] text-primary hover:text-terracotta-accent flex items-center gap-1 font-semibold cursor-pointer" title="Expandir visor a pantalla completa">
+                  <!-- LISTADO DE EQUIPAMIENTOS A ANCHO COMPLETO -->
+                  <div class="flex flex-col gap-space-sm w-full">
+                    <div class="flex items-center justify-between text-[11px] text-on-surface-variant px-1 font-medium pb-1 border-b border-sandstone-border/40">
+                      <span id="lbl-conteo-visibles-servicios">Mostrando 18 servicios y equipamientos en la cuenca de 5 min</span>
+                      <div class="flex items-center gap-3">
+                        <span class="text-outline text-[10px] hidden sm:inline">Haz clic en «Ubicar en mapa» para ver en el visor</span>
+                        <button type="button" onclick="window.abrirModalMapaFullscreen()" class="text-[11px] text-primary hover:text-terracotta-accent flex items-center gap-1 font-semibold cursor-pointer" title="Ver todos los equipamientos en el mapa a pantalla completa">
                           <span class="material-symbols-outlined text-[14px]">open_in_full</span>
-                          <span>Expandir</span>
+                          <span>Abrir en Plano</span>
                         </button>
                       </div>
-                      
-                      <!-- Dock para el Mapa en Tab Servicios -->
-                      <div class="relative w-full h-[490px] rounded-lg overflow-hidden border border-sandstone-border bg-stone-surface" id="dock-mapa-servicios">
-                        <!-- #leaflet-map se acopla aquí dinámicamente cuando esta pestaña se activa -->
-                      </div>
-                      
-                      <div class="flex items-center justify-between px-1 text-[10px] text-outline font-label-tabular-sm">
-                        <span>Colegios, centros médicos, parkings y zonas verdes</span>
-                        <span class="text-blue-900 font-semibold">Guia Equipaments BCN</span>
-                      </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-space-sm max-h-[580px] overflow-y-auto pr-1" id="contenedor-lista-servicios">
+                      <!-- Las fichas de servicios con Nombre, Dirección, Categoría/Subtipo y Distancia a pie se renderizan aquí dinámicamente -->
                     </div>
                   </div>
+                  <!-- Dock de reserva para compatibilidad -->
+                  <div id="dock-mapa-servicios" class="hidden"></div>
 
                   <!-- BLOQUE DESPLEGABLE: PROCEDENCIA OFICIAL Y CÁLCULO DE DISTANCIA A PIE DE SERVICIOS -->
                   <details class="group mt-2 pt-3 border-t border-sandstone-border/60 cursor-pointer">
@@ -1800,13 +1733,14 @@
               if (activePane) {
                 activePane.classList.remove('hidden');
               }
+              if (tabId === 'tab-finanzas') {
+                if (typeof window.acoplarMapa === 'function') window.acoplarMapa('dock-mapa-principal');
+              }
               if (tabId === 'tab-negocios') {
                 if (typeof window.renderizarNegocios === 'function') window.renderizarNegocios();
-                if (typeof window.acoplarMapa === 'function') window.acoplarMapa('dock-mapa-negocios');
               }
               if (tabId === 'tab-servicios') {
                 if (typeof window.renderizarServicios === 'function') window.renderizarServicios();
-                if (typeof window.acoplarMapa === 'function') window.acoplarMapa('dock-mapa-servicios');
               }
               if (window.leafletMap) {
                 setTimeout(function() {
@@ -1838,7 +1772,7 @@
 
             // Isochrone button toggle
             window.cambiarIsocrona = function(minutos) {
-              var btns = [5, 10, 15];
+              var btns = [3, 5, 7];
               btns.forEach(function(m) {
                 var b = document.getElementById('iso-' + m);
                 if (!b) return;
@@ -1862,14 +1796,14 @@
 
               var lbl = document.getElementById('lbl-isocrona-radio');
               if (lbl) {
-                lbl.textContent = minutos === 5 ? '5 min (~300 m)' : (minutos === 10 ? '10 min (~650 m)' : '15 min (~1.000 m)');
+                lbl.textContent = minutos === 3 ? '3 min (~240 m)' : (minutos === 5 ? '5 min (~400 m)' : '7 min (~560 m)');
               }
               var modalSub = document.getElementById('modal-mapa-subtitulo');
               if (modalSub) {
                 var dir = document.getElementById('input-calle')?.value || 'Carrer de Balmes';
                 var num = document.getElementById('input-numero')?.value || '12';
                 var mun = document.getElementById('input-municipio')?.value || 'Barcelona';
-                var isoText = minutos === 5 ? '5 min (~300 m)' : (minutos === 10 ? '10 min (~650 m)' : '15 min (~1.000 m)');
+                var isoText = minutos === 3 ? '3 min (~240 m)' : (minutos === 5 ? '5 min (~400 m)' : '7 min (~560 m)');
                 modalSub.textContent = dir + ', ' + num + ', ' + mun + ' • Isócrona activa: ' + isoText;
               }
               window.mostrarToast('Isócrona fijada a ' + minutos + ' min a pie');
@@ -2113,16 +2047,16 @@
               <span class="font-headline-md text-[15px] font-bold text-primary truncate">Visor Cartográfico Geoespacial &amp; Isócronas Peatonales</span>
               <span class="px-2 py-0.5 rounded-full text-[9px] font-bold font-mono bg-emerald-100 text-emerald-900 border border-emerald-300 flex-shrink-0">ICGC &amp; OSM</span>
             </div>
-            <span class="font-label-tabular-sm text-[11px] text-outline truncate" id="modal-mapa-subtitulo">Carrer de Balmes, 12, Barcelona • Isócrona activa: 5 min (~300 m)</span>
+            <span class="font-label-tabular-sm text-[11px] text-outline truncate" id="modal-mapa-subtitulo">Carrer de Balmes, 12, Barcelona • Isócrona activa: 3 min (~240 m)</span>
           </div>
         </div>
 
         <div class="flex items-center gap-2 flex-shrink-0">
           <!-- Selector rápido de isócronas dentro del modal -->
           <div class="hidden sm:flex items-center gap-1 bg-stone-surface p-0.5 rounded-md border border-sandstone-border/70">
-            <button class="px-2 py-0.5 text-center font-label-tabular-sm text-[10px] rounded bg-primary text-white font-semibold cursor-pointer" id="modal-iso-5" onclick="window.cambiarIsocrona(5)" type="button">5 min</button>
-            <button class="px-2 py-0.5 text-center font-label-tabular-sm text-[10px] rounded hover:bg-stone-surface text-charcoal-text font-medium cursor-pointer" id="modal-iso-10" onclick="window.cambiarIsocrona(10)" type="button">10 min</button>
-            <button class="px-2 py-0.5 text-center font-label-tabular-sm text-[10px] rounded hover:bg-stone-surface text-charcoal-text font-medium cursor-pointer" id="modal-iso-15" onclick="window.cambiarIsocrona(15)" type="button">15 min</button>
+            <button class="px-2 py-0.5 text-center font-label-tabular-sm text-[10px] rounded bg-primary text-white font-semibold cursor-pointer" id="modal-iso-3" onclick="window.cambiarIsocrona(3)" type="button">3 min</button>
+            <button class="px-2 py-0.5 text-center font-label-tabular-sm text-[10px] rounded hover:bg-stone-surface text-charcoal-text font-medium cursor-pointer" id="modal-iso-5" onclick="window.cambiarIsocrona(5)" type="button">5 min</button>
+            <button class="px-2 py-0.5 text-center font-label-tabular-sm text-[10px] rounded hover:bg-stone-surface text-charcoal-text font-medium cursor-pointer" id="modal-iso-7" onclick="window.cambiarIsocrona(7)" type="button">7 min</button>
           </div>
 
           <button type="button" onclick="window.cerrarModalMapaFullscreen()" class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-stone-surface text-outline hover:text-primary transition-colors cursor-pointer" title="Cerrar visor cartográfico (ESC)">
