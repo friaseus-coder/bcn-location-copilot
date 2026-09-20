@@ -1588,19 +1588,22 @@
       }
 
       const latTxt = (f.latencia_ms !== null && f.latencia_ms !== undefined) ? `${f.latencia_ms} ms` : '--';
+      const org = f.organismo || f.proveedor || 'Organismo Oficial';
+      const desc = f.descripcion || f.mensaje || f.detalle || 'Conexión verificada';
+      const met = f.metodo || (f.en_vivo ? 'API REST en vivo' : 'Cálculo Oficial');
 
       tr.innerHTML = `
         <td class="py-2.5 pr-2">
           <div class="flex flex-col">
-            <span class="font-bold text-charcoal-text">${f.nombre}</span>
-            <span class="text-[10px] text-outline leading-tight">${f.descripcion}</span>
+            <span class="font-bold text-charcoal-text">${f.nombre || key}</span>
+            <span class="text-[10px] text-outline leading-tight">${desc}</span>
           </div>
         </td>
         <td class="py-2.5 px-2">
-          <span class="font-medium text-primary">${f.organismo}</span>
+          <span class="font-medium text-primary">${org}</span>
         </td>
         <td class="py-2.5 px-2 text-center">
-          <span class="font-mono text-[10px] bg-stone-surface px-1.5 py-0.5 rounded border border-sandstone-border">${f.metodo}</span>
+          <span class="font-mono text-[10px] bg-stone-surface px-1.5 py-0.5 rounded border border-sandstone-border">${met}</span>
         </td>
         <td class="py-2.5 px-2 text-center font-mono font-bold ${f.latencia_ms ? 'text-emerald-900' : 'text-outline'}">
           ${latTxt}
