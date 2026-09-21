@@ -816,7 +816,7 @@
     }
 
     const inputSuperficieEl = document.getElementById('input-superficie');
-    if (inputSuperficieEl) {
+    if (inputSuperficieEl && inputSuperficieEl.type !== 'hidden') {
       inputSuperficieEl.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
           e.preventDefault();
@@ -861,7 +861,6 @@
     const numero = document.getElementById('input-numero')?.value.trim() || '12';
     const piso = document.getElementById('input-piso')?.value.trim() || '';
     const tipologia = document.getElementById('select-tipologia')?.value || 'residencial';
-    const superficie = parseFloat(document.getElementById('input-superficie')?.value) || 110;
     const precio = parseFloat(document.getElementById('input-precio')?.value) || 320000;
     const fachada = document.getElementById('select-fachada')?.value || 'chaflan';
     const humos = document.getElementById('check-humos')?.checked || false;
@@ -903,7 +902,6 @@
         piso: piso,
         direccion: direccionCompleta,
         tipologia: tipologia,
-        superficie: superficie.toString(),
         precio: precio.toString(),
         fachada: fachada,
         humos: humos ? 'true' : 'false',
@@ -1410,6 +1408,8 @@
         setText('mov-deficit-score', `${mov.deficit_score} / 100`);
         const defScoreEl = document.getElementById('mov-deficit-score');
         if (defScoreEl) defScoreEl.className = 'font-headline-lg text-headline-lg font-bold text-error';
+        const defBar = document.getElementById('mov-deficit-bar');
+        if (defBar) defBar.style.width = Math.min(100, Math.max(0, mov.deficit_score)) + '%';
       }
       if (mov.deficit_desc) setText('mov-deficit-desc', mov.deficit_desc);
       setText('lbl-zona-azul-card-titulo', '_estacionamiento_zona_azul');
@@ -1417,6 +1417,8 @@
         setText('mov-ocupacion-pct', `${mov.ocupacion_pct} % Ocupación`);
         const ocupScoreEl = document.getElementById('mov-ocupacion-pct');
         if (ocupScoreEl) ocupScoreEl.className = 'font-headline-lg text-headline-lg font-bold text-secondary';
+        const ocupBar = document.getElementById('mov-ocupacion-bar');
+        if (ocupBar) ocupBar.style.width = Math.min(100, Math.max(0, mov.ocupacion_pct)) + '%';
       }
       if (mov.ocupacion_desc) setText('mov-ocupacion-desc', mov.ocupacion_desc);
       const marcaMov = document.getElementById('marca-origen-movilidad');

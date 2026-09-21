@@ -225,11 +225,8 @@
           <div id="badge-radiografia-edificio" class="hidden absolute top-full left-0 right-0 mt-1 p-2 bg-stone-900/95 text-stone-100 text-[10px] rounded shadow-lg z-40 leading-tight"></div>
         </div>
 
-        <!-- Input Superficie Construida (m²) Editable Directamente -->
-        <div class="relative w-[90px] flex-shrink-0" title="Superficie construida total en m² (Sede Catastro OVC)">
-          <input class="w-full h-9 pl-2 pr-7 text-center rounded bg-surface border border-sandstone-border font-body-sm text-body-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary font-bold font-mono" id="input-superficie" max="99999" min="10" placeholder="110" type="number" value="110" autocomplete="off" onfocus="this.select()" />
-          <span class="absolute right-2 top-1/2 -translate-y-1/2 text-[11px] font-bold text-outline pointer-events-none">m²</span>
-        </div>
+        <!-- Superficie construida oficial resuelta directamente desde Sede Catastro OVC -->
+        <input type="hidden" id="input-superficie" value="" />
 
         <!-- Input hidden fallback for legacy compatibility -->
         <input type="hidden" id="input-direccion" value="Carrer de Balmes, 12, Barcelona"/>
@@ -746,6 +743,7 @@
                         <span>Pines interactivos y radios de proximidad</span>
                         <span class="text-primary font-semibold">ICGC &amp; OpenStreetMap</span>
                       </div>
+                    </div>
                   </div>
 
                   <!-- 3. RADIOGRAFÍA CATASTRAL: DESGLOSE OFICIAL DE SUPERFICIES Y TIPO DE EDIFICACIÓN -->
@@ -843,6 +841,9 @@
                         </div>
                       </div>
                       <div class="font-headline-lg text-headline-lg font-bold text-error" id="mov-deficit-score">90 / 100</div>
+                      <div class="w-full bg-stone-surface h-1.5 rounded-full overflow-hidden my-1">
+                        <div class="bg-error h-full rounded-full transition-all duration-500" id="mov-deficit-bar" style="width: 90%;"></div>
+                      </div>
                       <span class="font-body-sm text-body-sm text-on-surface-variant" id="mov-deficit-desc">Rotación crítica: cuenca de captación sin plazas libres en radio 300m.</span>
                     </div>
                     <div class="p-space-md rounded-lg bg-surface border border-sandstone-border flex flex-col gap-space-xs" id="card-zona-azul">
@@ -851,6 +852,9 @@
                         <span class="material-symbols-outlined text-secondary text-[18px]">local_parking</span>
                       </div>
                       <div class="font-headline-lg text-headline-lg font-bold text-secondary" id="mov-ocupacion-pct">98 % Ocupación</div>
+                      <div class="w-full bg-stone-surface h-1.5 rounded-full overflow-hidden my-1">
+                        <div class="bg-secondary h-full rounded-full transition-all duration-500" id="mov-ocupacion-bar" style="width: 98%;"></div>
+                      </div>
                       <span class="font-body-sm text-body-sm text-on-surface-variant" id="mov-ocupacion-desc">Horas punta 10:00 - 13:30h y 17:00 - 19:30h (Días laborables).</span>
                     </div>
                     <div class="p-space-md rounded-lg bg-surface border border-sandstone-border flex flex-col gap-space-xs">

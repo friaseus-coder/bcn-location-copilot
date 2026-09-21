@@ -2480,8 +2480,16 @@ def resolver_acustica_y_viandantes(
         "sensor_real": sensor_real_data
     }
 
+CLIMA_CACHE: Dict[Tuple[float, float], Dict[str, Any]] = {}
+
 async def consultar_clima_open_meteo(lat: float, lon: float) -> Dict[str, Any]:
-    """Consulta la serie de 365 días reales a Open-Meteo Archive API."""
+    """Consulta la serie de 365 días reales a Open-Meteo Archive API con caché en memoria y resiliencia."""
+    cache_key = (round(lat, 3), round(lon, 3))
+    if cache_key in CLIMA_CACHE:
+        cached = dict(CLIMA_CACHE[cache_key])
+        cached["latencia_ms"] = 15
+        return cached
+
     t_clima_start = time.time()
     hoy = date.today()
     fin = hoy - timedelta(days=5)
@@ -2493,12 +2501,12 @@ async def consultar_clima_open_meteo(lat: float, lon: float) -> Dict[str, Any]:
         "longitude": round(lon, 4),
         "start_date": inicio.isoformat(),
         "end_date": fin.isoformat(),
-        "daily": ["temperature_2m_max", "temperature_2m_min", "precipitation_sum"],
+        "daily": "temperature_2m_max,temperature_2m_min,precipitation_sum",
         "timezone": "Europe/Madrid"
     }
 
     try:
-        async with httpx.AsyncClient(timeout=3.5) as client:
+        async with httpx.AsyncClient(timeout=6.0) as client:
             resp = await client.get(url, params=params)
             latencia_ms = max(20, round((time.time() - t_clima_start) * 1000))
             if resp.status_code == 200:
@@ -2507,10 +2515,10 @@ async def consultar_clima_open_meteo(lat: float, lon: float) -> Dict[str, Any]:
                 t_min = data.get("temperature_2m_min", [])
                 precip = data.get("precipitation_sum", [])
 
-                dias_lluvia = sum(1 for p in precip if p and p > 1.0)
-                precip_total = round(sum(p for p in precip if p), 1)
-                olas_calor = sum(1 for t in t_max if t and t > 32.0)
-                noches_tropicales = sum(1 for t in t_min if t and t > 20.0)
+                dias_lluvia = sum(1 for p in precip if p is not None and p > 1.0)
+                precip_total = round(sum(p for p in precip if p is not None), 1)
+                olas_calor = sum(1 for t in t_max if t is not None and t > 32.0)
+                noches_tropicales = sum(1 for t in t_min if t is not None and t > 20.0)
 
                 # Grados día de calefacción (HDD base 18) y refrigeración (CDD base 21)
                 hdd = 0.0
@@ -2523,7 +2531,7 @@ async def consultar_clima_open_meteo(lat: float, lon: float) -> Dict[str, Any]:
                         if t_med > 21.0:
                             cdd += (t_med - 21.0)
 
-                return {
+                resultado = {
                     "dias_lluvia": dias_lluvia,
                     "precipitacion_mm": precip_total,
                     "olas_calor": olas_calor,
@@ -2533,8 +2541,12 @@ async def consultar_clima_open_meteo(lat: float, lon: float) -> Dict[str, Any]:
                     "clima_en_vivo": True,
                     "latencia_ms": latencia_ms
                 }
-    except Exception:
-        pass
+                CLIMA_CACHE[cache_key] = resultado
+                return resultado
+            else:
+                print(f"[Open-Meteo Archive Warning] Status {resp.status_code}: {resp.text[:200]}")
+    except Exception as e:
+        print(f"[Open-Meteo Archive Exception] {type(e).__name__}: {e}")
 
     latencia_ms = max(20, round((time.time() - t_clima_start) * 1000))
     # Fallback climatológico histórico consolidado de la cuenca de Barcelona
