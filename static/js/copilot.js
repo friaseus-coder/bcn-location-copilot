@@ -1480,6 +1480,28 @@
     } else {
       generarMarcasEstadoPorDefecto(municipioActivo);
     }
+
+    // L. Sincronizar resumen e indicadores en la barra móvil (< xl)
+    try {
+      const calleInput = document.getElementById('input-calle')?.value.trim() || 'Balmes';
+      const numInput = document.getElementById('input-numero')?.value.trim() || '12';
+      const dirTexto = activo.direccion || `${calleInput}, ${numInput}, ${municipioActivo}`;
+      const lblMovilDir = document.getElementById('lbl-busqueda-movil-direccion');
+      if (lblMovilDir) {
+        lblMovilDir.textContent = `${calleInput.replace(/^(carrer de |calle |c\/|av\.? |avinguda )/i, '')}, ${numInput}`;
+      }
+      setText('resumen-movil-dir', dirTexto);
+      setText('resumen-movil-sup', `${supM2} m²`);
+      setText('resumen-movil-ano', `${anoConstruccion}`);
+      setText('resumen-movil-uso', tipoNombres[tipologiaActiva] || 'Residencial');
+
+      // Si estamos en móvil y el panel de búsqueda estaba abierto tras click en Analizar, cerrarlo
+      if (window.innerWidth < 1280 && typeof window.togglePanelBusquedaMovil === 'function') {
+        window.togglePanelBusquedaMovil(false);
+      }
+    } catch (eResumen) {
+      console.debug('Error sincronizando resumen móvil:', eResumen);
+    }
   }
 
   // ==========================================
@@ -3407,6 +3429,15 @@ Tiempo de Acceso = ${distanciaMetro} m / 80 m/min = ${(distanciaMetro / 80).toFi
     setTimeout(() => {
       ejecutarAnalisisCompleto();
     }, 150);
+
+    // Ajustar mapa Leaflet ante rotaciones de pantalla o cambios de viewport
+    let resizeTimer = null;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        if (map) map.invalidateSize();
+      }, 150);
+    });
   });
 
 })();

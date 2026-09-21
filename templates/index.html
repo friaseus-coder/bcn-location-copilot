@@ -156,10 +156,10 @@
 
   <div class="w-full">
     <!-- TOP MULTIDATA PROVINCIAL HEADER (FULL WIDTH) -->
-    <header class="fixed top-0 left-0 right-0 h-16 bg-surface-container-lowest/95 backdrop-blur-md border-b border-sandstone-border z-40 px-space-md flex items-center justify-between gap-space-md shadow-[0_1px_4px_rgba(27,28,26,0.03)]">
+    <header class="fixed top-0 left-0 right-0 h-14 sm:h-16 bg-surface-container-lowest/95 backdrop-blur-md border-b border-sandstone-border z-40 px-3 sm:px-space-md flex items-center justify-between gap-2 sm:gap-space-md shadow-[0_1px_4px_rgba(27,28,26,0.03)]">
       
       <!-- Institutional Logo & Brand Crest -->
-      <div class="flex items-center gap-2 flex-shrink-0 pr-3 border-r border-sandstone-border/60">
+      <div class="flex items-center gap-2 flex-shrink-0 pr-2 sm:pr-3 border-r border-sandstone-border/60">
         <div class="w-8 h-8 rounded bg-primary flex items-center justify-center text-on-primary shadow-sm">
           <span class="material-symbols-outlined text-[19px]">account_balance</span>
         </div>
@@ -168,88 +168,125 @@
             <span class="font-headline-md text-[13px] font-bold tracking-tight text-primary leading-none">BCN COPILOT</span>
             <span class="px-1.5 py-0.2 rounded bg-primary text-on-primary font-label-tabular-sm text-[9px] font-medium tracking-wide">v3.0</span>
           </div>
-          <span class="font-label-caps text-[9px] text-outline uppercase tracking-wider mt-0.5 font-medium">Província de Barcelona</span>
+          <span class="font-label-caps text-[9px] text-outline uppercase tracking-wider mt-0.5 font-medium hidden sm:inline">Província de Barcelona</span>
         </div>
       </div>
 
-      <!-- 3. BARRA DE BÚSQUEDA MULTIDATO PROVINCIAL (ERGONÓMICA) -->
-      <div class="relative flex items-center gap-2 flex-1 max-w-3xl">
-        <!-- Municipio Selector con Autocompletado Predictivo -->
-        <div class="relative min-w-[150px] max-w-[185px]">
-          <span class="material-symbols-outlined absolute left-2 top-1/2 -translate-y-1/2 text-outline text-[16px] pointer-events-none">location_city</span>
-          <input id="input-municipio" type="text" autocomplete="off" value="Barcelona" placeholder="Municipio..." 
-            class="w-full h-9 pl-7 pr-6 rounded bg-surface border border-sandstone-border font-body-sm text-body-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all font-semibold"
-            title="Escriba para buscar municipio de la provincia (ej. Barcelona, Badalona, Sabadell, Mataró...)" onfocus="this.select()" />
-          <input type="hidden" id="select-municipio" value="Barcelona" />
-          <span id="btn-toggle-municipios" class="material-symbols-outlined absolute right-1.5 top-1/2 -translate-y-1/2 text-outline text-[16px] cursor-pointer hover:text-charcoal-text">expand_more</span>
-          <!-- Dropdown Sugerencias Municipios -->
-          <div id="sugerencias-municipios" class="hidden absolute top-full left-0 right-0 mt-1 max-h-64 overflow-y-auto bg-surface-container-lowest border border-sandstone-border rounded-lg shadow-xl z-50 divide-y divide-sandstone-border/60">
-          </div>
-        </div>
-
-        <!-- Input Calle (Nombre de la vía) con Selección Total al Marcar -->
-        <div class="relative flex-1 min-w-[160px]">
-          <span class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-outline text-[16px]">location_searching</span>
-          <input class="w-full h-9 pl-8 pr-2 rounded bg-surface border border-sandstone-border font-body-sm text-body-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" id="input-calle" autocomplete="off" placeholder="Calle / Vía (ej. Balmes)" type="text" value="Carrer de Balmes" onfocus="this.select()" />
-          <!-- Sugerencias Vías (Contenedor Flotante Oculto para API ICGC Pelias) -->
-          <div class="hidden absolute top-full left-0 right-0 mt-1 max-h-60 overflow-y-auto bg-surface-container-lowest border border-sandstone-border rounded-lg shadow-xl z-50 divide-y divide-sandstone-border/60" id="sugerencias-vias">
-          </div>
-        </div>
-
-        <!-- Input Número de policía con Validación en Catastro OVC -->
-        <div class="relative w-[85px] flex-shrink-0">
-          <input class="w-full h-9 pl-2 pr-6 text-center rounded bg-surface border border-sandstone-border font-body-sm text-body-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary font-bold" id="input-numero" max="9999" min="1" placeholder="Nº" type="text" value="12" autocomplete="off" onfocus="this.select()" />
-          <span id="badge-catastro-numero" class="material-symbols-outlined absolute right-1.5 top-1/2 -translate-y-1/2 text-[15px] text-emerald-600 transition-colors pointer-events-none" title="Validado con Sede Electrónica de Catastro">verified</span>
-          <!-- Dropdown Sugerencias Números Reales de Catastro -->
-          <div id="sugerencias-numeros-catastro" class="hidden absolute top-full left-0 w-52 mt-1 max-h-52 overflow-y-auto bg-surface-container-lowest border border-sandstone-border rounded-lg shadow-xl z-50 p-2 text-xs">
-          </div>
-        </div>
-
-        <!-- Selector Desplegable Entidades Registrales (Ordenado estrictamente desde los Bajos) -->
-        <div class="relative min-w-[145px] max-w-[185px] flex-shrink-0 group">
-          <select id="input-piso" class="w-full h-9 pl-2.5 pr-7 rounded bg-surface border border-sandstone-border font-body-sm text-body-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary appearance-none cursor-pointer truncate font-medium" title="Entidades registrales de Catastro (organizadas desde los Bajos)">
-            <option value="Bajos / Local">Planta Baja (Local)</option>
-            <option value="Entresuelo">Entresuelo</option>
-            <option value="Principal" selected>Principal</option>
-            <option value="Planta 1ª">Planta 1ª</option>
-            <option value="Planta 2ª">Planta 2ª</option>
-            <option value="Planta 3ª">Planta 3ª</option>
-            <option value="Planta 4ª">Planta 4ª</option>
-            <option value="Planta 5ª">Planta 5ª</option>
-            <option value="Ático">Ático</option>
-            <option value="Sobreático">Sobreático</option>
-            <option value="Edificio Entero">Edificio Entero</option>
-          </select>
-          <span class="material-symbols-outlined absolute right-1.5 top-1/2 -translate-y-1/2 pointer-events-none text-outline text-[16px]">expand_more</span>
-          <!-- Badge contextual con Radiografía de la Finca -->
-          <div id="badge-radiografia-edificio" class="hidden absolute top-full left-0 right-0 mt-1 p-2 bg-stone-900/95 text-stone-100 text-[10px] rounded shadow-lg z-40 leading-tight"></div>
-        </div>
-
-        <!-- Superficie construida oficial resuelta directamente desde Sede Catastro OVC -->
-        <input type="hidden" id="input-superficie" value="" />
-
-        <!-- Input hidden fallback for legacy compatibility -->
-        <input type="hidden" id="input-direccion" value="Carrer de Balmes, 12, Barcelona"/>
-
-        <!-- Botón Primario Analizar -->
-        <button class="h-9 px-3.5 rounded bg-primary text-on-primary hover:bg-forest-muted font-body-sm text-body-sm font-semibold flex items-center gap-1.5 whitespace-nowrap shadow-sm transition-colors cursor-pointer" id="btn-analizar" type="button">
-          <span class="material-symbols-outlined text-[16px]">travel_explore</span>
-          <span>Analizar</span>
+      <!-- Controles Compactos para Móvil y Tablet (xl:hidden) -->
+      <div class="xl:hidden flex items-center gap-1.5 flex-1 justify-end">
+        <!-- Botón Desplegable de Búsqueda -->
+        <button type="button" id="btn-toggle-busqueda-movil" onclick="window.togglePanelBusquedaMovil()" class="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-surface border border-sandstone-border hover:bg-stone-surface text-charcoal-text text-[11px] font-semibold transition-all shadow-xs cursor-pointer max-w-[145px] sm:max-w-xs truncate" title="Buscar otra dirección o municipio">
+          <span class="material-symbols-outlined text-[16px] text-primary flex-shrink-0">search</span>
+          <span class="truncate font-body-sm text-[11px]" id="lbl-busqueda-movil-direccion">Balmes, 12</span>
+          <span class="material-symbols-outlined text-[14px] text-outline flex-shrink-0" id="icono-busqueda-chevron">expand_more</span>
         </button>
 
-        <!-- Insignia Global de Estado de Sincronización de Fuentes -->
-        <button type="button" id="btn-estado-origenes" onclick="window.abrirModalOrigenes()" class="h-9 px-3 rounded bg-surface border border-sandstone-border hover:bg-stone-surface text-charcoal-text font-body-sm text-[11px] font-semibold flex items-center gap-1.5 whitespace-nowrap transition-all shadow-xs cursor-pointer group" title="Haga clic para ver la auditoría en tiempo real de los 17 orígenes de datos">
+        <!-- Botón Drawer Ficha Técnica -->
+        <button type="button" onclick="window.toggleDrawerSidebar(true)" class="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-surface border border-sandstone-border hover:bg-stone-surface text-charcoal-text text-[11px] font-semibold transition-all shadow-xs cursor-pointer" title="Ver Ficha Técnica y Catastro">
+          <span class="material-symbols-outlined text-[16px] text-primary">domain</span>
+          <span class="hidden sm:inline font-headline-md text-[11px]">Ficha</span>
+        </button>
+
+        <!-- Insignia 17/17 Fuentes Móvil -->
+        <button type="button" onclick="window.abrirModalOrigenes()" class="flex items-center gap-1 px-2 py-1.5 rounded-lg bg-surface border border-sandstone-border text-charcoal-text text-[10px] font-semibold shadow-xs cursor-pointer" title="Auditoría de 17 fuentes en vivo">
           <span class="relative flex h-2 w-2">
-            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" id="ping-estado-origenes"></span>
-            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-600" id="dot-estado-origenes"></span>
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-600"></span>
           </span>
-          <span id="txt-estado-origenes" class="text-primary font-bold">17/17 Fuentes OK</span>
-          <span class="material-symbols-outlined text-[15px] text-outline group-hover:text-primary transition-colors">tune</span>
+          <span class="text-primary font-bold hidden sm:inline">17/17</span>
+        </button>
+
+        <!-- Visor GIS Pantalla Completa Móvil -->
+        <button type="button" onclick="window.abrirModalMapaFullscreen()" class="flex items-center justify-center w-8 h-8 rounded-lg bg-primary hover:bg-forest-muted text-white text-[12px] font-semibold shadow-xs flex-shrink-0 cursor-pointer" title="Visor Cartográfico a pantalla completa">
+          <span class="material-symbols-outlined text-[17px] text-[#ffd166]">map</span>
         </button>
       </div>
 
-      <!-- Header Right: Selector Global de Isócronas Conectadas & Brand -->
-      <div class="flex items-center gap-space-md">
+      <!-- 3. BARRA DE BÚSQUEDA MULTIDATO PROVINCIAL (RESPONSIVE UNIFICADA) -->
+      <div id="panel-busqueda-movil" class="hidden xl:flex flex-col xl:flex-row items-stretch xl:items-center gap-2 flex-1 max-w-3xl fixed xl:static top-14 sm:top-16 left-0 right-0 bg-surface-container-lowest/98 backdrop-blur-md xl:bg-transparent p-3.5 xl:p-0 border-b xl:border-b-0 border-sandstone-border shadow-xl xl:shadow-none z-30 transition-all duration-200">
+        
+        <!-- Fila 1 en móvil / en línea en escritorio: Municipio + Calle -->
+        <div class="flex flex-col sm:flex-row xl:flex-row items-stretch xl:items-center gap-2 flex-1">
+          <!-- Municipio Selector con Autocompletado Predictivo -->
+          <div class="relative w-full sm:w-48 xl:min-w-[150px] xl:max-w-[185px] flex-shrink-0">
+            <span class="material-symbols-outlined absolute left-2 top-1/2 -translate-y-1/2 text-outline text-[16px] pointer-events-none">location_city</span>
+            <input id="input-municipio" type="text" autocomplete="off" value="Barcelona" placeholder="Municipio..." 
+              class="w-full h-9 pl-7 pr-6 rounded bg-surface border border-sandstone-border font-body-sm text-body-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all font-semibold"
+              title="Escriba para buscar municipio de la provincia (ej. Barcelona, Badalona, Sabadell, Mataró...)" onfocus="this.select()" />
+            <input type="hidden" id="select-municipio" value="Barcelona" />
+            <span id="btn-toggle-municipios" class="material-symbols-outlined absolute right-1.5 top-1/2 -translate-y-1/2 text-outline text-[16px] cursor-pointer hover:text-charcoal-text">expand_more</span>
+            <!-- Dropdown Sugerencias Municipios -->
+            <div id="sugerencias-municipios" class="hidden absolute top-full left-0 right-0 mt-1 max-h-64 overflow-y-auto bg-surface-container-lowest border border-sandstone-border rounded-lg shadow-xl z-50 divide-y divide-sandstone-border/60">
+            </div>
+          </div>
+
+          <!-- Input Calle (Nombre de la vía) con Selección Total al Marcar -->
+          <div class="relative flex-1 min-w-[160px]">
+            <span class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-outline text-[16px]">location_searching</span>
+            <input class="w-full h-9 pl-8 pr-2 rounded bg-surface border border-sandstone-border font-body-sm text-body-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" id="input-calle" autocomplete="off" placeholder="Calle / Vía (ej. Balmes)" type="text" value="Carrer de Balmes" onfocus="this.select()" />
+            <!-- Sugerencias Vías (Contenedor Flotante Oculto para API ICGC Pelias) -->
+            <div class="hidden absolute top-full left-0 right-0 mt-1 max-h-60 overflow-y-auto bg-surface-container-lowest border border-sandstone-border rounded-lg shadow-xl z-50 divide-y divide-sandstone-border/60" id="sugerencias-vias">
+            </div>
+          </div>
+        </div>
+
+        <!-- Fila 2 en móvil / en línea en escritorio: Nº + Planta + Botón Analizar + Fuentes -->
+        <div class="flex items-center gap-2 flex-shrink-0">
+          <!-- Input Número de policía con Validación en Catastro OVC -->
+          <div class="relative w-20 sm:w-[85px] flex-shrink-0">
+            <input class="w-full h-9 pl-2 pr-6 text-center rounded bg-surface border border-sandstone-border font-body-sm text-body-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary font-bold" id="input-numero" max="9999" min="1" placeholder="Nº" type="text" value="12" autocomplete="off" onfocus="this.select()" />
+            <span id="badge-catastro-numero" class="material-symbols-outlined absolute right-1.5 top-1/2 -translate-y-1/2 text-[15px] text-emerald-600 transition-colors pointer-events-none" title="Validado con Sede Electrónica de Catastro">verified</span>
+            <!-- Dropdown Sugerencias Números Reales de Catastro -->
+            <div id="sugerencias-numeros-catastro" class="hidden absolute top-full left-0 w-52 mt-1 max-h-52 overflow-y-auto bg-surface-container-lowest border border-sandstone-border rounded-lg shadow-xl z-50 p-2 text-xs">
+            </div>
+          </div>
+
+          <!-- Selector Desplegable Entidades Registrales (Ordenado estrictamente desde los Bajos) -->
+          <div class="relative flex-1 sm:min-w-[145px] sm:max-w-[185px] group">
+            <select id="input-piso" class="w-full h-9 pl-2.5 pr-7 rounded bg-surface border border-sandstone-border font-body-sm text-body-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary appearance-none cursor-pointer truncate font-medium" title="Entidades registrales de Catastro (organizadas desde los Bajos)">
+              <option value="Bajos / Local">Planta Baja (Local)</option>
+              <option value="Entresuelo">Entresuelo</option>
+              <option value="Principal" selected>Principal</option>
+              <option value="Planta 1ª">Planta 1ª</option>
+              <option value="Planta 2ª">Planta 2ª</option>
+              <option value="Planta 3ª">Planta 3ª</option>
+              <option value="Planta 4ª">Planta 4ª</option>
+              <option value="Planta 5ª">Planta 5ª</option>
+              <option value="Ático">Ático</option>
+              <option value="Sobreático">Sobreático</option>
+              <option value="Edificio Entero">Edificio Entero</option>
+            </select>
+            <span class="material-symbols-outlined absolute right-1.5 top-1/2 -translate-y-1/2 pointer-events-none text-outline text-[16px]">expand_more</span>
+            <!-- Badge contextual con Radiografía de la Finca -->
+            <div id="badge-radiografia-edificio" class="hidden absolute top-full left-0 right-0 mt-1 p-2 bg-stone-900/95 text-stone-100 text-[10px] rounded shadow-lg z-40 leading-tight"></div>
+          </div>
+
+          <!-- Superficie construida oficial resuelta directamente desde Sede Catastro OVC -->
+          <input type="hidden" id="input-superficie" value="" />
+
+          <!-- Input hidden fallback for legacy compatibility -->
+          <input type="hidden" id="input-direccion" value="Carrer de Balmes, 12, Barcelona"/>
+
+          <!-- Botón Primario Analizar -->
+          <button class="h-9 px-4 rounded bg-primary text-on-primary hover:bg-forest-muted font-body-sm text-body-sm font-semibold flex items-center justify-center gap-1.5 whitespace-nowrap shadow-sm transition-colors cursor-pointer flex-shrink-0" id="btn-analizar" type="button">
+            <span class="material-symbols-outlined text-[16px]">travel_explore</span>
+            <span>Analizar</span>
+          </button>
+
+          <!-- Insignia Global de Estado de Sincronización de Fuentes (solo desktop xl) -->
+          <button type="button" id="btn-estado-origenes" onclick="window.abrirModalOrigenes()" class="hidden xl:flex h-9 px-3 rounded bg-surface border border-sandstone-border hover:bg-stone-surface text-charcoal-text font-body-sm text-[11px] font-semibold items-center gap-1.5 whitespace-nowrap transition-all shadow-xs cursor-pointer group" title="Haga clic para ver la auditoría en tiempo real de los 17 orígenes de datos">
+            <span class="relative flex h-2 w-2">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-600"></span>
+            </span>
+            <span id="txt-estado-origenes" class="text-primary font-bold">17/17 Fuentes OK</span>
+            <span class="material-symbols-outlined text-[15px] text-outline group-hover:text-primary transition-colors">tune</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Header Right: Selector Global de Isócronas Conectadas & Brand (Solo Desktop xl) -->
+      <div class="hidden xl:flex items-center gap-space-md">
         <!-- Control Global de Isócronas Peatonales -->
         <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface border border-sandstone-border shadow-xs" id="control-isocrona-header">
           <div class="flex items-center gap-1.5 pr-2 border-r border-sandstone-border/60">
@@ -288,7 +325,7 @@
     </header>
 
     <!-- MAIN BODY -->
-    <main class="relative pt-16 bg-background w-full min-h-screen">
+    <main class="relative pt-14 sm:pt-16 bg-background w-full min-h-screen">
       <div class="flex flex-col w-full">
         
         <!-- Interactive Feedback Toast -->
@@ -297,16 +334,19 @@
           <span class="font-body-sm text-body-sm font-medium" id="toast-text">Modelo actualizado correctamente</span>
         </div>
 
-        <!-- Botón flotante para desplegar la barra lateral cuando está escondida -->
+        <!-- Backdrop para el Drawer de Ficha Técnica en Móvil / Tablet (< xl) -->
+        <div id="backdrop-sidebar" onclick="window.toggleDrawerSidebar(false)" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-40 hidden xl:hidden transition-opacity"></div>
+
+        <!-- Botón flotante para desplegar la barra lateral en Desktop cuando está escondida -->
         <button type="button" id="btn-desplegar-sidebar" onclick="window.toggleSidebarIzquierdo()" title="Desplegar Ficha Técnica y Catastro" class="hidden fixed left-0 top-24 z-40 bg-surface-container-lowest border-2 border-l-0 border-primary/40 hover:border-primary shadow-lg rounded-r-xl px-2.5 py-2.5 text-primary hover:bg-stone-surface transition-all flex items-center gap-1.5 cursor-pointer group">
           <span class="material-symbols-outlined text-[22px] group-hover:translate-x-0.5 transition-transform text-primary">keyboard_double_arrow_right</span>
           <span class="font-label-caps text-[10px] font-bold uppercase tracking-wider text-charcoal-text hidden md:inline">Ficha Técnica</span>
         </button>
 
-        <div class="p-space-lg flex flex-col xl:flex-row gap-space-lg items-start">
+        <div class="p-2.5 sm:p-space-md xl:p-space-lg flex flex-col xl:flex-row gap-3 sm:gap-space-md xl:gap-space-lg items-start">
           
-          <!-- 1. LEFT COLLAPSIBLE UNDERWRITING CONTROL SIDEBAR (320px) -->
-          <aside class="w-full xl:w-[320px] flex-shrink-0 flex flex-col gap-space-md bg-surface-container-lowest rounded-xl p-space-md border border-sandstone-border shadow-[0_1px_3px_rgba(27,28,26,0.03)] transition-all duration-300" id="sidebar-control">
+          <!-- 1. LEFT COLLAPSIBLE UNDERWRITING CONTROL SIDEBAR (Drawer en móvil/tablet, Columna fija en desktop) -->
+          <aside class="fixed inset-y-0 left-0 z-50 w-[310px] max-w-[85vw] h-full overflow-y-auto bg-surface-container-lowest p-space-md border-r border-sandstone-border shadow-2xl transition-transform duration-300 transform -translate-x-full xl:translate-x-0 xl:static xl:w-[320px] xl:h-auto xl:shadow-[0_1px_3px_rgba(27,28,26,0.03)] xl:rounded-xl xl:border xl:overflow-visible flex flex-col gap-space-md" id="sidebar-control">
             <!-- Institutional Module Crest (Informativo Oficial) -->
             <div class="flex items-center justify-between gap-space-sm pb-space-sm bg-stone-surface/40 p-space-sm rounded-lg border border-sandstone-border/60">
               <div class="flex items-center gap-space-sm min-w-0">
@@ -322,9 +362,10 @@
                   <span class="font-label-caps text-outline uppercase text-[9px] tracking-wider truncate font-medium">Auditoría Territorial Verificada</span>
                 </div>
               </div>
-              <!-- Botón para esconder la barra a la izquierda -->
-              <button type="button" onclick="window.toggleSidebarIzquierdo()" title="Esconder barra lateral a la izquierda" class="p-1 rounded-md hover:bg-stone-surface text-outline hover:text-primary transition-colors cursor-pointer flex items-center justify-center flex-shrink-0" id="btn-colapsar-sidebar">
-                <span class="material-symbols-outlined text-[20px]">keyboard_double_arrow_left</span>
+              <!-- Botón para esconder la barra a la izquierda o cerrar el drawer en móvil -->
+              <button type="button" onclick="window.cerrarOColapsarSidebar()" title="Cerrar ficha técnica" class="p-1 rounded-md hover:bg-stone-surface text-outline hover:text-primary transition-colors cursor-pointer flex items-center justify-center flex-shrink-0" id="btn-colapsar-sidebar">
+                <span class="material-symbols-outlined text-[20px] xl:hidden">close</span>
+                <span class="material-symbols-outlined text-[20px] hidden xl:inline">keyboard_double_arrow_left</span>
               </button>
             </div>
 
@@ -547,6 +588,29 @@
           <!-- 2. MAIN COCKPIT & TABULAR UNDERWRITING PANE -->
           <div class="flex-1 flex flex-col gap-space-md w-full min-w-0">
             
+            <!-- Barra Resumen Rápido del Inmueble (Solo Móvil / Tablet < xl) -->
+            <div class="xl:hidden flex items-center justify-between gap-2 p-2.5 rounded-xl bg-surface-container-lowest border border-sandstone-border shadow-xs">
+              <div class="flex items-center gap-2 min-w-0">
+                <div class="w-8 h-8 rounded-lg bg-primary text-on-primary flex items-center justify-center flex-shrink-0 shadow-xs">
+                  <span class="material-symbols-outlined text-[18px]">domain</span>
+                </div>
+                <div class="flex flex-col min-w-0">
+                  <span class="font-headline-md text-[13px] font-bold text-primary truncate" id="resumen-movil-dir">Carrer de Balmes, 12, Barcelona</span>
+                  <div class="flex items-center gap-1.5 text-[10px] text-outline font-label-tabular-sm truncate mt-0.5">
+                    <span id="resumen-movil-sup" class="font-bold text-charcoal-text">110 m²</span>
+                    <span>•</span>
+                    <span id="resumen-movil-ano">1928</span>
+                    <span>•</span>
+                    <span id="resumen-movil-uso" class="truncate">Residencial</span>
+                  </div>
+                </div>
+              </div>
+              <button type="button" onclick="window.toggleDrawerSidebar(true)" class="px-2.5 py-1.5 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary font-headline-md text-[11px] font-bold whitespace-nowrap transition-colors flex items-center gap-1 cursor-pointer flex-shrink-0">
+                <span>Ficha</span>
+                <span class="material-symbols-outlined text-[14px]">chevron_right</span>
+              </button>
+            </div>
+
             <!-- 3. CRITICAL REGULATORY & MOBILITY BANNERS ROW -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-space-sm">
               <!-- Banner 1: Pla d'Usos / Regulación (#badge-regulacion) -->
@@ -735,8 +799,8 @@
                       </div>
 
                       <!-- Dock para el Mapa en Tab 1 (Posición Principal) -->
-                      <div class="pt-2 mt-2 w-full h-[340px] min-h-[340px] relative rounded-lg overflow-hidden border border-sandstone-border bg-stone-surface shadow-inner" id="dock-mapa-principal">
-                        <div id="leaflet-map" class="w-full h-full min-h-[340px]"></div>
+                      <div class="pt-2 mt-2 w-full h-[270px] sm:h-[310px] xl:h-[340px] min-h-[270px] relative rounded-lg overflow-hidden border border-sandstone-border bg-stone-surface shadow-inner" id="dock-mapa-principal">
+                        <div id="leaflet-map" class="w-full h-full min-h-[270px]"></div>
                       </div>
 
                       <div class="pt-2 mt-2 border-t border-sandstone-border/60 flex items-center justify-between text-[10px] text-outline font-label-tabular-sm">
@@ -1914,11 +1978,77 @@
               }, 3000);
             };
 
-            // Toggle sidebar izquierdo (esconder a la izquierda o desplegar)
+            // Toggle panel de búsqueda móvil (< xl)
+            window.togglePanelBusquedaMovil = function(forzar) {
+              var panel = document.getElementById('panel-busqueda-movil');
+              var chevron = document.getElementById('icono-busqueda-chevron');
+              if (!panel) return;
+              var estaOculto = panel.classList.contains('hidden');
+              var abrir = typeof forzar === 'boolean' ? forzar : estaOculto;
+              if (abrir) {
+                panel.classList.remove('hidden');
+                if (chevron) chevron.textContent = 'expand_less';
+                // Cerrar drawer si estuviera abierto
+                window.toggleDrawerSidebar(false);
+                var inp = document.getElementById('input-calle');
+                if (inp) inp.focus();
+              } else {
+                panel.classList.add('hidden');
+                if (chevron) chevron.textContent = 'expand_more';
+              }
+              if (window.leafletMap) {
+                setTimeout(function() { window.leafletMap.invalidateSize(); }, 150);
+              }
+            };
+
+            // Toggle drawer lateral de ficha técnica en móvil / tablet (< xl)
+            window.toggleDrawerSidebar = function(abrir) {
+              var sidebar = document.getElementById('sidebar-control');
+              var backdrop = document.getElementById('backdrop-sidebar');
+              if (!sidebar) return;
+              var isMobile = window.innerWidth < 1280;
+              if (!isMobile) {
+                // En escritorio delegamos al colapso tradicional
+                window.toggleSidebarIzquierdo();
+                return;
+              }
+              var estaAbierto = sidebar.classList.contains('translate-x-0');
+              var targetAbrir = typeof abrir === 'boolean' ? abrir : !estaAbierto;
+              if (targetAbrir) {
+                sidebar.classList.remove('-translate-x-full');
+                sidebar.classList.add('translate-x-0');
+                if (backdrop) backdrop.classList.remove('hidden');
+                // Cerrar panel de búsqueda móvil si está abierto
+                window.togglePanelBusquedaMovil(false);
+              } else {
+                sidebar.classList.add('-translate-x-full');
+                sidebar.classList.remove('translate-x-0');
+                if (backdrop) backdrop.classList.add('hidden');
+              }
+              if (window.leafletMap) {
+                setTimeout(function() { window.leafletMap.invalidateSize(); }, 200);
+              }
+            };
+
+            // Botón en la cabecera de la ficha: si es móvil cierra drawer; si es desktop colapsa
+            window.cerrarOColapsarSidebar = function() {
+              if (window.innerWidth < 1280) {
+                window.toggleDrawerSidebar(false);
+              } else {
+                window.toggleSidebarIzquierdo();
+              }
+            };
+
+            // Toggle sidebar izquierdo tradicional para desktop (esconder a la izquierda o desplegar)
             window.toggleSidebarIzquierdo = function() {
               var sidebar = document.getElementById('sidebar-control');
               var btnDesplegar = document.getElementById('btn-desplegar-sidebar');
               if (!sidebar) return;
+
+              if (window.innerWidth < 1280) {
+                window.toggleDrawerSidebar(true);
+                return;
+              }
 
               var estaOculto = sidebar.classList.contains('hidden');
               if (estaOculto) {
@@ -2092,10 +2222,14 @@
               }
             };
 
-            // Cerrar con Escape
+            // Cerrar con Escape modales, panel de búsqueda y drawer móvil
             document.addEventListener('keydown', function(e) {
               if (e.key === 'Escape') {
                 window.cerrarModalInfo();
+                if (typeof window.cerrarModalOrigenes === 'function') window.cerrarModalOrigenes();
+                if (typeof window.cerrarModalMapaFullscreen === 'function') window.cerrarModalMapaFullscreen();
+                if (typeof window.toggleDrawerSidebar === 'function') window.toggleDrawerSidebar(false);
+                if (typeof window.togglePanelBusquedaMovil === 'function') window.togglePanelBusquedaMovil(false);
               }
             });
           })();
