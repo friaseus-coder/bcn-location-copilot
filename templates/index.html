@@ -257,8 +257,13 @@
               <option value="Edificio Entero">Edificio Entero</option>
             </select>
             <span class="material-symbols-outlined absolute right-1.5 top-1/2 -translate-y-1/2 pointer-events-none text-outline text-[16px]">expand_more</span>
-            <!-- Badge contextual con Radiografía de la Finca -->
+            <!-- Badge contextual con Radiografía de la Finca y estado de entidades -->
             <div id="badge-radiografia-edificio" class="hidden absolute top-full left-0 right-0 mt-1 p-2 bg-stone-900/95 text-stone-100 text-[10px] rounded shadow-lg z-40 leading-tight"></div>
+            <!-- Aviso visual explícito de entidades de Catastro cargadas -->
+            <div id="aviso-entidades-catastro" class="hidden absolute -bottom-6 left-0 whitespace-nowrap text-[9.5px] font-semibold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-300 shadow-2xs z-30 flex items-center gap-1 transition-all">
+              <span class="material-symbols-outlined text-[12px] text-emerald-700">check_circle</span>
+              <span id="texto-aviso-entidades">Entidades Catastro actualizadas</span>
+            </div>
           </div>
 
           <!-- Superficie construida oficial resuelta directamente desde Sede Catastro OVC -->
@@ -371,24 +376,21 @@
 
             <!-- Ficha Técnica del Inmueble (100% Solo Lectura Informativo) -->
             <div class="flex flex-col gap-space-sm">
-              <!-- Tipología del Activo con Selector Sincronizado -->
-              <div class="flex flex-col gap-1">
+              <!-- Uso Principal Catastral Oficial (Datos Oficiales Sede Catastro OVC - No Editable) -->
+              <div class="flex flex-col gap-1" id="bloque-uso-catastral">
                 <div class="font-label-caps text-outline uppercase flex items-center justify-between text-[10px] font-semibold">
                   <span>_uso_principal_catastral</span>
                   <span class="text-terracotta-accent font-label-tabular-sm" id="badge-planeamiento-urbanistico">PUM-BCN</span>
                 </div>
-                <div class="p-2 rounded-lg bg-surface border border-sandstone-border flex items-center justify-between shadow-xs hover:border-primary/40 transition-colors">
+                <div class="p-2 rounded-lg bg-surface border border-sandstone-border flex items-center justify-between shadow-xs">
                   <div class="flex items-center gap-2 min-w-0 flex-1">
                     <span class="material-symbols-outlined text-primary text-[18px] flex-shrink-0" id="icon-tipologia">apartment</span>
-                    <select id="select-tipologia" class="bg-transparent font-semibold text-charcoal-text text-[13px] focus:outline-none cursor-pointer w-full" title="Seleccionar uso catastral / destino urbanístico">
-                      <option value="residencial" selected>Vivienda Residencial</option>
-                      <option value="retail">Local Comercial (Retail)</option>
-                      <option value="oficina">Oficina / Terciario</option>
-                    </select>
+                    <span class="font-semibold text-charcoal-text text-[13px] truncate" id="disp-tipologia">Vivienda Residencial</span>
                   </div>
-                  <span class="px-1.5 py-0.5 rounded bg-stone-surface text-outline font-label-tabular-sm text-[10px] uppercase font-medium flex-shrink-0">Uso Dominante</span>
+                  <span class="px-1.5 py-0.5 rounded bg-stone-surface text-outline font-label-tabular-sm text-[10px] uppercase font-medium flex-shrink-0" id="badge-uso-catastral">Catastro OVC</span>
                 </div>
-                <span class="hidden" id="disp-tipologia">Vivienda Residencial</span>
+                <!-- Input oculto para mantener compatibilidad con scripts existentes -->
+                <input type="hidden" id="select-tipologia" value="residencial" />
               </div>
 
               <!-- Datos Oficiales Clave: Superficie, Año Construcción y Cuota IBI -->
@@ -2126,43 +2128,34 @@
               }
             };
 
-            // Isochrone button toggle
+            // Isochrone button toggle - Delegado a copilot.js para sincronización completa
             window.cambiarIsocrona = function(minutos) {
+              if (typeof window.copilotCambiarIsocrona === 'function') {
+                window.copilotCambiarIsocrona(minutos);
+                return;
+              }
               var btns = [3, 5, 7];
               btns.forEach(function(m) {
                 var b = document.getElementById('iso-' + m);
-                if (!b) return;
-                if (m === minutos) {
-                  b.className = 'px-2.5 py-1 text-center font-label-tabular-sm text-[11px] rounded bg-primary text-on-primary font-semibold transition-all shadow-xs cursor-pointer';
-                } else {
-                  b.className = 'px-2.5 py-1 text-center font-label-tabular-sm text-[11px] rounded bg-surface border border-sandstone-border text-charcoal-text hover:bg-stone-surface font-medium transition-all cursor-pointer';
+                if (b) {
+                  b.className = m === minutos
+                    ? 'px-2.5 py-1 text-center font-label-tabular-sm text-[11px] rounded bg-primary text-on-primary font-semibold transition-all shadow-xs cursor-pointer'
+                    : 'px-2.5 py-1 text-center font-label-tabular-sm text-[11px] rounded bg-surface border border-sandstone-border text-charcoal-text hover:bg-stone-surface font-medium transition-all cursor-pointer';
                 }
-              });
-
-              // Sincronizar también los botones de isócronas del modal si existen
-              btns.forEach(function(m) {
                 var mb = document.getElementById('modal-iso-' + m);
-                if (!mb) return;
-                if (m === minutos) {
-                  mb.className = 'px-2 py-0.5 text-center font-label-tabular-sm text-[10px] rounded bg-primary text-white font-semibold cursor-pointer';
-                } else {
-                  mb.className = 'px-2 py-0.5 text-center font-label-tabular-sm text-[10px] rounded hover:bg-stone-surface text-charcoal-text font-medium cursor-pointer';
+                if (mb) {
+                  mb.className = m === minutos
+                    ? 'px-2 py-0.5 text-center font-label-tabular-sm text-[10px] rounded bg-primary text-white font-semibold cursor-pointer'
+                    : 'px-2 py-0.5 text-center font-label-tabular-sm text-[10px] rounded hover:bg-stone-surface text-charcoal-text font-medium cursor-pointer';
                 }
               });
-
               var lbl = document.getElementById('lbl-isocrona-radio');
               if (lbl) {
                 lbl.textContent = minutos === 3 ? '3 min (~240 m)' : (minutos === 5 ? '5 min (~400 m)' : '7 min (~560 m)');
               }
-              var modalSub = document.getElementById('modal-mapa-subtitulo');
-              if (modalSub) {
-                var dir = document.getElementById('input-calle')?.value || 'Carrer de Balmes';
-                var num = document.getElementById('input-numero')?.value || '12';
-                var mun = document.getElementById('input-municipio')?.value || 'Barcelona';
-                var isoText = minutos === 3 ? '3 min (~240 m)' : (minutos === 5 ? '5 min (~400 m)' : '7 min (~560 m)');
-                modalSub.textContent = dir + ', ' + num + ', ' + mun + ' • Isócrona activa: ' + isoText;
+              if (typeof window.sincronizarDatosConIsocrona === 'function') {
+                window.sincronizarDatosConIsocrona(minutos);
               }
-              window.mostrarToast('Isócrona fijada a ' + minutos + ' min a pie');
             };
 
             // Alternar visibilidad/plegado del Visor Cartográfico (delegado a modal)
@@ -2440,6 +2433,102 @@
           Cerrar Visor
         </button>
       </div>
+    </div>
+  </div>
+
+  <!-- MODAL / POP-UP INSTITUCIONAL DE CARGA Y COMPROBACIÓN EN TIEMPO REAL -->
+  <div id="modal-cargando-datos" class="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-md hidden flex items-center justify-center p-4 transition-all duration-300">
+    <div class="max-w-md w-full rounded-2xl bg-surface-container-lowest border border-sandstone-border shadow-2xl p-6 flex flex-col gap-4 animate-in fade-in zoom-in-95 duration-200">
+      
+      <!-- Cabecera del Pop-up con Spinner y Título -->
+      <div class="flex items-start gap-3.5">
+        <div class="w-11 h-11 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary flex-shrink-0">
+          <span class="material-symbols-outlined text-[26px] animate-spin">progress_activity</span>
+        </div>
+        <div class="flex flex-col min-w-0 flex-1">
+          <div class="flex items-center justify-between">
+            <span class="font-headline-md font-bold text-primary text-[15px] leading-tight">Cargando y Auditando Emplazamiento</span>
+            <span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-900 text-[10px] font-mono font-bold" id="modal-carga-pct">0%</span>
+          </div>
+          <span class="font-body-sm text-[12px] text-outline mt-0.5 truncate" id="modal-carga-direccion">Consultando fuentes oficiales...</span>
+        </div>
+      </div>
+
+      <!-- Barra de Progreso Dinámica -->
+      <div class="w-full bg-stone-surface h-2 rounded-full overflow-hidden border border-sandstone-border/60">
+        <div id="modal-carga-barra" class="h-full bg-primary rounded-full transition-all duration-300 ease-out" style="width: 10%;"></div>
+      </div>
+
+      <!-- Checklist de Verificación de Fuentes Oficiales -->
+      <div class="flex flex-col gap-2 p-3 rounded-xl bg-stone-surface/40 border border-sandstone-border/60 text-[12px]">
+        <span class="font-label-caps text-outline uppercase text-[9.5px] font-bold">_comprobación_de_fuentes_en_vivo</span>
+        
+        <div class="flex items-center justify-between text-charcoal-text" id="chk-catastro">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-[16px] text-amber-500 animate-spin" id="icon-chk-catastro">sync</span>
+            <span class="font-medium text-[11.5px]">Catastro OVC (Referencia, año, superficies y entidades)</span>
+          </div>
+          <span class="font-mono text-[10px] text-outline flex-shrink-0" id="txt-chk-catastro">Conectando...</span>
+        </div>
+
+        <div class="flex items-center justify-between text-charcoal-text" id="chk-geo">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-[16px] text-outline" id="icon-chk-geo">hourglass_empty</span>
+            <span class="font-medium text-[11.5px]">Georreferenciación & Cuencas Isócronas (3, 5 y 7 min)</span>
+          </div>
+          <span class="font-mono text-[10px] text-outline flex-shrink-0" id="txt-chk-geo">Pendiente</span>
+        </div>
+
+        <div class="flex items-center justify-between text-charcoal-text" id="chk-registro">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-[16px] text-outline" id="icon-chk-registro">hourglass_empty</span>
+            <span class="font-medium text-[11.5px]">Registro de la Propiedad & Demarcación</span>
+          </div>
+          <span class="font-mono text-[10px] text-outline flex-shrink-0" id="txt-chk-registro">Pendiente</span>
+        </div>
+
+        <div class="flex items-center justify-between text-charcoal-text" id="chk-incasol">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-[16px] text-outline" id="icon-chk-incasol">hourglass_empty</span>
+            <span class="font-medium text-[11.5px]">Rentas INCASÒL, P&L y Padrón IBI</span>
+          </div>
+          <span class="font-mono text-[10px] text-outline flex-shrink-0" id="txt-chk-incasol">Pendiente</span>
+        </div>
+
+        <div class="flex items-center justify-between text-charcoal-text" id="chk-movilidad">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-[16px] text-outline" id="icon-chk-movilidad">hourglass_empty</span>
+            <span class="font-medium text-[11.5px]">Movilidad, Metro & Telemetría de Parking</span>
+          </div>
+          <span class="font-mono text-[10px] text-outline flex-shrink-0" id="txt-chk-movilidad">Pendiente</span>
+        </div>
+
+        <div class="flex items-center justify-between text-charcoal-text" id="chk-censo">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-[16px] text-outline" id="icon-chk-censo">hourglass_empty</span>
+            <span class="font-medium text-[11.5px]">Censo Dotacional de Equipamientos y Comercios</span>
+          </div>
+          <span class="font-mono text-[10px] text-outline flex-shrink-0" id="txt-chk-censo">Pendiente</span>
+        </div>
+
+        <div class="flex items-center justify-between text-charcoal-text" id="chk-clima">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-[16px] text-outline" id="icon-chk-clima">hourglass_empty</span>
+            <span class="font-medium text-[11.5px]">Auditoría Climática 365 días (Open-Meteo)</span>
+          </div>
+          <span class="font-mono text-[10px] text-outline flex-shrink-0" id="txt-chk-clima">Pendiente</span>
+        </div>
+      </div>
+
+      <!-- Pie del Pop-up con Mensaje de Auditoría -->
+      <div class="flex items-center justify-between pt-1 border-t border-sandstone-border/50 text-[11px] text-outline">
+        <div class="flex items-center gap-1.5 font-medium">
+          <span class="inline-block w-2 h-2 rounded-full bg-amber-500 animate-pulse" id="dot-estado-carga"></span>
+          <span id="txt-estado-carga">Comprobando integridad territorial de fuentes...</span>
+        </div>
+        <span class="font-mono text-[10px]">17 Fuentes</span>
+      </div>
+
     </div>
   </div>
 </body>

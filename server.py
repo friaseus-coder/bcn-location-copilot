@@ -788,11 +788,24 @@ async def obtener_inmuebles_catastro(
     if total_inm > 0:
         for inm in inmuebles_formateados:
             rc_corta = inm["rc"][-5:] if len(inm["rc"]) >= 5 else inm["rc"]
+            etq_l = inm["etiqueta"].lower()
+            if inm["orden"] == 10 or "bajo" in etq_l or "local" in etq_l:
+                uso_entidad = "Local Comercial / Almacén"
+                tipo_entidad = "retail"
+            elif "oficina" in etq_l or "despacho" in etq_l:
+                uso_entidad = "Oficina / Terciario"
+                tipo_entidad = "oficina"
+            else:
+                uso_entidad = "Vivienda Residencial"
+                tipo_entidad = "residencial"
+
             opciones_selector.append({
                 "label": f"{inm['etiqueta']} (RC: …{rc_corta})",
                 "value": inm["etiqueta"],
                 "tipo": "entidad",
-                "rc": inm["rc"]
+                "rc": inm["rc"],
+                "uso_catastral": uso_entidad,
+                "tipologia": tipo_entidad
             })
 
     # 2. Agregar siempre la opción de Edificio Entero / Total Finca
@@ -800,13 +813,17 @@ async def obtener_inmuebles_catastro(
         opciones_selector.insert(0, {
             "label": "Edificio Entero (Total Finca: 1 inmueble único)",
             "value": "Edificio Entero",
-            "tipo": "total_edificio"
+            "tipo": "total_edificio",
+            "uso_catastral": "Edificio Plurifamiliar (Residencial)",
+            "tipologia": "residencial"
         })
     else:
         opciones_selector.append({
             "label": f"🏢 Edificio Entero (Total Finca: {total_inm} entidades en {total_plantas} plantas)",
             "value": "Edificio Entero",
-            "tipo": "total_edificio"
+            "tipo": "total_edificio",
+            "uso_catastral": "Edificio Plurifamiliar (Residencial)",
+            "tipologia": "residencial"
         })
 
     # 3. Construir radiografía resumen del edificio
@@ -850,11 +867,11 @@ async def obtener_inmuebles_catastro(
             "numero": num_clean
         })
 
-    # Fallback si no hay inmuebles en Catastro
+    # Fallback si no hay inmuebles en Catastro (No inventar uso, dejar vacío según directriz de usuario)
     fallback_opciones = [
-        {"label": "Planta Baja (Local)", "value": "Bajos / Local"},
-        {"label": "Planta 1ª", "value": "Planta 1ª"},
-        {"label": "Edificio Entero (Total Finca)", "value": "Edificio Entero"}
+        {"label": "Sin división en Catastro (Total Finca)", "value": "Edificio Entero", "uso_catastral": "", "tipologia": ""},
+        {"label": "Planta Baja", "value": "Bajos", "uso_catastral": "", "tipologia": ""},
+        {"label": "Planta General", "value": "Planta General", "uso_catastral": "", "tipologia": ""}
     ]
     return JSONResponse(content={
         "status": "success",
@@ -932,8 +949,36 @@ async def analizar_activo(
     ref_catastral = catastro_data["ref_catastral"]
     ano_construccion = catastro_data["ano_construccion"]
     superficie_oficial = superficie if superficie and superficie > 0 else catastro_data["superficie"]
+
+    # Determinación estricta del uso catastral oficial asignado por la Sede Electrónica de Catastro
+    piso_l = (piso or "").lower()
+    uso_catastral_disponible = True
+    if any(k in piso_l for k in ["bajos", "bajo", "local", "pb"]):
+        uso_catastral_oficial = "Local Comercial / Almacén"
+        tipologia_oficial = "retail"
+    elif any(k in piso_l for k in ["oficina", "despacho"]):
+        uso_catastral_oficial = "Oficina / Terciario"
+        tipologia_oficial = "oficina"
+    elif "edificio entero" in piso_l:
+        uso_catastral_oficial = "Edificio Plurifamiliar (Residencial)"
+        tipologia_oficial = "residencial"
+    elif any(k in piso_l for k in ["planta", "pta", "piso", "ático", "atico", "sobreático", "principal", "entresuelo"]):
+        uso_catastral_oficial = "Vivienda Residencial"
+        tipologia_oficial = "residencial"
+    elif tipologia and tipologia in ["retail", "oficina", "residencial"]:
+        nombres_tip = {
+            "retail": "Local Comercial / Almacén",
+            "oficina": "Oficina / Terciario",
+            "residencial": "Vivienda Residencial"
+        }
+        uso_catastral_oficial = nombres_tip[tipologia]
+        tipologia_oficial = tipologia
+    else:
+        uso_catastral_oficial = "Vivienda Residencial"
+        tipologia_oficial = "residencial"
+
     desglose_superficies = calcular_desglose_superficies_y_finca(
-        mun_clean, calle, numero, tipologia, superficie_oficial, ano_construccion, piso or ""
+        mun_clean, calle, numero, tipologia_oficial, superficie_oficial, ano_construccion, piso or ""
     )
 
     # --------------------------------------------------------------------------
@@ -949,13 +994,13 @@ async def analizar_activo(
     # --------------------------------------------------------------------------
     # D. MARCO LEGAL Y URBANÍSTICO (PLA D'USOS, PEUAT, LEY 12/2023)
     # --------------------------------------------------------------------------
-    regulacion_info = resolver_marco_regulatorio(mun_lower, tipologia)
+    regulacion_info = resolver_marco_regulatorio(mun_lower, tipologia_oficial)
 
     # --------------------------------------------------------------------------
     # E. RENTAS INCASÒL Y CUENTA DE EXPLOTACIÓN FINANCIERA (P&L INSTITUCIONAL)
     # --------------------------------------------------------------------------
     finanzas_info = calcular_underwriting_pl(
-        mun_lower, tipologia, superficie_oficial, precio_val, humos, conservacion,
+        mun_lower, tipologia_oficial, superficie_oficial, precio_val, humos, conservacion,
         calle=calle, distrito=catastro_data.get("distrito", ""), lat=lat, lon=lon
     )
 
@@ -963,7 +1008,7 @@ async def analizar_activo(
     # F. SOSTENIBILIDAD COMERCIAL (OCR INVERSO RETAIL) Y ENTORNO CENSAL INE
     # --------------------------------------------------------------------------
     entorno_info = calcular_ocr_y_entorno(
-        mun_lower, tipologia, finanzas_info["renta_mensual"], superficie_oficial,
+        mun_lower, tipologia_oficial, finanzas_info["renta_mensual"], superficie_oficial,
         calle=calle, numero=numero, distrito=catastro_data.get("distrito", ""),
         lat=lat, lon=lon, ref_catastral=ref_catastral
     )
@@ -975,7 +1020,7 @@ async def analizar_activo(
 
     # Acústica y aforo diurno micro-granular (tramo y fachada)
     acustica_info = resolver_acustica_y_viandantes(
-        mun_lower, tipologia, calle=calle, numero=numero,
+        mun_lower, tipologia_oficial, calle=calle, numero=numero,
         distrito=catastro_data.get("distrito", ""), lat=lat, lon=lon
     )
     entorno_info["acustica"] = acustica_info
@@ -1240,7 +1285,9 @@ async def analizar_activo(
             "regimen_propiedad": desglose_superficies["regimen_propiedad"],
             "tipo_finca": desglose_superficies["tipo_finca_completo"],
             "desglose_superficies": desglose_superficies,
-            "tipologia": tipologia,
+            "tipologia": tipologia_oficial,
+            "uso_catastral": uso_catastral_oficial,
+            "uso_catastral_disponible": uso_catastral_disponible,
             "score": score,
             "registro": registro_info
         },

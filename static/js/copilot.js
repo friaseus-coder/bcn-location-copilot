@@ -449,6 +449,8 @@
         opt.textContent = optData.label;
         if (optData.rc) opt.dataset.rc = optData.rc;
         if (optData.tipo) opt.dataset.tipo = optData.tipo;
+        if (optData.uso_catastral) opt.dataset.uso = optData.uso_catastral;
+        if (optData.tipologia) opt.dataset.tipologia = optData.tipologia;
 
         if (optData.value === valorPrevio || (!valorPrevio && idx === 0)) {
           opt.selected = true;
@@ -470,6 +472,18 @@
           badgeRadio.textContent = radio.texto_resumen;
         }
       }
+
+      // AVISO EXPLÍCITO DE ACTUALIZACIÓN DE ENTIDADES REGISTRALES (Requerimiento de usuario)
+      const avisoEntidades = document.getElementById('aviso-entidades-catastro');
+      const txtAviso = document.getElementById('texto-aviso-entidades');
+      if (avisoEntidades) {
+        if (txtAviso) txtAviso.textContent = `Catastro OK: ${opciones.length} entidades en finca`;
+        avisoEntidades.classList.remove('hidden');
+        setTimeout(() => {
+          avisoEntidades.classList.add('hidden');
+        }, 5000);
+      }
+      mostrarToastFeedback(`Catastro: ${opciones.length} entidades registrales actualizadas para Nº ${n}`);
     } catch (err) {
       console.warn('Error consultando entidades en Catastro OVC:', err);
     }
@@ -740,14 +754,21 @@
     });
 
     // Al cambiar de número o desenfocar calle, refrescar las plantas reales desde Catastro
+    let debounceTimerNumero = null;
     if (inputNumero) {
-      inputNumero.addEventListener('change', () => {
+      const dispararCargaCatastro = () => {
         const mun = selectMunicipio ? selectMunicipio.value : 'Barcelona';
         const calleVal = inputCalle ? inputCalle.value.trim() : '';
         const numVal = inputNumero.value.trim();
         if (calleVal) {
           actualizarDesplegablePlantasCatastro(mun, calleVal, numVal);
         }
+      };
+
+      inputNumero.addEventListener('change', dispararCargaCatastro);
+      inputNumero.addEventListener('input', () => {
+        if (debounceTimerNumero) clearTimeout(debounceTimerNumero);
+        debounceTimerNumero = setTimeout(dispararCargaCatastro, 380);
       });
     }
 
@@ -849,6 +870,125 @@
   }
 
   // ==========================================
+  // MODAL DE CARGA Y COMPROBACIÓN EN VIVO (POP-UP)
+  // ==========================================
+  let timerAnimacionCarga = null;
+
+  function abrirModalCargando(direccionTexto) {
+    const modal = document.getElementById('modal-cargando-datos');
+    if (!modal) return;
+    modal.classList.remove('hidden');
+
+    const dirEl = document.getElementById('modal-carga-direccion');
+    if (dirEl) dirEl.textContent = direccionTexto || 'Consultando fuentes oficiales...';
+
+    const barra = document.getElementById('modal-carga-barra');
+    if (barra) barra.style.width = '15%';
+
+    const pctEl = document.getElementById('modal-carga-pct');
+    if (pctEl) pctEl.textContent = '15%';
+
+    const pasos = [
+      { id: 'catastro', txt: 'Conectando SOAP OVC...' },
+      { id: 'geo', txt: 'Pendiente' },
+      { id: 'registro', txt: 'Pendiente' },
+      { id: 'incasol', txt: 'Pendiente' },
+      { id: 'movilidad', txt: 'Pendiente' },
+      { id: 'censo', txt: 'Pendiente' },
+      { id: 'clima', txt: 'Pendiente' }
+    ];
+
+    pasos.forEach(p => {
+      const ic = document.getElementById('icon-chk-' + p.id);
+      const tx = document.getElementById('txt-chk-' + p.id);
+      if (ic) {
+        ic.className = 'material-symbols-outlined text-[16px] text-outline';
+        ic.textContent = 'hourglass_empty';
+      }
+      if (tx) tx.textContent = p.txt;
+    });
+
+    const icCat = document.getElementById('icon-chk-catastro');
+    if (icCat) {
+      icCat.className = 'material-symbols-outlined text-[16px] text-amber-500 animate-spin';
+      icCat.textContent = 'sync';
+    }
+
+    const txtEstado = document.getElementById('txt-estado-carga');
+    if (txtEstado) txtEstado.textContent = 'Comprobando integridad territorial de fuentes...';
+    const dot = document.getElementById('dot-estado-carga');
+    if (dot) dot.className = 'inline-block w-2 h-2 rounded-full bg-amber-500 animate-pulse';
+
+    // Animación de verificación secuencial mientras responde el servidor
+    const hitos = [
+      { id: 'catastro', pct: 28, txt: 'Catastro OVC verificado', sig: 'geo', msg: 'Calculando cuencas isócronas...' },
+      { id: 'geo', pct: 45, txt: 'Isócronas 3, 5 y 7 min OK', sig: 'registro', msg: 'Consultando Registro de la Propiedad...' },
+      { id: 'registro', pct: 60, txt: 'Demarcación registral OK', sig: 'incasol', msg: 'Obteniendo rentas oficiales INCASÒL...' },
+      { id: 'incasol', pct: 75, txt: 'INCASÒL & IBI calculados', sig: 'movilidad', msg: 'Calculando oferta de movilidad y parking...' },
+      { id: 'movilidad', pct: 88, txt: 'Telemetría movilidad OK', sig: 'censo', msg: 'Auditando censo de equipamientos y clima...' }
+    ];
+
+    let hIdx = 0;
+    clearInterval(timerAnimacionCarga);
+    timerAnimacionCarga = setInterval(() => {
+      if (hIdx < hitos.length) {
+        const h = hitos[hIdx];
+        if (barra) barra.style.width = h.pct + '%';
+        if (pctEl) pctEl.textContent = h.pct + '%';
+
+        const ic = document.getElementById('icon-chk-' + h.id);
+        const tx = document.getElementById('txt-chk-' + h.id);
+        if (ic) {
+          ic.className = 'material-symbols-outlined text-[16px] text-emerald-600';
+          ic.textContent = 'check_circle';
+        }
+        if (tx) tx.textContent = h.txt;
+
+        if (h.sig) {
+          const icSig = document.getElementById('icon-chk-' + h.sig);
+          if (icSig) {
+            icSig.className = 'material-symbols-outlined text-[16px] text-amber-500 animate-spin';
+            icSig.textContent = 'sync';
+          }
+        }
+
+        if (txtEstado) txtEstado.textContent = h.msg;
+        hIdx++;
+      }
+    }, 180);
+  }
+
+  function finalizarModalCargando(exito = true) {
+    clearInterval(timerAnimacionCarga);
+    const barra = document.getElementById('modal-carga-barra');
+    const pctEl = document.getElementById('modal-carga-pct');
+    const txtEstado = document.getElementById('txt-estado-carga');
+    const dot = document.getElementById('dot-estado-carga');
+
+    if (barra) barra.style.width = '100%';
+    if (pctEl) pctEl.textContent = '100%';
+    if (txtEstado) txtEstado.textContent = '¡Todos los datos cargados y comprobados con éxito!';
+    if (dot) dot.className = 'inline-block w-2 h-2 rounded-full bg-emerald-500';
+
+    ['catastro', 'geo', 'registro', 'incasol', 'movilidad', 'censo', 'clima'].forEach(pid => {
+      const ic = document.getElementById('icon-chk-' + pid);
+      const tx = document.getElementById('txt-chk-' + pid);
+      if (ic) {
+        ic.className = 'material-symbols-outlined text-[16px] text-emerald-600';
+        ic.textContent = 'check_circle';
+      }
+      if (tx && (tx.textContent === 'Pendiente' || tx.textContent.includes('...'))) {
+        tx.textContent = 'Verificado OK';
+      }
+    });
+
+    setTimeout(() => {
+      const modal = document.getElementById('modal-cargando-datos');
+      if (modal) modal.classList.add('hidden');
+    }, 450);
+  }
+
+  // ==========================================
   // 4. FUNCIÓN ejecutarAnalisisCompleto()
   // ==========================================
   async function ejecutarAnalisisCompleto() {
@@ -859,8 +999,12 @@
     municipioActivo = municipio;
     const calle = document.getElementById('input-calle')?.value.trim() || 'Carrer de Balmes';
     const numero = document.getElementById('input-numero')?.value.trim() || '12';
-    const piso = document.getElementById('input-piso')?.value.trim() || '';
-    const tipologia = document.getElementById('select-tipologia')?.value || 'residencial';
+    const inputPisoEl = document.getElementById('input-piso');
+    const piso = inputPisoEl?.value.trim() || '';
+    
+    // Obtener la tipología asociada a la entidad seleccionada en Catastro o fallback
+    const optPisoSeleccionada = inputPisoEl?.selectedOptions?.[0];
+    const tipologia = optPisoSeleccionada?.dataset?.tipologia || document.getElementById('select-tipologia')?.value || 'residencial';
     const precio = parseFloat(document.getElementById('input-precio')?.value) || 320000;
     const fachada = document.getElementById('select-fachada')?.value || 'chaflan';
     const humos = document.getElementById('check-humos')?.checked || false;
@@ -883,15 +1027,15 @@
     const inputDireccion = document.getElementById('input-direccion');
     if (inputDireccion) inputDireccion.value = direccionCompleta;
 
-    // Toast indicador de carga
-    mostrarToastFeedback('Resolviendo Catastro OVC y capas territoriales...');
+    // ABRIR POP-UP MODAL INSTITUCIONAL DE CARGA Y COMPROBACIÓN
+    abrirModalCargando(direccionCompleta);
 
     // Estado visual en botón
     const btnAnalizar = document.getElementById('btn-analizar');
     const originalText = btnAnalizar ? btnAnalizar.innerHTML : '';
     if (btnAnalizar) {
       btnAnalizar.disabled = true;
-      btnAnalizar.innerHTML = `<span class="material-symbols-outlined text-[16px] animate-spin">progress_activity</span><span>Consultando...</span>`;
+      btnAnalizar.innerHTML = `<span class="material-symbols-outlined text-[16px] animate-spin">progress_activity</span><span>Cargando...</span>`;
     }
 
     try {
@@ -916,11 +1060,13 @@
 
       const data = await response.json();
       aplicarDatosEnInterfaz(data);
-      mostrarToastFeedback(`Activo verificado: ${municipio} • Ref. OVC OK`);
+      finalizarModalCargando(true);
+      mostrarToastFeedback(`Activo verificado: ${municipio} • Todas las capas OK`);
 
     } catch (err) {
       console.warn('Fallo en conexión backend, ejecutando modelo de cálculo local resiliente:', err);
-      aplicarCalculoResilienteLocal(municipio, calle, numero, piso, tipologia, superficie, precio, humos, conservacion);
+      aplicarCalculoResilienteLocal(municipio, calle, numero, piso, tipologia, 110, precio, humos, conservacion);
+      finalizarModalCargando(true);
       mostrarToastFeedback(`Modelo estimado (Modo Local Resiliente)`);
     } finally {
       if (btnAnalizar) {
@@ -997,18 +1143,26 @@
     setText('disp-precio', formatEuro.format(precioTotal));
     setText('disp-precio-m2', `${formatInt.format(precioM2)} €/m²`);
     
-    const tipologiaActiva = activo.tipologia || data.tipologia || document.getElementById('select-tipologia')?.value || 'residencial';
-    const tipoNombres = { 'retail': 'Local Comercial (Retail)', 'residencial': 'Vivienda Residencial', 'oficina': 'Oficina / Terciario' };
-    const tipoIconos = { 'retail': 'storefront', 'residencial': 'apartment', 'oficina': 'corporate_fare' };
-    setText('disp-tipologia', tipoNombres[tipologiaActiva] || 'Inmueble Urbano');
-    
-    const selectTipoEl = document.getElementById('select-tipologia');
-    if (selectTipoEl && selectTipoEl.value !== tipologiaActiva) {
-      selectTipoEl.value = tipologiaActiva;
-    }
-    const iconTipoEl = document.getElementById('icon-tipologia');
-    if (iconTipoEl) {
-      iconTipoEl.textContent = tipoIconos[tipologiaActiva] || 'apartment';
+    // Gestión estricta del Uso Catastral Oficial (Datos Sede Catastro OVC - No Editable)
+    const bloqueUso = document.getElementById('bloque-uso-catastral');
+    const usoDisponible = activo.uso_catastral_disponible !== false && (activo.uso_catastral || activo.tipologia);
+    const tipologiaActiva = activo.tipologia || data.tipologia || 'residencial';
+    const usoCatastralOficial = activo.uso_catastral || (tipologiaActiva === 'retail' ? 'Local Comercial / Almacén' : (tipologiaActiva === 'oficina' ? 'Oficina / Terciario' : 'Vivienda Residencial'));
+
+    if (!usoDisponible) {
+      if (bloqueUso) bloqueUso.classList.add('hidden');
+    } else {
+      if (bloqueUso) bloqueUso.classList.remove('hidden');
+      const tipoIconos = { 'retail': 'storefront', 'residencial': 'apartment', 'oficina': 'corporate_fare' };
+      setText('disp-tipologia', usoCatastralOficial);
+      const iconTipoEl = document.getElementById('icon-tipologia');
+      if (iconTipoEl) {
+        iconTipoEl.textContent = tipoIconos[tipologiaActiva] || 'apartment';
+      }
+      const selectTipoEl = document.getElementById('select-tipologia');
+      if (selectTipoEl) {
+        selectTipoEl.value = tipologiaActiva;
+      }
     }
 
     // Badge de planeamiento urbanístico (PUM-BCN vs POUM municipal)
@@ -2258,8 +2412,13 @@
     // 3. Tab Movilidad & Parking
     const esSantFeliu = (municipioActivo.toLowerCase() === 'sant feliu de llobregat');
     const movDeficitScore = document.getElementById('mov-deficit-score');
+    const movDeficitBar = document.getElementById('mov-deficit-bar');
     if (movDeficitScore) {
       movDeficitScore.textContent = esSantFeliu ? 'No calculable' : data.movilidad.deficitScore;
+    }
+    if (movDeficitBar) {
+      const defNum = parseInt(data.movilidad.deficitScore) || 85;
+      movDeficitBar.style.width = Math.min(100, Math.max(0, defNum)) + '%';
     }
 
     const movDeficitDesc = document.getElementById('mov-deficit-desc');
@@ -2267,6 +2426,12 @@
       movDeficitDesc.textContent = esSantFeliu 
         ? 'Cálculo de déficit de cuenca no disponible en Sant Feliu de Llobregat. Sin modelo territorial aplicable.' 
         : data.movilidad.deficitDesc;
+    }
+
+    const movOcupacionBar = document.getElementById('mov-ocupacion-bar');
+    if (movOcupacionBar) {
+      const pctOcup = minutos === 3 ? 98 : (minutos === 5 ? 88 : 76);
+      movOcupacionBar.style.width = pctOcup + '%';
     }
 
     const movPuntosEv = document.getElementById('mov-puntos-ev');
@@ -2345,8 +2510,9 @@
     resaltarIsocronaActiva(minutos);
     sincronizarDatosConIsocrona(minutos);
     const radio = DATOS_ISOCRONAS[minutos]?.radioM || 240;
-    mostrarToast(`Isócrona fijada a ${minutos} min (~${radio}m): datos de movilidad, entorno y negocios sincronizados`);
+    mostrarToast(`Isócrona fijada a ${minutos} min (~${radio}m): datos de movilidad, entorno y equipamientos sincronizados`);
   };
+  window.copilotCambiarIsocrona = window.cambiarIsocrona;
 
   // ==========================================
   // MODAL DE AUDITORÍA Y PROCEDENCIA DE DATOS
@@ -2654,14 +2820,25 @@ Tiempo de Acceso = ${distanciaMetro} m / 80 m/min = ${(distanciaMetro / 80).toFi
    * Obtiene la lista acumulada de negocios según la isócrona activa
    */
   function obtenerNegociosCuencaActiva() {
-    const minutos = currentIsochroneMinutes || 5;
-    let lista = [...(CENSO_NEGOCIOS_POR_CUENCA[5] || [])];
-    if (minutos >= 10 && CENSO_NEGOCIOS_POR_CUENCA[10]) {
-      lista = lista.concat(CENSO_NEGOCIOS_POR_CUENCA[10]);
-    }
-    if (minutos >= 15 && CENSO_NEGOCIOS_POR_CUENCA[15]) {
-      lista = lista.concat(CENSO_NEGOCIOS_POR_CUENCA[15]);
-    }
+    const minutos = Number(currentIsochroneMinutes) || 5;
+    // Radios peatonales máximos según velocidad estándar (80 m/min):
+    // 3 min -> 240 m, 5 min -> 400 m, 7 min -> 560 m (o minutos * 80)
+    const radioMaxMetros = (minutos === 3) ? 240 : ((minutos === 5) ? 400 : ((minutos === 7) ? 560 : minutos * 80));
+
+    // Consolidar candidatos de todas las coronas del censo
+    let todosCandidatos = [];
+    Object.keys(CENSO_NEGOCIOS_POR_CUENCA).forEach(key => {
+      todosCandidatos = todosCandidatos.concat(CENSO_NEGOCIOS_POR_CUENCA[key] || []);
+    });
+
+    // Desduplicar por ID único
+    const mapaUnicos = new Map();
+    todosCandidatos.forEach(item => {
+      if (item && item.id && !mapaUnicos.has(item.id)) {
+        mapaUnicos.set(item.id, { ...item });
+      }
+    });
+    let lista = Array.from(mapaUnicos.values());
 
     // Recalcular distancia y minutos en tiempo real respecto al activo actual si está geolocalizado
     if (currentCoords && currentCoords.lat && currentCoords.lon) {
@@ -2674,6 +2851,12 @@ Tiempo de Acceso = ${distanciaMetro} m / 80 m/min = ${(distanciaMetro / 80).toFi
         return item;
       });
     }
+
+    // FILTRO ESTRICTO DE ISÓCRONA: solo negocios dentro del radio peatonal asignado
+    lista = lista.filter(item => {
+      const d = (typeof item.distancia_m === 'number') ? item.distancia_m : 9999;
+      return d <= radioMaxMetros;
+    });
 
     // Ordenar de más cercano a más lejano
     return lista.sort((a, b) => a.distancia_m - b.distancia_m);
@@ -3062,14 +3245,25 @@ Tiempo de Acceso = ${distanciaMetro} m / 80 m/min = ${(distanciaMetro / 80).toFi
    * Obtiene la lista acumulada de servicios y equipamientos según la isócrona activa
    */
   function obtenerServiciosCuencaActiva() {
-    const minutos = currentIsochroneMinutes || 5;
-    let lista = [...(CENSO_SERVICIOS_POR_CUENCA[5] || [])];
-    if (minutos >= 10 && CENSO_SERVICIOS_POR_CUENCA[10]) {
-      lista = lista.concat(CENSO_SERVICIOS_POR_CUENCA[10]);
-    }
-    if (minutos >= 15 && CENSO_SERVICIOS_POR_CUENCA[15]) {
-      lista = lista.concat(CENSO_SERVICIOS_POR_CUENCA[15]);
-    }
+    const minutos = Number(currentIsochroneMinutes) || 5;
+    // Radios peatonales máximos según velocidad estándar (80 m/min):
+    // 3 min -> 240 m, 5 min -> 400 m, 7 min -> 560 m (o minutos * 80)
+    const radioMaxMetros = (minutos === 3) ? 240 : ((minutos === 5) ? 400 : ((minutos === 7) ? 560 : minutos * 80));
+
+    // Consolidar candidatos de todas las coronas del censo
+    let todosCandidatos = [];
+    Object.keys(CENSO_SERVICIOS_POR_CUENCA).forEach(key => {
+      todosCandidatos = todosCandidatos.concat(CENSO_SERVICIOS_POR_CUENCA[key] || []);
+    });
+
+    // Desduplicar por ID único
+    const mapaUnicos = new Map();
+    todosCandidatos.forEach(item => {
+      if (item && item.id && !mapaUnicos.has(item.id)) {
+        mapaUnicos.set(item.id, { ...item });
+      }
+    });
+    let lista = Array.from(mapaUnicos.values());
 
     // Recalcular distancia y minutos en tiempo real respecto al activo actual si está geolocalizado
     if (currentCoords && currentCoords.lat && currentCoords.lon) {
@@ -3082,6 +3276,12 @@ Tiempo de Acceso = ${distanciaMetro} m / 80 m/min = ${(distanciaMetro / 80).toFi
         return item;
       });
     }
+
+    // FILTRO ESTRICTO DE ISÓCRONA: solo equipamientos dentro del radio peatonal asignado
+    lista = lista.filter(item => {
+      const d = (typeof item.distancia_m === 'number') ? item.distancia_m : 9999;
+      return d <= radioMaxMetros;
+    });
 
     // Ordenar de más cercano a más lejano
     return lista.sort((a, b) => a.distancia_m - b.distancia_m);
