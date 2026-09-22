@@ -1600,15 +1600,20 @@
     if (mov.puntos_ev) setText('mov-puntos-ev', mov.puntos_ev);
     if (mov.puntos_ev_desc) setText('mov-puntos-ev-desc', mov.puntos_ev_desc);
 
-    const p1 = mov.parking1 || {};
+    const p1 = mov.parking1 || (mov.parkings && mov.parkings[0]) || {};
     if (p1.nombre) setText('mov-p1-nombre', p1.nombre);
     if (p1.desc) setText('mov-p1-desc', p1.desc);
     if (p1.tag) setText('mov-p1-tag', p1.tag);
 
-    const p2 = mov.parking2 || {};
+    const p2 = mov.parking2 || (mov.parkings && mov.parkings[1]) || {};
     if (p2.nombre) setText('mov-p2-nombre', p2.nombre);
     if (p2.desc) setText('mov-p2-desc', p2.desc);
     if (p2.tag) setText('mov-p2-tag', p2.tag);
+
+    const p3 = mov.parking3 || (mov.parkings && mov.parkings[2]) || {};
+    if (p3.nombre) setText('mov-p3-nombre', p3.nombre);
+    if (p3.desc) setText('mov-p3-desc', p3.desc);
+    if (p3.tag) setText('mov-p3-tag', p3.tag);
 
     if (mov.dum_desc) setText('mov-dum-desc', mov.dum_desc);
     if (mov.sensibilidad_lluvia) setText('mov-clima-impacto', mov.sensibilidad_lluvia);
