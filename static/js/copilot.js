@@ -24,6 +24,7 @@
   let map = null;
   let assetLayerGroup = null;
   let isochroneLayerGroup = null;
+  let businessesLayerGroup = null;
   let currentMarker = null;
   let isochroneCircles = {};
   let currentIsochroneMinutes = 3;
@@ -66,6 +67,7 @@
 
     // Grupos de capas vectoriales independientes
     isochroneLayerGroup = L.featureGroup().addTo(map);
+    businessesLayerGroup = L.featureGroup().addTo(map);
     assetLayerGroup = L.featureGroup().addTo(map);
 
     // Marcador inicial por defecto
@@ -160,9 +162,9 @@
     // 1. Polígonos circulares de isócrona peatonal (80 m/min según estándar de movilidad)
     // 3 min = ~240 m | 5 min = ~400 m | 7 min = ~560 m
     const isocronasConfig = [
-      { min: 7, radio: 560, color: '#02362f', fillOpacity: 0.03, dashArray: '6, 8', weight: 1.0 },
-      { min: 5, radio: 400, color: '#b45309', fillOpacity: 0.04, dashArray: '5, 6', weight: 1.2 },
-      { min: 3, radio: 240, color: '#02362f', fillOpacity: 0.08, dashArray: '3, 4', weight: 1.8 }
+      { min: 7, radio: 560, color: '#1e3a8a', label: 'Cuenca Barrial (7 min • ~560 m)', fillOpacity: 0.05, dashArray: '6, 8', weight: 1.2 },
+      { min: 5, radio: 400, color: '#b45309', label: 'Cuenca Proximidad (5 min • ~400 m)', fillOpacity: 0.07, dashArray: '5, 6', weight: 1.5 },
+      { min: 3, radio: 240, color: '#02362f', label: 'Cuenca Inmediata (3 min • ~240 m)', fillOpacity: 0.12, dashArray: '3, 4', weight: 2.2 }
     ];
 
     isocronasConfig.forEach(cfg => {
@@ -175,6 +177,12 @@
         dashArray: cfg.dashArray
       }).addTo(isochroneLayerGroup);
 
+      circle.bindTooltip(`<b>${cfg.label}</b>`, {
+        direction: 'top',
+        opacity: 0.92,
+        sticky: true
+      });
+
       isochroneCircles[cfg.min] = circle;
     });
 
@@ -182,13 +190,17 @@
 
     // 2. Marcador del Activo (British Racing Green institucional)
     currentMarker = L.circleMarker([lat, lon], {
-      radius: 8,
+      radius: 9,
       fillColor: '#02362f',
       color: '#ffffff',
-      weight: 2.5,
+      weight: 3.0,
       opacity: 1,
-      fillOpacity: 0.95
+      fillOpacity: 1.0
     }).addTo(assetLayerGroup);
+
+    // Asegurar que el activo y los negocios siempre queden visualmente por encima de las isócronas
+    if (assetLayerGroup) assetLayerGroup.bringToFront();
+    if (businessesLayerGroup) businessesLayerGroup.bringToFront();
 
     // Popup institucional con información catastral
     const popupContent = `
@@ -213,21 +225,22 @@
    */
   function resaltarIsocronaActiva(minutos) {
     currentIsochroneMinutes = minutos;
+    const coloresPorMinuto = { 3: '#02362f', 5: '#b45309', 7: '#1e3a8a' };
+
     [3, 5, 7].forEach(m => {
       const circle = isochroneCircles[m];
       if (!circle) return;
+      const cColor = coloresPorMinuto[m] || '#02362f';
       if (m === minutos) {
         circle.setStyle({
-          weight: 2.4,
-          fillOpacity: 0.14,
-          color: '#02362f'
+          weight: 2.8,
+          fillOpacity: 0.16,
+          color: cColor,
+          fillColor: cColor
         });
-        if (typeof circle.bringToFront === 'function') {
-          circle.bringToFront();
-        }
         if (map && circle.getBounds) {
           try {
-            map.fitBounds(circle.getBounds(), { padding: [25, 25], maxZoom: 16 });
+            map.fitBounds(circle.getBounds(), { padding: [30, 30], maxZoom: 16 });
           } catch (e) {
             // Silencioso si el contenedor del mapa no tiene dimensiones aún
           }
@@ -235,11 +248,15 @@
       } else {
         circle.setStyle({
           weight: 1.0,
-          fillOpacity: 0.03,
-          color: m === 10 ? '#b45309' : '#02362f'
+          fillOpacity: 0.04,
+          color: cColor,
+          fillColor: cColor
         });
       }
     });
+
+    if (businessesLayerGroup) businessesLayerGroup.bringToFront();
+    if (assetLayerGroup) assetLayerGroup.bringToFront();
   }
 
   // ==========================================
@@ -2961,6 +2978,41 @@ Tiempo de Acceso = ${distanciaMetro} m / 80 m/min = ${(distanciaMetro / 80).toFi
     if (lblVisibles) {
       const nombreCat = categoriaNegociosActiva === 'todas' ? '' : ` de ${categoriaNegociosActiva.toUpperCase()}`;
       lblVisibles.textContent = `Mostrando ${listaFiltrada.length} negocios${nombreCat} en la cuenca de ${minutos} min`;
+    }
+
+    // 4.1. Sincronizar y dibujar marcadores de los comercios en el mapa de Leaflet
+    if (businessesLayerGroup) {
+      businessesLayerGroup.clearLayers();
+      listaFiltrada.forEach(item => {
+        if (!item.lat || !item.lon) return;
+        const colorPin = item.categoria === 'hosteleria' ? '#d97706' :
+                         item.categoria === 'retail' ? '#e11d48' :
+                         item.categoria === 'alimentacion' ? '#059669' :
+                         item.categoria === 'salud' ? '#0d9488' :
+                         item.categoria === 'servicios' ? '#4f46e5' : '#7c3aed';
+
+        const pin = L.circleMarker([item.lat, item.lon], {
+          radius: 5,
+          fillColor: colorPin,
+          color: '#ffffff',
+          weight: 1.5,
+          opacity: 0.95,
+          fillOpacity: 0.85
+        }).addTo(businessesLayerGroup);
+
+        pin.bindTooltip(`
+          <div style="font-family:'Plus Jakarta Sans',sans-serif; font-size:11px;">
+            <b>${item.nombre}</b><br/>
+            <span style="color:#666; font-size:10px;">${item.categoriaNombre} • ${item.distancia_m} m (~${item.minutos})</span>
+          </div>
+        `, { direction: 'top', opacity: 0.92 });
+
+        pin.on('click', () => {
+          window.ubicarNegocioPorId(item.id);
+        });
+      });
+      businessesLayerGroup.bringToFront();
+      if (assetLayerGroup) assetLayerGroup.bringToFront();
     }
 
     // 5. Renderizar tarjetas dinámicas en el contenedor
