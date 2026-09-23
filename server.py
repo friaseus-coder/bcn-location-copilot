@@ -1,4 +1,4 @@
- """
+"""
 BCN Location Intelligence & Underwriting Copilot (v3.0)
 FastAPI Backend Server & Spatial Underwriting Engine
 """
@@ -1891,7 +1891,7 @@ def clasificar_negocio_osm(tags: Dict[str, str]) -> Tuple[str, str, str]:
 async def consultar_negocios_osm_en_vivo(lat: float, lon: float, radio_m: int = 400) -> List[Dict[str, Any]]:
     """Consulta en vivo comercios y equipamientos reales vía Overpass API con resiliencia y caché."""
     cache_key = (round(lat, 3), round(lon, 3), radio_m)
-    if cache_key in OSM_BUSINESS_CACHE:
+    if cache_key in OSM_BUSINESS_CACHE and OSM_BUSINESS_CACHE[cache_key]:
         return OSM_BUSINESS_CACHE[cache_key]
 
     overpass_query = f"""[out:json][timeout:10];
@@ -1909,15 +1909,15 @@ out center 120;
     }
     mirrors = [
         "https://z.overpass-api.de/api/interpreter",
-        "https://lz4.overpass-api.de/api/interpreter",
         "https://overpass-api.de/api/interpreter",
+        "https://lz4.overpass-api.de/api/interpreter",
         "https://overpass.kumi.systems/api/interpreter"
     ]
 
     elements = []
     for ep in mirrors:
         try:
-            async with httpx.AsyncClient(timeout=4.0) as client:
+            async with httpx.AsyncClient(timeout=4.5) as client:
                 resp = await client.post(ep, data={"data": overpass_query}, headers=headers)
                 if resp.status_code == 200:
                     data = resp.json()
@@ -1971,7 +1971,8 @@ out center 120;
         idx += 1
 
     negocios.sort(key=lambda x: x["distancia_m"])
-    OSM_BUSINESS_CACHE[cache_key] = negocios
+    if negocios:
+        OSM_BUSINESS_CACHE[cache_key] = negocios
     return negocios
 
 @app.get("/api/negocios-cercanos")
