@@ -33,6 +33,7 @@
   let currentCoords = { lat: 41.3888, lon: 2.1590 };
   let municipioActivo = 'Barcelona';
   let negociosEnMemoria = [];
+  let serviciosEnMemoria = [];
 
   // Formateadores numéricos institucional es-ES
   const formatEuro = new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 });
@@ -1119,6 +1120,9 @@
     }
     if (data.negocios_cercanos && Array.isArray(data.negocios_cercanos)) {
       negociosEnMemoria = data.negocios_cercanos;
+    }
+    if (data.servicios_cercanos && Array.isArray(data.servicios_cercanos)) {
+      serviciosEnMemoria = data.servicios_cercanos;
     }
     const finanzas = data.finanzas || {};
     const entorno = data.entorno || {};
@@ -2550,12 +2554,16 @@
     const radio = DATOS_ISOCRONAS[minutos]?.radioM || (minutos * 80);
     mostrarToast(`Isócrona fijada a ${minutos} min (~${radio}m): datos de movilidad, entorno y equipamientos sincronizados`);
 
-    // Sincronización dinámica de comercios en vivo para cuencas ampliadas (>5 min)
+    // Sincronización dinámica de comercios y servicios en vivo para cuencas ampliadas (>5 min)
     if (currentCoords && currentCoords.lat && currentCoords.lon && minutos > 5) {
       try {
-        const resp = await fetch(`${API_BASE_URL}/api/negocios-cercanos?lat=${currentCoords.lat}&lon=${currentCoords.lon}&minutos=${minutos}`);
-        if (resp.ok) {
-          const resJson = await resp.json();
+        const [respNeg, respServ] = await Promise.all([
+          fetch(`${API_BASE_URL}/api/negocios-cercanos?lat=${currentCoords.lat}&lon=${currentCoords.lon}&minutos=${minutos}`),
+          fetch(`${API_BASE_URL}/api/servicios-cercanos?lat=${currentCoords.lat}&lon=${currentCoords.lon}&minutos=${minutos}`)
+        ]);
+
+        if (respNeg.ok) {
+          const resJson = await respNeg.json();
           if (resJson && resJson.negocios && resJson.negocios.length > 0) {
             negociosEnMemoria = resJson.negocios;
             if (typeof window.renderizarNegocios === 'function') {
@@ -2563,8 +2571,17 @@
             }
           }
         }
+        if (respServ.ok) {
+          const resServJson = await respServ.json();
+          if (resServJson && resServJson.servicios && resServJson.servicios.length > 0) {
+            serviciosEnMemoria = resServJson.servicios;
+            if (typeof window.renderizarServicios === 'function') {
+              window.renderizarServicios();
+            }
+          }
+        }
       } catch (err) {
-        console.debug('Aviso consultando negocios para isócrona extendida:', err);
+        console.debug('Aviso consultando negocios o servicios para isócrona extendida:', err);
       }
     }
   };
@@ -3346,20 +3363,25 @@ Tiempo de Acceso = ${distanciaMetro} m / 80 m/min = ${(distanciaMetro / 80).toFi
     // 3 min -> 240 m, 5 min -> 400 m, 7 min -> 560 m (o minutos * 80)
     const radioMaxMetros = (minutos === 3) ? 240 : ((minutos === 5) ? 400 : ((minutos === 7) ? 560 : minutos * 80));
 
-    // Consolidar candidatos de todas las coronas del censo
-    let todosCandidatos = [];
-    Object.keys(CENSO_SERVICIOS_POR_CUENCA).forEach(key => {
-      todosCandidatos = todosCandidatos.concat(CENSO_SERVICIOS_POR_CUENCA[key] || []);
-    });
+    let lista = [];
+    if (typeof serviciosEnMemoria !== 'undefined' && Array.isArray(serviciosEnMemoria) && serviciosEnMemoria.length > 0) {
+      lista = serviciosEnMemoria.map(item => ({ ...item }));
+    } else {
+      // Consolidar candidatos de todas las coronas del censo
+      let todosCandidatos = [];
+      Object.keys(CENSO_SERVICIOS_POR_CUENCA).forEach(key => {
+        todosCandidatos = todosCandidatos.concat(CENSO_SERVICIOS_POR_CUENCA[key] || []);
+      });
 
-    // Desduplicar por ID único
-    const mapaUnicos = new Map();
-    todosCandidatos.forEach(item => {
-      if (item && item.id && !mapaUnicos.has(item.id)) {
-        mapaUnicos.set(item.id, { ...item });
-      }
-    });
-    let lista = Array.from(mapaUnicos.values());
+      // Desduplicar por ID único
+      const mapaUnicos = new Map();
+      todosCandidatos.forEach(item => {
+        if (item && item.id && !mapaUnicos.has(item.id)) {
+          mapaUnicos.set(item.id, { ...item });
+        }
+      });
+      lista = Array.from(mapaUnicos.values());
+    }
 
     // Recalcular distancia y minutos en tiempo real respecto al activo actual si está geolocalizado
     if (currentCoords && currentCoords.lat && currentCoords.lon) {
@@ -3393,8 +3415,8 @@ Tiempo de Acceso = ${distanciaMetro} m / 80 m/min = ${(distanciaMetro / 80).toFi
     const minutos = currentIsochroneMinutes || 5;
 
     // 0. VERIFICACIÓN DE DISPONIBILIDAD DE DATOS POR MUNICIPIO
-    // Si la ubicación es fuera de Barcelona o no hay datos dotacionales abiertos
-    if (municipioActivo.toLowerCase() !== 'barcelona') {
+    // Si la ubicación es fuera de Barcelona y no tenemos datos dotacionales en vivo
+    if (municipioActivo.toLowerCase() !== 'barcelona' && (!serviciosEnMemoria || serviciosEnMemoria.length === 0)) {
       setText('cnt-serv-educacion', 0);
       setText('cnt-serv-salud', 0);
       setText('cnt-serv-parking', 0);

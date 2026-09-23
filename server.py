@@ -1289,6 +1289,16 @@ async def analizar_activo(
         else:
             conteo_negocios["retail"] += 1
 
+    # Consulta de equipamientos y dotaciones públicas en vivo (OpenStreetMap / Overpass)
+    servicios_vivos = await consultar_servicios_osm_en_vivo(lat, lon, radio_m=400)
+    conteo_servicios = {"educacion": 0, "salud": 0, "parking": 0, "zonas_verdes": 0, "culto": 0, "civicos": 0}
+    for s in servicios_vivos:
+        c = s.get("categoria", "civicos")
+        if c in conteo_servicios:
+            conteo_servicios[c] += 1
+        else:
+            conteo_servicios["civicos"] += 1
+
     return JSONResponse(content={
         "status": "success",
         "activo": {
@@ -1328,7 +1338,9 @@ async def analizar_activo(
         "tiene_negocios": True,
         "tiene_servicios": True,
         "negocios_cercanos": negocios_vivos,
-        "conteo_negocios": conteo_negocios
+        "conteo_negocios": conteo_negocios,
+        "servicios_cercanos": servicios_vivos,
+        "conteo_servicios": conteo_servicios
     })
 
 # ==============================================================================
@@ -2007,6 +2019,243 @@ async def endpoint_negocios_cercanos(
         "conteos": conteo,
         "negocios": negocios
     })
+
+# ==============================================================================
+# MOTOR DE EQUIPAMIENTOS Y SERVICIOS URBANOS EN VIVO (OPENSTREETMAP / OVERPASS)
+# ==============================================================================
+
+OSM_SERVICES_CACHE: Dict[Tuple[float, float, int], List[Dict[str, Any]]] = {}
+
+def clasificar_servicio_osm(tags: Dict[str, str]) -> Tuple[str, str, str, str]:
+    """
+    Clasifica un equipamiento o servicio de OpenStreetMap en las 6 categorías dotacionales:
+    1. educacion
+    2. salud
+    3. parking
+    4. zonas_verdes
+    5. culto
+    6. civicos
+    Retorna: (categoria, categoriaNombre, subtipo, titularidad)
+    """
+    amenity = tags.get("amenity", "").lower()
+    leisure = tags.get("leisure", "").lower()
+    tourism = tags.get("tourism", "").lower()
+    name = tags.get("name", "").strip()
+
+    # 1. Educación
+    if amenity in ["school", "kindergarten", "college", "university", "music_school", "language_school"]:
+        subtipos = {
+            "kindergarten": "Escuela Infantil y Guardería (0-3 años)",
+            "school": "Centro de Educación Primaria / Secundaria (CEIP / IES)",
+            "college": "Colegio Mayor / Centro de Formación Profesional",
+            "university": "Campus y Facultad Universitaria",
+            "music_school": "Conservatorio y Escuela de Música",
+            "language_school": "Escuela Oficial de Idiomas / Formación"
+        }
+        tit = "Pública Municipal" if amenity == "kindergarten" else ("Pública (Generalitat / Consorci)" if "privat" not in name.lower() and "concertad" not in name.lower() else "Concertada / Privada")
+        return "educacion", "Educación & Enseñanza", subtipos.get(amenity, "Centro Educativo"), tit
+
+    # 2. Salud
+    if amenity in ["hospital", "clinic", "doctors", "dentist", "pharmacy"]:
+        subtipos = {
+            "hospital": "Hospital de Alta Complejidad / Especialidades",
+            "clinic": "Centro de Atención Primaria (CAP / CUAP)",
+            "doctors": "Consultorio Sanitario Territorial",
+            "dentist": "Clínica Dental y Salud Bucodental",
+            "pharmacy": "Oficina de Farmacia Comunitaria"
+        }
+        tit = "Pública (CatSalut / ICS)" if amenity in ["hospital", "clinic", "doctors"] else "Servicio Sanitario Colegiado"
+        return "salud", "Salud & Centros Médicos", subtipos.get(amenity, "Equipamiento Sanitario"), tit
+
+    # 3. Aparcamientos Públicos
+    if amenity in ["parking", "parking_entrance", "bicycle_parking"]:
+        subtipos = {
+            "parking": "Aparcamiento Público Subterráneo / Superficie",
+            "parking_entrance": "Acceso a Aparcamiento Rotacional",
+            "bicycle_parking": "Aparcamiento Intermodal de Bicicletas"
+        }
+        return "parking", "Aparcamiento Público", subtipos.get(amenity, "Parking Público"), "Pública / Concesión Municipal"
+
+    # 4. Parques y Zonas Verdes
+    if leisure in ["park", "garden", "playground", "pitch"] or tags.get("landuse") in ["grass", "village_green", "recreation_ground"]:
+        subtipos = {
+            "park": "Parque Urbano Arbolado",
+            "garden": "Jardines Públicos de Proximidad",
+            "playground": "Área Recreativa y Juegos Infantiles",
+            "pitch": "Zona Deportiva y Recreativa al Aire Libre"
+        }
+        return "zonas_verdes", "Parques & Zonas Verdes", subtipos.get(leisure, "Espacio Verde Urbano"), "Pública Municipal"
+
+    # 5. Centros Religiosos y Culto
+    if amenity == "place_of_worship":
+        return "culto", "Centros Religiosos & Culto", "Templo Parroquial & Espacio Comunitario", "Diócesis / Arzobispado"
+
+    # 6. Equipamientos Cívicos, Cultura y Seguridad
+    subtipos_civ = {
+        "library": "Biblioteca Pública Municipal",
+        "community_centre": "Centro Cívico y Espacio Cultural",
+        "police": "Comisaría de Seguridad Ciudadana",
+        "fire_station": "Parque de Bomberos y Emergencias",
+        "townhall": "Casa Consistorial / Sede Municipal",
+        "courthouse": "Juzgados y Administración de Justicia",
+        "post_office": "Oficina Postal y Logística de Proximidad"
+    }
+    if amenity in subtipos_civ:
+        tit = "Pública (Mossos / Guàrdia Urbana)" if amenity == "police" else "Pública Municipal"
+        return "civicos", "Equipamientos Cívicos & Seguridad", subtipos_civ[amenity], tit
+
+    if tourism in ["museum", "gallery", "artwork"]:
+        return "civicos", "Cultura & Museos", "Espacio Expositivo y Patrimonio Cultural", "Pública / Consorcio Cultural"
+
+    if leisure in ["sports_centre", "swimming_pool"]:
+        return "civicos", "Instalaciones Deportivas", "Polideportivo Municipal y Piscinas", "Pública (Institut Barcelona Esports)"
+
+    return "civicos", "Equipamiento Dotacional", "Servicio Público Cívico", "Administración Pública"
+
+async def consultar_servicios_osm_en_vivo(lat: float, lon: float, radio_m: int = 400) -> List[Dict[str, Any]]:
+    """Consulta en vivo equipamientos y dotaciones públicas vía Overpass API con resiliencia y caché."""
+    cache_key = (round(lat, 3), round(lon, 3), radio_m)
+    if cache_key in OSM_SERVICES_CACHE and OSM_SERVICES_CACHE[cache_key]:
+        return OSM_SERVICES_CACHE[cache_key]
+
+    overpass_query = f"""[out:json][timeout:10];
+(
+  node["amenity"~"school|kindergarten|college|university|music_school|language_school|hospital|clinic|doctors|dentist|pharmacy|parking|parking_entrance|bicycle_parking|place_of_worship|library|community_centre|police|fire_station|townhall|courthouse|post_office"](around:{radio_m},{lat},{lon});
+  node["leisure"~"park|garden|playground|pitch|sports_centre|swimming_pool"](around:{radio_m},{lat},{lon});
+  node["tourism"~"museum|gallery"](around:{radio_m},{lat},{lon});
+);
+out center 100;
+"""
+    headers = {
+        "User-Agent": "BCNLocationCopilot/3.0 (underwriting@bcncopilot.local)",
+        "Accept": "application/json"
+    }
+    mirrors = [
+        "https://z.overpass-api.de/api/interpreter",
+        "https://overpass-api.de/api/interpreter",
+        "https://lz4.overpass-api.de/api/interpreter",
+        "https://overpass.kumi.systems/api/interpreter"
+    ]
+
+    elements = []
+    for ep in mirrors:
+        try:
+            async with httpx.AsyncClient(timeout=4.5) as client:
+                resp = await client.post(ep, data={"data": overpass_query}, headers=headers)
+                if resp.status_code == 200:
+                    data = resp.json()
+                    elements = data.get("elements", [])
+                    if elements:
+                        break
+        except Exception:
+            continue
+
+    servicios = []
+    nombres_vistos = set()
+    idx = 1
+    for el in elements:
+        tags = el.get("tags", {})
+        nombre = tags.get("name", "").strip()
+        amenity = tags.get("amenity", "")
+        leisure = tags.get("leisure", "")
+        tourism = tags.get("tourism", "")
+
+        cat_id, cat_nom, subtipo_desc, tit = clasificar_servicio_osm(tags)
+
+        # Si no tiene nombre específico, generar nombre descriptivo
+        if not nombre:
+            if amenity == "parking":
+                nombre = f"Aparcamiento Público ({tags.get('access', 'Rotacional').title()})"
+            elif amenity == "parking_entrance":
+                nombre = "Acceso a Parking Subterráneo"
+            elif amenity == "bicycle_parking":
+                nombre = "Punto de Estacionamiento de Bicicletas"
+            elif amenity == "pharmacy":
+                nombre = "Oficina de Farmacia"
+            elif leisure == "playground":
+                nombre = "Área de Juegos Infantiles"
+            elif leisure == "garden":
+                nombre = "Jardín Urbano Público"
+            elif leisure == "park":
+                nombre = "Parque Urbano"
+            else:
+                nombre = subtipo_desc
+
+        clave_unica = (nombre.lower(), cat_id)
+        if clave_unica in nombres_vistos:
+            continue
+        nombres_vistos.add(clave_unica)
+
+        el_lat = float(el.get("lat") or el.get("center", {}).get("lat", lat))
+        el_lon = float(el.get("lon") or el.get("center", {}).get("lon", lon))
+        dist_m = max(15, round(calcular_distancia_metros(lat, lon, el_lat, el_lon)))
+        if dist_m > radio_m + 50:
+            continue
+
+        mins_val = max(0.5, round(dist_m / 80.0, 1))
+        mins_str = f"{str(mins_val).replace('.', ',')} min"
+
+        calle_s = tags.get("addr:street", "").strip()
+        num_s = tags.get("addr:housenumber", "").strip()
+        if calle_s:
+            dir_str = f"{calle_s}, {num_s}".strip(", ")
+        else:
+            dir_str = f"Inmediaciones ({dist_m} m a pie)"
+
+        servicios.append({
+            "id": f"serv-osm-{idx}",
+            "nombre": nombre,
+            "direccion": dir_str,
+            "categoria": cat_id,
+            "categoriaNombre": cat_nom,
+            "subtipo": subtipo_desc,
+            "titularidad": tit,
+            "distancia_m": dist_m,
+            "minutos": mins_str,
+            "lat": el_lat,
+            "lon": el_lon,
+            "fuente": "OpenStreetMap en vivo (Overpass API)"
+        })
+        idx += 1
+
+    servicios.sort(key=lambda x: x["distancia_m"])
+    if servicios:
+        OSM_SERVICES_CACHE[cache_key] = servicios
+    return servicios
+
+@app.get("/api/servicios-cercanos")
+async def endpoint_servicios_cercanos(
+    lat: float = Query(...),
+    lon: float = Query(...),
+    radio: Optional[int] = Query(None),
+    minutos: Optional[int] = Query(None)
+):
+    """Endpoint REST para recuperar equipamientos y servicios públicos reales en la cuenca peatonal solicitada."""
+    if radio is None:
+        mins = minutos or 5
+        radio_map = {3: 240, 5: 400, 7: 560, 10: 800}
+        radio = radio_map.get(mins, mins * 80)
+
+    servicios = await consultar_servicios_osm_en_vivo(lat, lon, radio_m=radio)
+    conteo = {"educacion": 0, "salud": 0, "parking": 0, "zonas_verdes": 0, "culto": 0, "civicos": 0}
+    for s in servicios:
+        c = s.get("categoria", "civicos")
+        if c in conteo:
+            conteo[c] += 1
+        else:
+            conteo["civicos"] += 1
+
+    return JSONResponse(content={
+        "status": "success",
+        "lat": lat,
+        "lon": lon,
+        "radio_m": radio,
+        "total": len(servicios),
+        "conteo": conteo,
+        "conteos": conteo,
+        "servicios": servicios
+    })
+
 
 CATALOGO_PARKINGS = [
     # Eixample Esquerra / Urgell / Hospital Clínic / Sants
