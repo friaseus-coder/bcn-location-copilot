@@ -32,6 +32,7 @@
   let ultimoAnalisisTimestamp = 0;
   let currentCoords = { lat: 41.3888, lon: 2.1590 };
   let municipioActivo = 'Barcelona';
+  let negociosEnMemoria = [];
 
   // Formateadores numéricos institucional es-ES
   const formatEuro = new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 });
@@ -1019,9 +1020,12 @@
     const inputPisoEl = document.getElementById('input-piso');
     const piso = inputPisoEl?.value.trim() || '';
     
-    // Obtener la tipología asociada a la entidad seleccionada en Catastro o fallback
+    // Obtener la tipología y referencia catastral asociada a la entidad seleccionada en Catastro o fallback
     const optPisoSeleccionada = inputPisoEl?.selectedOptions?.[0];
     const tipologia = optPisoSeleccionada?.dataset?.tipologia || document.getElementById('select-tipologia')?.value || 'residencial';
+    const rc = optPisoSeleccionada?.dataset?.rc || '';
+    const inputSup = document.getElementById('input-superficie')?.value;
+    const superficieManual = inputSup ? parseFloat(inputSup) : null;
     const precio = parseFloat(document.getElementById('input-precio')?.value) || 320000;
     const fachada = document.getElementById('select-fachada')?.value || 'chaflan';
     const humos = document.getElementById('check-humos')?.checked || false;
@@ -1068,6 +1072,12 @@
         humos: humos ? 'true' : 'false',
         conservacion: conservacion
       });
+      if (rc) {
+        params.append('rc', rc);
+      }
+      if (superficieManual && !isNaN(superficieManual)) {
+        params.append('superficie', superficieManual.toString());
+      }
 
       const response = await fetch(`${API_BASE_URL}/api/analizar?${params.toString()}`);
       
@@ -1104,6 +1114,12 @@
 
     const activo = data.activo || {};
     municipioActivo = (activo.municipio || document.getElementById('select-municipio')?.value || 'Barcelona').trim();
+    if (activo.lat && activo.lon) {
+      currentCoords = { lat: parseFloat(activo.lat), lon: parseFloat(activo.lon) };
+    }
+    if (data.negocios_cercanos && Array.isArray(data.negocios_cercanos)) {
+      negociosEnMemoria = data.negocios_cercanos;
+    }
     const finanzas = data.finanzas || {};
     const entorno = data.entorno || {};
     const ocr = entorno.ocr || {};
@@ -2527,12 +2543,30 @@
   }
 
   // Asignar función global para el cambio de isócrona conectado
-  window.cambiarIsocrona = function (minutos) {
+  window.cambiarIsocrona = async function (minutos) {
     actualizarEstiloBotonesIsocrona(minutos);
     resaltarIsocronaActiva(minutos);
     sincronizarDatosConIsocrona(minutos);
-    const radio = DATOS_ISOCRONAS[minutos]?.radioM || 240;
+    const radio = DATOS_ISOCRONAS[minutos]?.radioM || (minutos * 80);
     mostrarToast(`Isócrona fijada a ${minutos} min (~${radio}m): datos de movilidad, entorno y equipamientos sincronizados`);
+
+    // Sincronización dinámica de comercios en vivo para cuencas ampliadas (>5 min)
+    if (currentCoords && currentCoords.lat && currentCoords.lon && minutos > 5) {
+      try {
+        const resp = await fetch(`${API_BASE_URL}/api/negocios-cercanos?lat=${currentCoords.lat}&lon=${currentCoords.lon}&minutos=${minutos}`);
+        if (resp.ok) {
+          const resJson = await resp.json();
+          if (resJson && resJson.negocios && resJson.negocios.length > 0) {
+            negociosEnMemoria = resJson.negocios;
+            if (typeof window.renderizarNegocios === 'function') {
+              window.renderizarNegocios();
+            }
+          }
+        }
+      } catch (err) {
+        console.debug('Aviso consultando negocios para isócrona extendida:', err);
+      }
+    }
   };
   window.copilotCambiarIsocrona = window.cambiarIsocrona;
 
@@ -2847,20 +2881,25 @@ Tiempo de Acceso = ${distanciaMetro} m / 80 m/min = ${(distanciaMetro / 80).toFi
     // 3 min -> 240 m, 5 min -> 400 m, 7 min -> 560 m (o minutos * 80)
     const radioMaxMetros = (minutos === 3) ? 240 : ((minutos === 5) ? 400 : ((minutos === 7) ? 560 : minutos * 80));
 
-    // Consolidar candidatos de todas las coronas del censo
-    let todosCandidatos = [];
-    Object.keys(CENSO_NEGOCIOS_POR_CUENCA).forEach(key => {
-      todosCandidatos = todosCandidatos.concat(CENSO_NEGOCIOS_POR_CUENCA[key] || []);
-    });
+    let lista = [];
+    if (negociosEnMemoria && negociosEnMemoria.length > 0) {
+      lista = negociosEnMemoria.map(item => ({ ...item }));
+    } else {
+      // Consolidar candidatos de todas las coronas del censo de respaldo
+      let todosCandidatos = [];
+      Object.keys(CENSO_NEGOCIOS_POR_CUENCA).forEach(key => {
+        todosCandidatos = todosCandidatos.concat(CENSO_NEGOCIOS_POR_CUENCA[key] || []);
+      });
 
-    // Desduplicar por ID único
-    const mapaUnicos = new Map();
-    todosCandidatos.forEach(item => {
-      if (item && item.id && !mapaUnicos.has(item.id)) {
-        mapaUnicos.set(item.id, { ...item });
-      }
-    });
-    let lista = Array.from(mapaUnicos.values());
+      // Desduplicar por ID único
+      const mapaUnicos = new Map();
+      todosCandidatos.forEach(item => {
+        if (item && item.id && !mapaUnicos.has(item.id)) {
+          mapaUnicos.set(item.id, { ...item });
+        }
+      });
+      lista = Array.from(mapaUnicos.values());
+    }
 
     // Recalcular distancia y minutos en tiempo real respecto al activo actual si está geolocalizado
     if (currentCoords && currentCoords.lat && currentCoords.lon) {
@@ -2894,8 +2933,8 @@ Tiempo de Acceso = ${distanciaMetro} m / 80 m/min = ${(distanciaMetro / 80).toFi
     const minutos = currentIsochroneMinutes || 5;
 
     // 0. VERIFICACIÓN DE DISPONIBILIDAD DE DATOS POR MUNICIPIO
-    // Si la ubicación es fuera de Barcelona o no hay datos censales abiertos
-    if (municipioActivo.toLowerCase() !== 'barcelona') {
+    // Si la ubicación es fuera de Barcelona y no se han obtenido datos censales abiertos en vivo
+    if (municipioActivo.toLowerCase() !== 'barcelona' && (!negociosEnMemoria || negociosEnMemoria.length === 0)) {
       setText('cnt-neg-hosteleria', 0);
       setText('cnt-neg-retail', 0);
       setText('cnt-neg-alimentacion', 0);
@@ -3142,7 +3181,7 @@ Tiempo de Acceso = ${distanciaMetro} m / 80 m/min = ${(distanciaMetro / 80).toFi
     });
 
     // Actualizar botones de filtro rápido
-    const botones = ['todas', 'hosteleria', 'retail', 'alimentacion', 'salud', 'servicios'];
+    const botones = ['todas', 'hosteleria', 'retail', 'alimentacion', 'salud', 'servicios', 'especializados'];
     botones.forEach(b => {
       const btn = document.getElementById('btn-filtro-' + b);
       if (btn) {
